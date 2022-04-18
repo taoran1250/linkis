@@ -39,10 +39,11 @@ import org.apache.linkis.engineconn.core.executor.ExecutorManager
 import org.apache.linkis.engineconn.executor.entity.ResourceFetchExecutor
 import org.apache.linkis.engineconn.executor.listener.ExecutorListenerBusContext
 import org.apache.linkis.engineconn.executor.listener.event.EngineConnSyncEvent
+import org.apache.linkis.governance.common.constant.job.JobRequestConstants
 import org.apache.linkis.governance.common.entity.ExecutionNodeStatus
 import org.apache.linkis.governance.common.exception.engineconn.{EngineConnExecutorErrorCode, EngineConnExecutorErrorException}
 import org.apache.linkis.governance.common.protocol.task._
-import org.apache.linkis.governance.common.utils.JobUtils
+import org.apache.linkis.governance.common.utils.{JobUtils, SkywalkingTraceUtil}
 import org.apache.linkis.manager.common.entity.enumeration.NodeStatus
 import org.apache.linkis.manager.common.protocol.resource.ResponseTaskYarnResource
 import org.apache.linkis.manager.label.entity.Label
@@ -52,6 +53,7 @@ import org.apache.linkis.rpc.message.annotation.Receiver
 import org.apache.linkis.rpc.utils.RPCUtils
 import org.apache.linkis.scheduler.executer.{ErrorExecuteResponse, ExecuteResponse, IncompleteExecuteResponse, SubmitResponse}
 import org.apache.linkis.server.BDPJettyServerHelper
+import org.apache.skywalking.apm.toolkit.trace.Trace
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -107,11 +109,14 @@ class TaskExecutionServiceImpl extends TaskExecutionService with Logging with Re
     }
   }
 
+  @Trace
   @Receiver
   override def execute(requestTask: RequestTask, sender: Sender): ExecuteResponse = {
-
-    // check lock
-    info("Received a new task, task content is " + requestTask)
+    val paramMap = requestTask.getProperties
+    val jobId = JobUtils.getJobIdFromMap(paramMap)
+    info(s"Received a new task with id : ${jobId}, task content is " + requestTask)
+    SkywalkingTraceUtil.addTagForActiveSpan(paramMap, JobRequestConstants.JOB_ID)
+    SkywalkingTraceUtil.addTagForActiveSpan(paramMap, JobRequestConstants.EXEC_ID)
     if (StringUtils.isBlank(requestTask.getLock)) {
       error(s"Invalid lock : ${requestTask.getLock} , requestTask : " + requestTask)
       return ErrorExecuteResponse(s"Invalid lock : ${requestTask.getLock}.", new EngineConnExecutorErrorException(EngineConnExecutorErrorCode.INVALID_PARAMS, "Invalid lock or code(请获取到锁后再提交任务.)"))
@@ -131,7 +136,6 @@ class TaskExecutionServiceImpl extends TaskExecutionService with Logging with Re
       if (null != retry) retry.asInstanceOf[Boolean]
       else false
     }
-    val jobId = JobUtils.getJobIdFromMap(requestTask.getProperties)
     if (StringUtils.isNotBlank(jobId)) {
       System.getProperties().put(ComputationExecutorConf.JOB_ID_TO_ENV_KEY, jobId)
       logger.info(s"Received job with id ${jobId}.")

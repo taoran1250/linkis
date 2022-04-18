@@ -20,8 +20,10 @@ package org.apache.linkis.orchestrator.ecm.service.impl
 import org.apache.linkis.common.ServiceInstance
 import org.apache.linkis.common.utils.Utils
 import org.apache.linkis.governance.common.conf.GovernanceCommonConf
+import org.apache.linkis.governance.common.constant.job.JobRequestConstants
 import org.apache.linkis.governance.common.entity.ExecutionNodeStatus
 import org.apache.linkis.governance.common.protocol.task.{RequestTask, RequestTaskKill, RequestTaskStatus, ResponseTaskStatus}
+import org.apache.linkis.governance.common.utils.SkywalkingTraceUtil
 import org.apache.linkis.manager.common.entity.node.EngineNode
 import org.apache.linkis.manager.common.protocol.RequestManagerUnlock
 import org.apache.linkis.orchestrator.ecm.conf.ECMPluginConf
@@ -30,6 +32,7 @@ import org.apache.linkis.orchestrator.ecm.service.AbstractEngineConnExecutor
 import org.apache.linkis.orchestrator.ecm.utils.ECMPUtils
 import org.apache.linkis.rpc.Sender
 import org.apache.linkis.scheduler.executer._
+import org.apache.skywalking.apm.toolkit.trace.{ActiveSpan, Trace}
 
 
 /**
@@ -67,10 +70,14 @@ class ComputationEngineConnExecutor(engineNode: EngineNode) extends AbstractEngi
     }
   }
 
+  @Trace
   override def execute(requestTask: RequestTask): ExecuteResponse = {
     debug(s"Start to submit task${requestTask.getSourceID()} to engineConn($getServiceInstance)")
     requestTask.setLabels(ECMPUtils.filterJobStrategyLabel(requestTask.getLabels))
     requestTask.setLock(this.locker)
+    SkywalkingTraceUtil.addTagForActiveSpan(requestTask.getProperties, JobRequestConstants.JOB_ID)
+    SkywalkingTraceUtil.addTagForActiveSpan(requestTask.getProperties, JobRequestConstants.EXEC_ID)
+    SkywalkingTraceUtil.addTagForActiveSpan(requestTask.getProperties, JobRequestConstants.ORCHESTRATOR_CODEEXECTASK_ID)
     getEngineConnSender.ask(requestTask) match {
       case submitResponse: SubmitResponse =>
         info(s"Succeed to submit task${requestTask.getSourceID()} to engineConn($getServiceInstance), Get asyncResponse execID is ${submitResponse}")

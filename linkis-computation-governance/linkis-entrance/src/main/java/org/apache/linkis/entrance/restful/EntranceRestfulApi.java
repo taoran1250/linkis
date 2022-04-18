@@ -26,7 +26,9 @@ import org.apache.linkis.entrance.log.LogReader;
 import org.apache.linkis.entrance.utils.JobHistoryHelper;
 import org.apache.linkis.entrance.utils.RGBUtils;
 import org.apache.linkis.entrance.vo.YarnResourceWithStatusVo;
+import org.apache.linkis.governance.common.constant.job.JobRequestConstants;
 import org.apache.linkis.governance.common.entity.job.JobRequest;
+import org.apache.linkis.governance.common.utils.SkywalkingTraceUtil;
 import org.apache.linkis.manager.common.protocol.resource.ResourceWithStatus;
 import org.apache.linkis.protocol.constants.TaskConstant;
 import org.apache.linkis.protocol.engine.JobProgressInfo;
@@ -42,6 +44,8 @@ import org.apache.linkis.server.utils.ModuleUserUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
+import org.apache.skywalking.apm.toolkit.trace.ActiveSpan;
+import org.apache.skywalking.apm.toolkit.trace.Trace;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,6 +78,7 @@ public class EntranceRestfulApi implements EntranceRestfulRemote {
      * key-value pair(传入的键值对) Repsonse
      */
     @Override
+    @Trace
     @RequestMapping(path = "/execute", method = RequestMethod.POST)
     public Message execute(HttpServletRequest req, @RequestBody Map<String, Object> json) {
         Message message = null;
@@ -122,11 +127,15 @@ public class EntranceRestfulApi implements EntranceRestfulRemote {
         message.setMethod("/api/entrance/execute");
         message.data("execID", execID);
         message.data("taskID", jobReqId);
+        json.put(JobRequestConstants.JOB_ID(), String.valueOf(jobReqId));
+        json.put(JobRequestConstants.EXEC_ID(), execID);
+        addTagForTrace(json);
         logger.info("End to get an an execID: {}, taskID: {}", execID, jobReqId);
         return message;
     }
 
     @Override
+    @Trace
     @RequestMapping(path = "/submit", method = RequestMethod.POST)
     public Message submit(HttpServletRequest req, @RequestBody Map<String, Object> json) {
         Message message = null;
@@ -174,12 +183,22 @@ public class EntranceRestfulApi implements EntranceRestfulRemote {
         message.setMethod("/api/entrance/submit");
         message.data("execID", execID);
         message.data("taskID", jobReqId);
+        json.put(JobRequestConstants.JOB_ID(), String.valueOf(jobReqId));
+        json.put(JobRequestConstants.EXEC_ID(), execID);
+        addTagForTrace(json);
         logger.info("End to get an an execID: {}, taskID: {}", execID, jobReqId);
         return message;
     }
 
     private void pushLog(String log, Job job) {
         entranceServer.getEntranceContext().getOrCreateLogManager().onLogUpdate(job, log);
+    }
+
+    private void addTagForTrace(Map<String, Object> map) {
+        SkywalkingTraceUtil.addTagForActiveSpan(map, JobRequestConstants.JOB_ID());
+        SkywalkingTraceUtil.addTagForActiveSpan(map, JobRequestConstants.EXEC_ID());
+        SkywalkingTraceUtil.addTagForActiveSpan(map, TaskConstant.SUBMIT_USER);
+        SkywalkingTraceUtil.addTagForActiveSpan(map, TaskConstant.EXECUTE_USER);
     }
 
     @Override

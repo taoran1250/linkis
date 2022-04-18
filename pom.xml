@@ -146,6 +146,7 @@
         <jacoco.version>0.8.7</jacoco.version>
         <jacoco.skip>false</jacoco.skip>
         <junit.version>4.12</junit.version>
+        <skywalking.version>8.9.0</skywalking.version>
     </properties>
 
     <dependencyManagement>
