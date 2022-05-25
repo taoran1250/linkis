@@ -38,7 +38,8 @@ import org.apache.linkis.orchestrator.strategy.async.AsyncExecTask
 import org.apache.linkis.orchestrator.strategy.{ResultSetExecTask, StatusInfoExecTask}
 import org.apache.linkis.orchestrator.utils.OrchestratorIDCreator
 import org.apache.linkis.scheduler.executer.{ErrorExecuteResponse, SubmitResponse}
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
+import org.apache.linkis.governance.common.constant.job.JobRequestConstants
 import org.apache.linkis.orchestrator.listener.task.TaskLogEvent
 
 import scala.concurrent.duration.Duration
@@ -134,6 +135,8 @@ class CodeLogicalUnitExecTask (parents: Array[ExecTask], children: Array[ExecTas
 //    })
     requestTask.getProperties.putAll(getParams.getRuntimeParams.toMap)
     requestTask.setSourceID(getIDInfo())
+    requestTask.getProperties.put(JobRequestConstants.JOB_ID, getIDInfo())
+    requestTask.getProperties.put(JobRequestConstants.ORCHESTRATOR_CODEEXECTASK_ID, id)
     requestTask
   }
 
