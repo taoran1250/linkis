@@ -265,6 +265,7 @@ class FlinkEngineConnFactory extends MultiExecutorEngineConnFactory with Logging
       logger.info(
         s"set ha_mode to ${FlinkEnvConfiguration.FLINK_MANAGER_HIGHAVAILABLE_MODE.getHotValue()}"
       )
+    }
 
     // set kubernetes config
     if (
