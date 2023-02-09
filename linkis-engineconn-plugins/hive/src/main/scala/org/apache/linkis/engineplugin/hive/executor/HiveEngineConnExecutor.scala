@@ -204,11 +204,7 @@ class HiveEngineConnExecutor(
       val startTime = System.currentTimeMillis()
       try {
         Utils.tryCatch {
-          val compileRet = driver.compile(realCode)
-          if (0 != compileRet) {
-            logger.warn(s"compile realCode error status : ${compileRet}")
-          }
-          val queryPlan = driver.getPlan
+          val queryPlan = driver.getPlan()
           val numberOfJobs = Utilities.getMRTasks(queryPlan.getRootTasks).size
           numberOfMRJobs = numberOfJobs
           logger.info(s"there are ${numberOfMRJobs} jobs.")
@@ -219,10 +215,18 @@ class HiveEngineConnExecutor(
         if (numberOfMRJobs > 0) {
           engineExecutorContext.appendStdout(s"Your hive sql has $numberOfMRJobs MR jobs to do")
         }
+        if (thread.isInterrupted) {
+          logger.error(
+            "The thread of execution has been interrupted and the task should be terminated"
+          )
+          return ErrorExecuteResponse(
+            "The thread of execution has been interrupted and the task should be terminated",
+            null
+          )
+        }
         val hiveResponse: CommandProcessorResponse = driver.run(realCode)
         if (hiveResponse.getResponseCode != 0) {
           LOG.error("Hive query failed, response code is {}", hiveResponse.getResponseCode)
-          // todo check uncleared context ?
           return ErrorExecuteResponse(hiveResponse.getErrorMessage, hiveResponse.getException)
         }
         engineExecutorContext.appendStdout(
@@ -406,6 +410,7 @@ class HiveEngineConnExecutor(
     singleSqlProgressMap.clear()
     Utils.tryAndWarnMsg(sessionState.close())("close session failed")
     super.close()
+    killTask("close")
   }
 
   override def FetchResource: util.HashMap[String, ResourceWithStatus] = {
