@@ -23,4 +23,14 @@ object InstanceConfigration {
 
   val GOVERNANCE_STATION_ADMIN = Configuration.GOVERNANCE_STATION_ADMIN
 
+  val EC_FLINK_CLIENT_TYPE_ATTACH = "attach"
+
+  val EC_FLINK_CLIENT_TYPE_DETACH = "detach"
+
+  val YARN_APPID_NAME_KEY = "appicationId"
+
+  val YARN_APP_URL_KEY = "applicationUrl"
+
+  val YARN_MODE_KEY = "yarnMode"
+
 }
