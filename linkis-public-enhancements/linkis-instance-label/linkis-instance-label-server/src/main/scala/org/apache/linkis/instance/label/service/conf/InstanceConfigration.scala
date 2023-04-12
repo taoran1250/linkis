@@ -33,4 +33,9 @@ object InstanceConfigration {
 
   val YARN_MODE_KEY = "yarnMode"
 
+  val EC_SERVICE_INSTANCE_KEY = "serviceInstance"
+
+  val ECM_SERVICE_INSTANCE_KEY = "ecmServiceInstance"
+
+  val NODE_STATUS_KEY = "nodeStatus"
 }
