@@ -123,4 +123,5 @@ object FlinkEnvConfiguration {
   val FLINK_PARAMS_BLANK_PLACEHOLER =
     CommonVars("linkis.flink.params.placeholder.blank", "\\0x001")
 
+  val FLINK_MANAGER_LOAD_TASK_MAX = CommonVars("linkis.flink.manager.load.task.max", 50)
 }
