@@ -243,6 +243,7 @@ export default {
                 duration: 3,
                 content: "添加成功"
               })
+              this.load()
             }else{
               this.$Message.success({
                 duration: 3,
