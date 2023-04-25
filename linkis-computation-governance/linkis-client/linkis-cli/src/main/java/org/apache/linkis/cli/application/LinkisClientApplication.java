@@ -17,6 +17,7 @@
 
 package org.apache.linkis.cli.application;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.cli.application.constants.CliConstants;
 import org.apache.linkis.cli.application.constants.CliKeys;
 import org.apache.linkis.cli.application.entity.command.CmdTemplate;
@@ -147,6 +148,12 @@ public class LinkisClientApplication {
     if (jobResult.isSuccess()) {
       LoggerManager.getPlaintTextLogger().info(CliConstants.SUCCESS_INDICATOR);
     } else {
+      LoggerManager.getInformationLogger().info(jobResult.getMessage());
+      StringBuilder b = new StringBuilder();
+      for (Map.Entry<String, String> e : jobResult.getExtraMessage().entrySet() ) {
+        b.append(e.getKey()).append(":").append(e.getValue()).append(System.lineSeparator());
+      }
+      LoggerManager.getInformationLogger().info(b.toString());
       LoggerManager.getPlaintTextLogger().info(CliConstants.FAILURE_INDICATOR);
     }
   }

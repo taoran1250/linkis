@@ -17,6 +17,7 @@
 
 package org.apache.linkis.cli.application.operator.ujes;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.linkis.cli.application.constants.LinkisKeys;
 import org.apache.linkis.cli.application.entity.operator.JobOper;
 import org.apache.linkis.cli.application.exception.LinkisClientExecutionException;
@@ -269,7 +270,7 @@ public class LinkisJobOper implements JobOper {
           }
           String msg =
               MessageFormat.format(
-                  "Get job info failed. retry time : {0}/{1}. taskID={0}, Reason: {1}",
+                  "Get job info failed. retry time : {0}/{1}. taskID={2}, Reason: {3}",
                   retryTime, MAX_RETRY_TIME, taskID, reason);
 
           logger.debug(
@@ -299,7 +300,7 @@ public class LinkisJobOper implements JobOper {
       if (jobInfoResult == null) {
         reason = "JobInfoResult is null";
       } else {
-        reason = "server returns non-zero status-code";
+        reason = "server returns non-zero status-code. ";
         reason += jobInfoResult.getMessage();
       }
       String msg =
@@ -318,63 +319,31 @@ public class LinkisJobOper implements JobOper {
     jobExecuteResult.setUser(user);
     jobExecuteResult.setTaskID(taskID);
     jobExecuteResult.setExecID(execID);
-
-    JobLogResult logResult = null;
-    int retryTime = 0;
-    final int MAX_RETRY_TIME = UJESConstants.DRIVER_REQUEST_MAX_RETRY_TIME;
-
-    while (retryTime++ < MAX_RETRY_TIME) {
-      try {
-        logResult = client.log(jobExecuteResult, fromLine, UJESConstants.MAX_LOG_SIZE);
-        logger.debug("runtime-log-result:" + CliUtils.GSON.toJson(logResult));
-        if (logResult == null || 0 != logResult.getStatus()) {
-          String reason;
-          if (logResult == null) {
-            reason = "JobLogResult is null";
-          } else {
-            reason = "server returns non-zero status-code";
-            reason += logResult.getMessage();
-          }
-          String msg =
-              MessageFormat.format(
-                  "Get log failed. retry time : {0}/{1}. taskID={2}. Reason: {3}",
-                  retryTime, MAX_RETRY_TIME, taskID, reason);
-          logger.debug(
-              "",
-              new LinkisClientExecutionException(
-                  "EXE0015", ErrorLevel.ERROR, CommonErrMsg.ExecutionErr, msg));
+    try {
+      JobLogResult logResult = client.log(jobExecuteResult, fromLine, UJESConstants.MAX_LOG_SIZE);
+      logger.debug("runtime-log-result:" + CliUtils.GSON.toJson(logResult));
+      if (logResult == null || 0 != logResult.getStatus()) {
+        String reason;
+        if (logResult == null) {
+          reason = "JobLogResult is null";
         } else {
-          break;
+          reason = "server returns non-zero status-code. ";
+          reason += logResult.getMessage();
         }
-      } catch (Exception e) {
         String msg =
-            MessageFormat.format("Get log failed. Retry time : {0}/{1}", retryTime, MAX_RETRY_TIME);
-        //                logger.warn("", new LinkisClientExecutionException("EXE0016",
-        // ErrorLevel.ERROR, CommonErrMsg.ExecutionErr, msg));
-        if (retryTime >= MAX_RETRY_TIME) {
-          throw new LinkisClientExecutionException(
-              "EXE0016", ErrorLevel.ERROR, CommonErrMsg.ExecutionErr, msg, e);
-        }
+            MessageFormat.format(
+                "Get log failed. taskID={0}. Reason: {1}",
+                taskID, reason);
+        Exception e = new LinkisClientExecutionException(
+                "EXE0016", ErrorLevel.ERROR, CommonErrMsg.ExecutionErr, msg);
+        logger.debug("",e);
+        throw e;
       }
-      CliUtils.doSleepQuietly(UJESConstants.DRIVER_QUERY_SLEEP_MILLS);
-    }
-    if (logResult == null || 0 != logResult.getStatus()) {
-      String reason;
-      if (logResult == null) {
-        reason = "JobLogResult is null";
-      } else {
-        reason = "server returns non-zero status-code. ";
-        reason += logResult.getMessage();
-      }
-      String msg =
-          MessageFormat.format(
-              "Get log failed. Retry exhausted. taskID={0}, Reason: {1}", taskID, reason);
-      //            logger.warn("", new LinkisClientExecutionException("EXE0016",
-      // ErrorLevel.ERROR, CommonErrMsg.ExecutionErr, msg));
+      return new UJESResultAdapter(logResult);
+    } catch (Exception e) {
       throw new LinkisClientExecutionException(
-          "EXE0016", ErrorLevel.ERROR, CommonErrMsg.ExecutionErr, msg);
+          "EXE0016", ErrorLevel.ERROR, CommonErrMsg.ExecutionErr, "Get log failed.", e);
     }
-    return new UJESResultAdapter(logResult);
   }
 
   public LinkisOperResultAdapter queryPersistedLogFromLine(
@@ -386,81 +355,47 @@ public class LinkisJobOper implements JobOper {
   private OpenLogResult queryPersistedLogInternal(String logPath, String user, String taskID)
       throws LinkisClientRuntimeException {
     checkInit();
-    int retryCnt = 0;
-    final int MAX_RETRY_TIMES = UJESConstants.DRIVER_REQUEST_MAX_RETRY_TIME;
-    OpenLogResult openLogResult = null;
-
-    while (retryCnt++ < MAX_RETRY_TIMES) {
-      try {
-        openLogResult =
-            client.openLog(
-                OpenLogAction.newBuilder().setLogPath(logPath).setProxyUser(user).build());
-        logger.debug("persisted-log-result:" + CliUtils.GSON.toJson(openLogResult));
-        if (openLogResult == null
-            || 0 != openLogResult.getStatus()
-            || StringUtils.isBlank(openLogResult.getLog()[UJESConstants.IDX_FOR_LOG_TYPE_ALL])) {
-          String reason;
-          if (openLogResult == null) {
-            reason = "OpenLogResult is null";
-          } else if (0 != openLogResult.getStatus()) {
-            reason = "server returns non-zero status-code. ";
-            reason += openLogResult.getMessage();
-          } else {
-            reason = "server returns empty log";
-          }
-          String msg =
-              MessageFormat.format(
-                  "Get log from openLog failed. retry time : {0}/{1}. taskID={2}. Reason: {3}",
-                  retryCnt, MAX_RETRY_TIMES, taskID, reason);
-          logger.debug(msg);
+    try {
+      OpenLogResult openLogResult =
+          client.openLog(
+              OpenLogAction.newBuilder().setLogPath(logPath).setProxyUser(user).build());
+      logger.debug("persisted-log-result:" + CliUtils.GSON.toJson(openLogResult));
+      if (openLogResult == null
+          || 0 != openLogResult.getStatus()
+          || StringUtils.isBlank(openLogResult.getLog()[UJESConstants.IDX_FOR_LOG_TYPE_ALL])) {
+        String reason;
+        if (openLogResult == null) {
+          reason = "OpenLogResult is null";
+        } else if (0 != openLogResult.getStatus()) {
+          reason = "server returns non-zero status-code. ";
+          reason += openLogResult.getMessage();
         } else {
-          break;
+          reason = "server returns empty log";
         }
-      } catch (Exception e) {
         String msg =
             MessageFormat.format(
-                "Get log from openLog failed. retry time : {0}/{1}", retryCnt, MAX_RETRY_TIMES);
-        if (e instanceof LinkisException) {
-          msg += " " + e.toString();
-        }
-        logger.debug(msg, e);
-        if (retryCnt >= MAX_RETRY_TIMES) {
-          throw new LinkisClientExecutionException(
+                "Get log from openLog failed. taskID={0}. Reason: {1}",
+                    taskID, reason);
+        logger.debug(msg);
+        throw new LinkisClientExecutionException(
+                "EXE0017",
+                ErrorLevel.ERROR,
+                CommonErrMsg.ExecutionErr,
+                msg);
+      }
+      return openLogResult;
+    } catch (Exception e) {
+      String msg = "Get log from openLog failed.";
+      if (e instanceof LinkisException) {
+        msg += " " + e.toString();
+      }
+      logger.debug(msg, e);
+      throw new LinkisClientExecutionException(
               "EXE0017",
               ErrorLevel.ERROR,
               CommonErrMsg.ExecutionErr,
-              "Get log from openLog failed. Retry exhausted. taskID=" + taskID,
-              e);
-        }
-      }
-      CliUtils.doSleepQuietly(UJESConstants.DRIVER_QUERY_SLEEP_MILLS);
+              msg);
     }
-    if (openLogResult == null
-        || 0 != openLogResult.getStatus()
-        || StringUtils.isBlank(openLogResult.getLog()[UJESConstants.IDX_FOR_LOG_TYPE_ALL])) {
-      String reason;
-      if (openLogResult == null) {
-        reason = "OpenLogResult is null";
-      } else if (0 != openLogResult.getStatus()) {
-        reason = "server returns non-zero status-code";
-      } else {
-        reason = "server returns empty log";
-      }
-      String msg =
-          MessageFormat.format(
-              "Get log from openLog failed. retry time : {0}/{1}. taskID={2}. Reason: {3}",
-              retryCnt, MAX_RETRY_TIMES, taskID, reason);
-      logger.debug(msg);
-      if (retryCnt >= MAX_RETRY_TIMES) {
-        msg =
-            MessageFormat.format(
-                "Get log from openLog failed. Retry exhausted. taskID={0}, Reason: {1}",
-                taskID, reason);
-        throw new LinkisClientExecutionException(
-            "EXE0017", ErrorLevel.ERROR, CommonErrMsg.ExecutionErr, msg);
-      }
-    }
-    return openLogResult;
   }
 
   public UJESResultAdapter queryProgress(String user, String taskID, String execId)
