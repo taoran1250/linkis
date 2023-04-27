@@ -17,7 +17,6 @@
 
 package org.apache.linkis.cli.application.operator.ujes;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.linkis.cli.application.constants.LinkisKeys;
 import org.apache.linkis.cli.application.entity.operator.JobOper;
 import org.apache.linkis.cli.application.exception.LinkisClientExecutionException;
@@ -331,12 +330,11 @@ public class LinkisJobOper implements JobOper {
           reason += logResult.getMessage();
         }
         String msg =
-            MessageFormat.format(
-                "Get log failed. taskID={0}. Reason: {1}",
-                taskID, reason);
-        Exception e = new LinkisClientExecutionException(
+            MessageFormat.format("Get log failed. taskID={0}. Reason: {1}", taskID, reason);
+        Exception e =
+            new LinkisClientExecutionException(
                 "EXE0016", ErrorLevel.ERROR, CommonErrMsg.ExecutionErr, msg);
-        logger.debug("",e);
+        logger.debug("", e);
         throw e;
       }
       return new UJESResultAdapter(logResult);
@@ -357,8 +355,7 @@ public class LinkisJobOper implements JobOper {
     checkInit();
     try {
       OpenLogResult openLogResult =
-          client.openLog(
-              OpenLogAction.newBuilder().setLogPath(logPath).setProxyUser(user).build());
+          client.openLog(OpenLogAction.newBuilder().setLogPath(logPath).setProxyUser(user).build());
       logger.debug("persisted-log-result:" + CliUtils.GSON.toJson(openLogResult));
       if (openLogResult == null
           || 0 != openLogResult.getStatus()
@@ -374,14 +371,10 @@ public class LinkisJobOper implements JobOper {
         }
         String msg =
             MessageFormat.format(
-                "Get log from openLog failed. taskID={0}. Reason: {1}",
-                    taskID, reason);
+                "Get log from openLog failed. taskID={0}. Reason: {1}", taskID, reason);
         logger.debug(msg);
         throw new LinkisClientExecutionException(
-                "EXE0017",
-                ErrorLevel.ERROR,
-                CommonErrMsg.ExecutionErr,
-                msg);
+            "EXE0017", ErrorLevel.ERROR, CommonErrMsg.ExecutionErr, msg);
       }
       return openLogResult;
     } catch (Exception e) {
@@ -391,10 +384,7 @@ public class LinkisJobOper implements JobOper {
       }
       logger.debug(msg, e);
       throw new LinkisClientExecutionException(
-              "EXE0017",
-              ErrorLevel.ERROR,
-              CommonErrMsg.ExecutionErr,
-              msg);
+          "EXE0017", ErrorLevel.ERROR, CommonErrMsg.ExecutionErr, msg);
     }
   }
 
