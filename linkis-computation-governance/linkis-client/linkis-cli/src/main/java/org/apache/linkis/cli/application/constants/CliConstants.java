@@ -20,7 +20,7 @@ package org.apache.linkis.cli.application.constants;
 public class CliConstants {
 
   public static final String DEFAULT_CONFIG_NAME = "linkis-cli.properties";
-  public static final Long JOB_QUERY_SLEEP_MILLS = 2000l;
+  public static final Long JOB_QUERY_SLEEP_MILLS = 2000L;
   public static final String RESULTSET_LOGO = "============ RESULT SET {0} ============";
 
   public static final String RESULTSET_META_BEGIN_LOGO = "----------- META DATA ------------";
@@ -30,9 +30,9 @@ public class CliConstants {
 
   public static final Integer RESULTSET_PAGE_SIZE = 5000;
 
-  public static final String JOB_CREATOR_DEFAULT = "BdpClient";
+  public static final String JOB_CREATOR_DEFAULT = "LINKISCLI";
 
-  public static final String JOB_CREATOR_ASYNC_DEFAULT = "BdpClient";
+  public static final String JOB_CREATOR_ASYNC_DEFAULT = "LINKISCLIASYNC";
 
   public static final String DUMMY_CID = "dummy";
 
