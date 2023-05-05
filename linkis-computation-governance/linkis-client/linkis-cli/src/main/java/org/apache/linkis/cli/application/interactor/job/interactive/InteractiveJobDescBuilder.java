@@ -102,7 +102,7 @@ public class InteractiveJobDescBuilder {
     String engineType = stdVarAccess.getVar(String.class, CliKeys.JOB_LABEL_ENGINE_TYPE);
     String runType = stdVarAccess.getVar(String.class, CliKeys.JOB_LABEL_CODE_TYPE);
     String scriptPath =
-        stdVarAccess.getVarOrDefault(String.class, CliKeys.JOB_SOURCE_SCRIPT_PATH, "BdpClient");
+        stdVarAccess.getVarOrDefault(String.class, CliKeys.JOB_SOURCE_SCRIPT_PATH, "LinkisCli");
 
     String osUser = System.getProperty(CliKeys.LINUX_USER_KEY);
     String[] adminUsers = StringUtils.split(CliKeys.ADMIN_USERS, ',');
