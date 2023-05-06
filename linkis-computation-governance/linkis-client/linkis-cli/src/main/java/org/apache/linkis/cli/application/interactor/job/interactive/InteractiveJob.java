@@ -87,8 +87,8 @@ public class InteractiveJob implements Job {
     // JobInfo
     LinkisOperResultAdapter jobInfoResult =
         oper.queryJobInfo(submitResult.getUser(), submitResult.getJobID());
-    oper.queryJobStatus(jobInfoResult.getUser(), jobInfoResult.getJobID(), jobInfoResult.getStrongerExecId());
-    oper.queryJobStatus(jobInfoResult.getUser(), jobInfoResult.getJobID(),jobInfoResult.getStrongerExecId());
+    oper.queryJobStatus(
+        jobInfoResult.getUser(), jobInfoResult.getJobID(), jobInfoResult.getStrongerExecId());
     infoBuilder.setLength(0);
     infoBuilder
         .append("JobId:")
@@ -217,7 +217,8 @@ public class InteractiveJob implements Job {
       // query progress
       try {
         jobInfoResult = oper.queryJobInfo(user, jobId);
-        oper.queryJobStatus(jobInfoResult.getUser(), jobInfoResult.getJobID(),jobInfoResult.getStrongerExecId());
+        oper.queryJobStatus(
+            jobInfoResult.getUser(), jobInfoResult.getJobID(), jobInfoResult.getStrongerExecId());
       } catch (Exception e) {
         logger.warn("", e);
         retryCnt++;
