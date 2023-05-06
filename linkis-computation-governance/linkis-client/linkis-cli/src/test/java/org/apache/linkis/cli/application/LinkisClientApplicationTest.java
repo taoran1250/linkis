@@ -62,7 +62,7 @@ public class LinkisClientApplicationTest {
     cmdStr =
         new String[] {
           "--gatewayUrl",
-          "http://127.0.0.1:9001",
+          "http://10.107.119.46:9001",
           "--authStg",
           "token",
           "--authKey",
@@ -76,7 +76,7 @@ public class LinkisClientApplicationTest {
           //                "--userConf", "src/test/resources/linkis-cli.properties",
 
           "-creator",
-          "LINKISCLI",
+          "1234",
           //                "-code", "show \${test};",
           //                "-codePath", "src/test/resources/test",
           //                "--kill", "6795",
@@ -111,6 +111,8 @@ public class LinkisClientApplicationTest {
           "-code",
           //          "exit -1",
           "whoami",
+          "--async",
+          "true",
 
           //        "-engineType", "spark-2.4.3",
           //        "-codeType", "py",
@@ -177,7 +179,7 @@ public class LinkisClientApplicationTest {
   @Test
   public void testExec() {
     //    LinkisClientApplication.main(cmdStr);
-    LinkisClientApplication.main(cmdStr3);
+    LinkisClientApplication.main(cmdStr);
     //    LinkisClientApplication.main(cmdStr2);
     /*
     try {
