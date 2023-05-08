@@ -62,7 +62,7 @@ public class LinkisClientApplicationTest {
     cmdStr =
         new String[] {
           "--gatewayUrl",
-          "http://10.107.119.46:9001",
+          "http://127.0.0.1:9001",
           "--authStg",
           "token",
           "--authKey",
@@ -111,8 +111,10 @@ public class LinkisClientApplicationTest {
           "-code",
           //          "exit -1",
           "whoami",
-          "--async",
-          "true",
+          //          "--async",
+          //          "true",
+          "-outPath",
+          "/home/hadoop",
 
           //        "-engineType", "spark-2.4.3",
           //        "-codeType", "py",
