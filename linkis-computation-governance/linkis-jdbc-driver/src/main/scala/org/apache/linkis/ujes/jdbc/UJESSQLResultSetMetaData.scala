@@ -34,19 +34,19 @@ class UJESSQLResultSetMetaData extends ResultSetMetaData with Logging {
   private[jdbc] def setColumnNameProperties(column: Int, columnName: String): Unit = {
     if (column != null && columnName != null) {
       columnNameProperties.put(column, columnName)
-    } else throw new UJESSQLException(UJESSQLErrorCode.METADATA_EMPTY)
+    } else throw new LinkisSQLException(LinkisSQLErrorCode.METADATA_EMPTY)
   }
 
   private[jdbc] def setDataTypeProperties(column: Int, columnName: String): Unit = {
     if (column != null && columnName != null) {
       dataTypeProperties.put(column, columnName)
-    } else throw new UJESSQLException(UJESSQLErrorCode.METADATA_EMPTY)
+    } else throw new LinkisSQLException(LinkisSQLErrorCode.METADATA_EMPTY)
   }
 
   private[jdbc] def setCommentPropreties(column: Int, columnName: String): Unit = {
     if (column != null && columnName != null) {
       commentProperties.put(column, columnName)
-    } else throw new UJESSQLException(UJESSQLErrorCode.METADATA_EMPTY)
+    } else throw new LinkisSQLException(LinkisSQLErrorCode.METADATA_EMPTY)
   }
 
   override def getColumnCount: Int = {
@@ -54,7 +54,7 @@ class UJESSQLResultSetMetaData extends ResultSetMetaData with Logging {
   }
 
   override def isAutoIncrement(column: Int): Boolean = {
-    throw new UJESSQLException(UJESSQLErrorCode.NOSUPPORT_METADATA)
+    throw new LinkisSQLException(LinkisSQLErrorCode.NOSUPPORT_METADATA)
   }
 
   override def isCaseSensitive(column: Int): Boolean = true
@@ -75,7 +75,7 @@ class UJESSQLResultSetMetaData extends ResultSetMetaData with Logging {
 
   override def getColumnLabel(column: Int): String = {
     if (columnNameProperties.get(column) == null) {
-      throw new UJESSQLException(UJESSQLErrorCode.METADATA_EMPTY)
+      throw new LinkisSQLException(LinkisSQLErrorCode.METADATA_EMPTY)
     } else columnNameProperties.get(column)
   }
 
@@ -84,7 +84,7 @@ class UJESSQLResultSetMetaData extends ResultSetMetaData with Logging {
   }
 
   override def getSchemaName(column: Int): String = {
-    throw new UJESSQLException(UJESSQLErrorCode.NOSUPPORT_METADATA)
+    throw new LinkisSQLException(LinkisSQLErrorCode.NOSUPPORT_METADATA)
   }
 
   override def getPrecision(column: Int): Int = {
@@ -103,11 +103,11 @@ class UJESSQLResultSetMetaData extends ResultSetMetaData with Logging {
   }
 
   override def getTableName(column: Int): String = {
-    throw new UJESSQLException(UJESSQLErrorCode.NOSUPPORT_METADATA)
+    throw new LinkisSQLException(LinkisSQLErrorCode.NOSUPPORT_METADATA)
   }
 
   override def getCatalogName(column: Int): String = {
-    throw new UJESSQLException(UJESSQLErrorCode.NOSUPPORT_METADATA)
+    throw new LinkisSQLException(LinkisSQLErrorCode.NOSUPPORT_METADATA)
   }
 
   override def getColumnType(column: Int): Int = {
@@ -116,7 +116,7 @@ class UJESSQLResultSetMetaData extends ResultSetMetaData with Logging {
 
   override def getColumnTypeName(column: Int): String = {
     if (dataTypeProperties.get(column) == null) {
-      throw new UJESSQLException(UJESSQLErrorCode.METADATA_EMPTY)
+      throw new LinkisSQLException(LinkisSQLErrorCode.METADATA_EMPTY)
     } else dataTypeProperties.get(column)
   }
 
@@ -129,19 +129,19 @@ class UJESSQLResultSetMetaData extends ResultSetMetaData with Logging {
   }
 
   override def isDefinitelyWritable(column: Int): Boolean = {
-    throw new UJESSQLException(UJESSQLErrorCode.NOSUPPORT_METADATA)
+    throw new LinkisSQLException(LinkisSQLErrorCode.NOSUPPORT_METADATA)
   }
 
   override def getColumnClassName(column: Int): String = {
-    throw new UJESSQLException(UJESSQLErrorCode.NOSUPPORT_METADATA)
+    throw new LinkisSQLException(LinkisSQLErrorCode.NOSUPPORT_METADATA)
   }
 
   override def unwrap[T](iface: Class[T]): T = {
-    throw new UJESSQLException(UJESSQLErrorCode.NOSUPPORT_METADATA)
+    throw new LinkisSQLException(LinkisSQLErrorCode.NOSUPPORT_METADATA)
   }
 
   override def isWrapperFor(iface: Class[_]): Boolean = {
-    throw new UJESSQLException(UJESSQLErrorCode.NOSUPPORT_METADATA)
+    throw new LinkisSQLException(LinkisSQLErrorCode.NOSUPPORT_METADATA)
   }
 
   protected def toZeroIndex(column: Int): Int = {
