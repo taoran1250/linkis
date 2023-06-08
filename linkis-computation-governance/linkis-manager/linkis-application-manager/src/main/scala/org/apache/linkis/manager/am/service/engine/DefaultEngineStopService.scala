@@ -107,6 +107,8 @@ class DefaultEngineStopService extends AbstractEngineService with EngineStopServ
     // 3. to clear engine node info
     getEngineNodeManager.deleteEngineNode(ecNode)
     logger.info(s"Finished to clear ec info $ecNode")
+    // 4. to clear hooks
+    ECHeartbeatHookHolder.removeEcHooks(ecNode.getServiceInstance)
   }
 
   @Receiver
