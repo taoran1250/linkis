@@ -19,6 +19,7 @@ package org.apache.linkis.engineconnplugin.flink.context
 
 import org.apache.linkis.engineconnplugin.flink.client.config.Environment
 import org.apache.linkis.engineconnplugin.flink.client.factory.LinkisYarnClusterClientFactory
+import org.apache.linkis.engineconnplugin.flink.config.FlinkExecutionTargetType
 
 import org.apache.commons.lang3.StringUtils
 import org.apache.flink.configuration.{
@@ -49,7 +50,7 @@ class EnvironmentContext(
 
   private var flinkConfig: Configuration = _
 
-  private var deploymentTarget: YarnDeploymentTarget = YarnDeploymentTarget.PER_JOB
+  private var deploymentTarget: String = YarnDeploymentTarget.PER_JOB.getName
 
   private var extraParams: util.Map[String, Any] = _
 
@@ -65,6 +66,7 @@ class EnvironmentContext(
       shipDirsArray: Array[String],
       dependencies: util.List[URL],
       extraParams: util.Map[String, Any]
+      flinkExecutionTarget: String
   ) {
     this(
       defaultEnv,
@@ -91,12 +93,17 @@ class EnvironmentContext(
     this.flinkConfig.set(YarnConfigOptions.FLINK_DIST_JAR, distJarPath)
     // other params
     this.extraParams = extraParams
+    if (!FlinkExecutionTargetType.isKubernetesExecutionTargetType(flinkExecutionTarget)) {
+      // set yarn conf-dir(设置 yarn conf目录)
+      this.flinkConfig.set(LinkisYarnClusterClientFactory.YARN_CONFIG_DIR, this.yarnConfDir)
+      // set flink dist-jar(设置 flink dist jar)
+      this.flinkConfig.set(YarnConfigOptions.FLINK_DIST_JAR, distJarPath)
+    }
   }
 
-  def setDeploymentTarget(deploymentTarget: YarnDeploymentTarget): Unit = this.deploymentTarget =
-    deploymentTarget
+  def setDeploymentTarget(deploymentTarget: String): Unit = this.deploymentTarget = deploymentTarget
 
-  def getDeploymentTarget: YarnDeploymentTarget = deploymentTarget
+  def getDeploymentTarget: String = deploymentTarget
 
   def getProvidedLibDirs: util.List[String] = providedLibDirs
 

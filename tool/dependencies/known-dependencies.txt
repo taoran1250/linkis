@@ -143,9 +143,10 @@ flink-table-api-java-bridge_2.11-1.12.2.jar
 flink-table-api-scala-bridge_2.11-1.12.2.jar
 flink-table-api-scala_2.11-1.12.2.jar
 flink-table-common-1.12.2.jar
-flink-table-planner-blink_2.11-1.12.2.jar
-flink-table-runtime-blink_2.11-1.12.2.jar
-flink-yarn_2.11-1.12.2.jar
+flink-table-planner-blink_2.12-1.12.2.jar
+flink-table-runtime-blink_2.12-1.12.2.jar
+flink-yarn_2.12-1.12.2.jar
+flink-kubernetes_2.12-1.12.2.jar
 force-shading-1.12.2.jar
 freemarker-2.3.31.jar
 geronimo-annotation_1.0_spec-1.1.1.jar
