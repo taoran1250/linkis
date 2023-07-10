@@ -194,7 +194,7 @@ public class EngineRestfulApi {
                 taskId,
                 engineAskAsyncId,
                 engineAskRequest.getCreateService());
-            // 如果原来的labels含engineInstance ，先去掉
+            // remove engineInstance label if exists
             engineAskRequest.getLabels().remove("engineInstance");
             EngineCreateRequest engineCreateRequest = new EngineCreateRequest();
             engineCreateRequest.setLabels(engineAskRequest.getLabels());
@@ -210,7 +210,7 @@ public class EngineRestfulApi {
               } else {
                 timeout = engineCreateRequest.getTimeout();
               }
-              // useEngine 需要加上超时
+              // useEngine need to add timeout
               EngineNode createEngineNode = engineNodeManager.useEngine(createNode, timeout);
               if (null == createEngineNode) {
                 throw new LinkisRetryException(
