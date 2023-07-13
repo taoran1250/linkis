@@ -208,20 +208,30 @@ function remote_access_to_link_logs() {
   # 脚本调用 获取远端链路日志
   source ./linkis-log-tool.sh $servername $job_id $link_log_path 1 $port_id
 
+  # entrance
   echo -e "\e[32m 服务日志所在路径：\e[0m"$servername:$port_id"($link_log_path)"
   echo -e "\e[32m 获取的完整日志见：\e[0m"$(pwd)/$job_id/entrance_"$server_name"_"$port_id".log
-  error_log=$(cat $(pwd)/$job_id/engineconn_"$server_name"_"$port_id".log | grep "ERROR")
+  error_log=$(cat $(pwd)/$job_id/entrance_"$server_name"_"$port_id".log | grep "ERROR")
   if [[ $error_log ]]; then
     echo -e "\e[32m engineconn异常日志信息如下：\e[0m"
   fi
-  echo $error_log
+  echo -e "\e[31m $error_log \e[0m"
 
+  # linkismanager
   echo -e "\e[32m 获取的完整日志见：\e[0m"$(pwd)/$job_id/linkismanager_"$server_name"_"$port_id".log
   error_log=$(cat $(pwd)/$job_id/linkismanager_"$server_name"_"$port_id".log | grep "ERROR")
   if [[ $error_log ]]; then
     echo -e "\e[32m linkismanager异常日志信息如下：\e[0m"
   fi
-  echo $error_log
+  echo -e "\e[31m $error_log \e[0m"
+
+  # publicservice
+  echo -e "\e[32m 获取的完整日志见：\e[0m"$(pwd)/$job_id/publicservice_"$server_name"_"$port_id".log
+  error_log=$(cat $(pwd)/$job_id/publicservice_"$server_name"_"$port_id".log | grep "ERROR")
+  if [[ $error_log ]]; then
+    echo -e "\e[32m publicservice异常日志信息如下：\e[0m"
+  fi
+  echo -e "\e[31m $error_log \e[0m"
 }
 
 # step1 提示信息

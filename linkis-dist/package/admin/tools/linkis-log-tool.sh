@@ -24,9 +24,11 @@ elif [ "$option_flag" == "1" ]; then
 
   scp -r hadoop@$server_name:$log_path/"$job_id"_entrance.log $(pwd)/$job_id/entrance_"$server_name"_"$port_id".log
   scp -r hadoop@$server_name:$log_path/"$job_id"_linkismanager.log $(pwd)/$job_id/linkismanager_"$server_name"_"$port_id".log
+  scp -r hadoop@$server_name:$log_path/"$job_id"_publicservice.log $(pwd)/$job_id/publicservice_"$server_name"_"$port_id".log
 
   ssh hadoop@$server_name "rm -f $log_path/$2_entrance.log"
   ssh hadoop@$server_name "rm -f $log_path/$2_linkismanager.log"
+  ssh hadoop@$server_name "rm -f $log_path/$2_publicservice.log"
 else
   echo "暂不支持的日志分析！"
 fi
