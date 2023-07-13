@@ -17,6 +17,8 @@
 
 package org.apache.linkis.cli.application;
 
+import org.apache.linkis.common.conf.CommonVars;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,8 @@ import org.slf4j.LoggerFactory;
 
 public class LinkisClientApplicationTest {
   private static final Logger logger = LoggerFactory.getLogger(LinkisClientApplicationTest.class);
+
+  String bmlToken = CommonVars.apply("wds.linkis.bml.auth.token.value", "BML-AUTH").getValue();
 
   String[] cmdStr;
   String[] cmdStr2;
@@ -68,7 +72,7 @@ public class LinkisClientApplicationTest {
           "--authKey",
           "Validation-Code",
           "--authVal",
-          "BML-AUTH",
+          bmlToken,
           //                "--help",
           //                "--kill", "8249",
           //                "--status", "379",
@@ -95,12 +99,12 @@ public class LinkisClientApplicationTest {
 
           /* Test different task type */
 
-          //                "-engineType", "spark-2.4.3",
+          //                "-engineType", "spark-3.2.1",
           //                "-codeType", "sql",
           //                "-code", "show tables;show tables;show tables",
 
           //
-          //        "-engineType", "hive-1.2.1",
+          //        "-engineType", "hive-3.1.3",
           //        "-codeType", "sql",
           //        "-code", "show tables;",
 
@@ -112,11 +116,11 @@ public class LinkisClientApplicationTest {
           //          "exit -1",
           "whoami",
 
-          //        "-engineType", "spark-2.4.3",
+          //        "-engineType", "spark-3.2.1",
           //        "-codeType", "py",
           //        "-code", "print ('hello')",
 
-          //        "-engineType", "spark-2.4.3",
+          //        "-engineType", "spark-3.2.1",
           //        "-codeType", "scala",
           //        "-codePath", "src/test/resources/testScala.scala",
 

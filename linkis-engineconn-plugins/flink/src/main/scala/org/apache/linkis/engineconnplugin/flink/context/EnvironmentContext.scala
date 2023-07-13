@@ -19,6 +19,7 @@ package org.apache.linkis.engineconnplugin.flink.context
 
 import org.apache.linkis.engineconnplugin.flink.client.config.Environment
 import org.apache.linkis.engineconnplugin.flink.client.factory.LinkisYarnClusterClientFactory
+import org.apache.linkis.engineconnplugin.flink.config.FlinkExecutionTargetType
 
 import org.apache.commons.lang3.StringUtils
 import org.apache.flink.configuration.{
@@ -49,9 +50,7 @@ class EnvironmentContext(
 
   private var flinkConfig: Configuration = _
 
-  private var deploymentTarget: YarnDeploymentTarget = YarnDeploymentTarget.PER_JOB
-
-  private var extraParams: util.Map[String, Any] = _
+  private var deploymentTarget: String = YarnDeploymentTarget.PER_JOB.getName
 
   def this(
       defaultEnv: Environment,
@@ -64,7 +63,7 @@ class EnvironmentContext(
       providedLibDirsArray: Array[String],
       shipDirsArray: Array[String],
       dependencies: util.List[URL],
-      extraParams: util.Map[String, Any]
+      flinkExecutionTarget: String
   ) {
     this(
       defaultEnv,
@@ -85,18 +84,17 @@ class EnvironmentContext(
     if (null != systemConfiguration) this.flinkConfig.addAll(systemConfiguration)
     // set flink conf-dir(设置 flink conf目录)
     this.flinkConfig.set(DeploymentOptionsInternal.CONF_DIR, this.flinkConfDir)
-    // set yarn conf-dir(设置 yarn conf目录)
-    this.flinkConfig.set(LinkisYarnClusterClientFactory.YARN_CONFIG_DIR, this.yarnConfDir)
-    // set flink dist-jar(设置 flink dist jar)
-    this.flinkConfig.set(YarnConfigOptions.FLINK_DIST_JAR, distJarPath)
-    // other params
-    this.extraParams = extraParams
+    if (!FlinkExecutionTargetType.isKubernetesExecutionTargetType(flinkExecutionTarget)) {
+      // set yarn conf-dir(设置 yarn conf目录)
+      this.flinkConfig.set(LinkisYarnClusterClientFactory.YARN_CONFIG_DIR, this.yarnConfDir)
+      // set flink dist-jar(设置 flink dist jar)
+      this.flinkConfig.set(YarnConfigOptions.FLINK_DIST_JAR, distJarPath)
+    }
   }
 
-  def setDeploymentTarget(deploymentTarget: YarnDeploymentTarget): Unit = this.deploymentTarget =
-    deploymentTarget
+  def setDeploymentTarget(deploymentTarget: String): Unit = this.deploymentTarget = deploymentTarget
 
-  def getDeploymentTarget: YarnDeploymentTarget = deploymentTarget
+  def getDeploymentTarget: String = deploymentTarget
 
   def getProvidedLibDirs: util.List[String] = providedLibDirs
 
@@ -115,13 +113,6 @@ class EnvironmentContext(
   def getDefaultEnv: Environment = defaultEnv
 
   def getDependencies: util.List[URL] = dependencies
-
-  def setExtraParams(params: util.Map[String, Any]): EnvironmentContext = {
-    this.extraParams = params
-    this
-  }
-
-  def getExtraParams(): util.Map[String, Any] = extraParams
 
   override def equals(o: Any): Boolean = o match {
     case context: EnvironmentContext =>

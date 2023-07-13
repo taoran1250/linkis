@@ -23,6 +23,7 @@ import org.apache.linkis.engineconn.executor.service.ManagerService
 import org.apache.linkis.engineconn.once.executor.OnceExecutorExecutionContext
 import org.apache.linkis.engineconnplugin.flink.client.deployment.YarnApplicationClusterDescriptorAdapter
 import org.apache.linkis.engineconnplugin.flink.config.FlinkEnvConfiguration
+import org.apache.linkis.engineconnplugin.flink.client.deployment.AbstractApplicationClusterDescriptorAdapter
 import org.apache.linkis.engineconnplugin.flink.config.FlinkEnvConfiguration._
 import org.apache.linkis.engineconnplugin.flink.context.FlinkEngineConnContext
 import org.apache.linkis.engineconnplugin.flink.operator.StatusOperator
@@ -41,7 +42,7 @@ import scala.concurrent.duration.Duration
 class FlinkJarOnceExecutor(
     override val id: Long,
     override protected val flinkEngineConnContext: FlinkEngineConnContext
-) extends FlinkOnceExecutor[YarnApplicationClusterDescriptorAdapter] {
+) extends FlinkOnceExecutor[AbstractApplicationClusterDescriptorAdapter] {
 
   private var daemonThread: Future[_] = _
 

@@ -29,7 +29,6 @@ import org.apache.linkis.manager.label.builder.factory.LabelBuilderFactoryContex
 import org.apache.linkis.manager.label.entity.Label
 import org.apache.linkis.manager.label.entity.route.RouteLabel
 import org.apache.linkis.protocol.constants.TaskConstant
-import org.apache.linkis.protocol.utils.ZuulEntranceUtils
 import org.apache.linkis.rpc.sender.SpringCloudFeignConfigurationCache
 import org.apache.linkis.server.BDPJettyServerHelper
 
@@ -72,28 +71,12 @@ class DSSGatewayParser extends AbstractGatewayParser {
   override def parse(gatewayContext: GatewayContext): Unit =
     gatewayContext.getRequest.getRequestURI match {
 
-      case DSSGatewayParser.DSS_URL_FLOW_QUERY_PREFIX(version, execId, _) =>
-        // must put it before DSS_URL_REGEX(_, _, _), because this match was included in DSS_URL_REGEX(_, _, _)
-        if (sendResponseWhenNotMatchVersion(gatewayContext, version)) return
-        val serviceInstances = ZuulEntranceUtils.parseServiceInstanceByExecID(execId)
-        gatewayContext.getGatewayRoute.setServiceInstance(serviceInstances(0))
       case DSSGatewayParser.DSS_URL_REGEX(version, firstName, secondName) =>
         if (sendResponseWhenNotMatchVersion(gatewayContext, version)) return
         var tmpServerName = "dss-" + firstName + "-" + secondName + "-server"
         tmpServerName = getServiceNameFromLabel(gatewayContext, tmpServerName)
-        // apiservice,datapipe,scriptis和guide服务合并到dss-apps-server，其中的接口需要转发到apps服务
-        var tmpFirstName = firstName
-        if (
-            DSSGatewayConfiguration.DSS_APPS_SERVER_ISMERGE.getValue &&
-            DSSGatewayConfiguration.DSS_APPS_SERVER_OTHER_PREFIX.getValue
-              .split(",")
-              .contains(firstName)
-        ) {
-          tmpFirstName =
-            DSSGatewayConfiguration.DSS_APPS_SERVER_DISTINCT_NAME.getValue + "/" + firstName
-        }
         val serviceName: Option[String] =
-          findCommonService("dss/" + tmpFirstName + "/" + secondName, tmpServerName)
+          findCommonService("dss/" + firstName + "/" + secondName, tmpServerName)
         if (serviceName.isDefined) {
           gatewayContext.getGatewayRoute.setServiceInstance(ServiceInstance(serviceName.get, null))
         } else {
@@ -108,18 +91,7 @@ class DSSGatewayParser extends AbstractGatewayParser {
         if (sendResponseWhenNotMatchVersion(gatewayContext, version)) return
         var tmpServerName = "dss-" + firstName + "-server"
         tmpServerName = getServiceNameFromLabel(gatewayContext, tmpServerName)
-        // apiservice,datapipe,scriptis和guide服务合并到dss-apps-server，其中的接口需要转发到apps服务
-        var tmpFirstName = firstName
-        if (
-            DSSGatewayConfiguration.DSS_APPS_SERVER_ISMERGE.getValue &&
-            DSSGatewayConfiguration.DSS_APPS_SERVER_OTHER_PREFIX.getValue
-              .split(",")
-              .contains(firstName)
-        ) {
-          tmpFirstName =
-            DSSGatewayConfiguration.DSS_APPS_SERVER_DISTINCT_NAME.getValue + "/" + firstName
-        }
-        val serviceName: Option[String] = findCommonService("dss/" + tmpFirstName, tmpServerName)
+        val serviceName: Option[String] = findCommonService("dss/" + firstName, tmpServerName)
         if (serviceName.isDefined) {
           gatewayContext.getGatewayRoute.setServiceInstance(ServiceInstance(serviceName.get, null))
         } else {
@@ -266,10 +238,8 @@ class DSSGatewayParser extends AbstractGatewayParser {
         retService
       }
     }
-    var lowerServiceId = parsedServiceId.toLowerCase(Locale.getDefault())
+    val lowerServiceId = parsedServiceId.toLowerCase(Locale.getDefault())
     val serverName = tmpServerName.toLowerCase(Locale.getDefault())
-    // 让prod的接口匹配到prod的服务
-    if (serverName.endsWith("-prod")) lowerServiceId += "/prod"
     findIt(_.toLowerCase(Locale.getDefault()) == serverName).orElse(findMostCorrect(service => {
       (service, lowerServiceId.split("/").count(word => service.contains(word)))
     }))
@@ -284,8 +254,5 @@ object DSSGatewayParser {
 
   val APPCONN_HEADER = normalPath(API_URL_PREFIX) + "rest_[a-zA-Z][a-zA-Z_0-9]*/(v\\d+)/([^/]+)/"
   val APPCONN_URL_DEFAULT_REGEX = (APPCONN_HEADER + "([^/]+).+").r
-
-  val DSS_URL_FLOW_QUERY_PREFIX =
-    (DSS_HEADER + "flow/entrance/" + "([^/]+)/" + "(status|execution|kill)").r
 
 }
