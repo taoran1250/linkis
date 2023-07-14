@@ -21,8 +21,8 @@ import org.apache.linkis.common.exception.LinkisRetryException
 import org.apache.linkis.common.utils.{Logging, Utils}
 import org.apache.linkis.governance.common.utils.{JobUtils, LoggerUtils}
 import org.apache.linkis.manager.am.conf.AMConfiguration
-import org.apache.linkis.manager.am.service.engine.EngineAskEngineService.getAsyncId
 import org.apache.linkis.manager.am.hook.{AskEngineConnHook, AskEngineConnHookContext}
+import org.apache.linkis.manager.am.service.engine.EngineAskEngineService.getAsyncId
 import org.apache.linkis.manager.common.constant.AMConstant
 import org.apache.linkis.manager.common.protocol.engine._
 import org.apache.linkis.manager.label.constant.LabelKeyConstant
