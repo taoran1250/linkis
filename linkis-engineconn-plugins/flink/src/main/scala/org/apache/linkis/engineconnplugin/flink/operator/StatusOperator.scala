@@ -26,10 +26,13 @@ import org.apache.linkis.governance.common.constant.ec.ECConstants
 import org.apache.linkis.governance.common.exception.engineconn.EngineConnExecutorErrorCode
 import org.apache.linkis.manager.common.entity.enumeration.NodeStatus
 import org.apache.linkis.manager.common.operator.Operator
+import org.apache.linkis.server.toScalaMap
 
 import org.apache.commons.lang3.StringUtils
 import org.apache.hadoop.yarn.api.records.{ApplicationId, ApplicationReport, FinalApplicationStatus}
 import org.apache.hadoop.yarn.exceptions.ApplicationNotFoundException
+
+import java.util
 
 import scala.collection.mutable
 

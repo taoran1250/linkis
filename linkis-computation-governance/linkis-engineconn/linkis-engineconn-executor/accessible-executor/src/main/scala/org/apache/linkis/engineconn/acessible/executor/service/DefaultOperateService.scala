@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 
+import scala.collection.JavaConverters.mapAsScalaMapConverter
+
 @Service
 class DefaultOperateService extends OperateService with Logging {
 
@@ -41,10 +43,15 @@ class DefaultOperateService extends OperateService with Logging {
   ): EngineOperateResponse = {
     var response: EngineOperateResponse = null
 
-    val parameters = engineOperateRequest.parameters.asScala.toMap
-    val operator = Utils.tryCatch(OperatorFactory().getOperatorRequest(parameters)) { t =>
-      logger.error(s"Get operator failed, parameters is ${engineOperateRequest.parameters}.", t)
-      response = EngineOperateResponse(Map.empty, true, ExceptionUtils.getRootCauseMessage(t))
+    val parameters =
+      engineOperateRequest.getParameters.asScala.toMap.asInstanceOf[util.Map[String, Object]]
+    val operator = Utils.tryCatch(OperatorFactory.apply().getOperatorRequest(parameters)) { t =>
+      logger.error(s"Get operator failed, parameters is ${engineOperateRequest.getParameters}.", t)
+      response = new EngineOperateResponse(
+        new util.HashMap[String, Object](),
+        true,
+        ExceptionUtils.getRootCauseMessage(t)
+      )
       doPostHook(engineOperateRequest, response)
       return response
     }
@@ -53,12 +60,16 @@ class DefaultOperateService extends OperateService with Logging {
     )
     val result = Utils.tryCatch(operator(parameters)) { t =>
       logger.error(s"Execute ${operator.getClass.getSimpleName} failed.", t)
-      response = EngineOperateResponse(Map.empty, true, ExceptionUtils.getRootCauseMessage(t))
+      response = new EngineOperateResponse(
+        new util.HashMap[String, Object](),
+        true,
+        ExceptionUtils.getRootCauseMessage(t)
+      )
       doPostHook(engineOperateRequest, response)
       return response
     }
     logger.info(s"End to execute operator ${operator.getClass.getSimpleName}.")
-    response = EngineOperateResponse(result)
+    response = new EngineOperateResponse(result)
     doPostHook(engineOperateRequest, response)
     response
   }

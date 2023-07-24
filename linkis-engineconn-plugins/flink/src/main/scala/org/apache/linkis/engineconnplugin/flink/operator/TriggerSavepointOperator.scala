@@ -28,6 +28,7 @@ import org.apache.linkis.engineconnplugin.flink.operator.clientmanager.FlinkRest
 import org.apache.linkis.engineconnplugin.flink.util.YarnUtil
 import org.apache.linkis.engineconnplugin.flink.util.YarnUtil.logAndException
 import org.apache.linkis.governance.common.constant.ec.ECConstants
+import org.apache.linkis.governance.common.exception.GovernanceErrorException
 import org.apache.linkis.manager.common.operator.Operator
 
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus
