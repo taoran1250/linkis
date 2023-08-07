@@ -17,6 +17,8 @@
 
 package org.apache.linkis.computation.client.once.action
 
+import org.apache.linkis.common.conf.CommonVars
+import org.apache.linkis.common.utils.Logging
 import org.apache.linkis.httpclient.dws.DWSHttpClient
 import org.apache.linkis.httpclient.request.POSTAction
 import org.apache.linkis.ujes.client.exception.UJESJobException
@@ -32,7 +34,7 @@ class CreateEngineConnAction extends POSTAction with LinkisManagerAction {
 
 }
 
-object CreateEngineConnAction {
+object CreateEngineConnAction extends Logging {
 
   def newBuilder(): Builder = new Builder
 
@@ -89,7 +91,17 @@ object CreateEngineConnAction {
       action.addRequestPayload("properties", properties)
       action.addRequestPayload("labels", labels)
       action.addRequestPayload("createService", createService)
-      action.addRequestPayload("timeout", maxSubmitTime)
+      if (CommonVars.apply("linkis.manager.create.ec.timeout.compatible.old", false).getHotValue) {
+        logger.info(
+          "linkis.manager.create.ec.timeout.compatible.old is true, use old timeOut instead of new timeout"
+        )
+        action.addRequestPayload("timeOut", maxSubmitTime)
+      } else {
+        logger.info(
+          "linkis.manager.create.ec.timeout.compatible.old is false, use new timeout instead of old timeOut"
+        )
+        action.addRequestPayload("timeout", maxSubmitTime)
+      }
       action.addRequestPayload("description", description)
       action.addRequestPayload("ignoreTimeout", ignoreTimeout)
       action
