@@ -98,7 +98,7 @@ object CreateEngineConnAction extends Logging {
         action.addRequestPayload("timeOut", maxSubmitTime)
       } else {
         logger.info(
-          "linkis.manager.create.ec.timeout.compatible.old is false, use new timeout instead of old timeOut"
+          "linkis.manager.create.ec.timeout.compatible.old is false, use default new timeout instead of old timeOut"
         )
         action.addRequestPayload("timeout", maxSubmitTime)
       }
