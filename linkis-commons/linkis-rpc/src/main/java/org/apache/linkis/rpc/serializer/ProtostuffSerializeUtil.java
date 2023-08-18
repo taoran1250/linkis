@@ -70,11 +70,8 @@ public class ProtostuffSerializeUtil {
     Schema<T> schema = (Schema<T>) schemaCache.get(clazz);
     if (schema == null) {
       schema = RuntimeSchema.createFrom(clazz, idStrategy);
-      if (schema != null) {
-        schemaCache.put(clazz, schema);
-      }
+      schemaCache.put(clazz, schema);
     }
-
     return schema;
   }
 
@@ -93,7 +90,7 @@ public class ProtostuffSerializeUtil {
     for (int i = 0; i < byteArray.length; i++) {
       byte high = (byte) (Character.digit(hexString.charAt(k), 16) & 0xff);
       byte low = (byte) (Character.digit(hexString.charAt(k + 1), 16) & 0xff);
-      byteArray[i] = (byte) (high << 4 | low);
+      byteArray[i] = (byte) (high << 4 | low & 0xff);
       k += 2;
     }
     return byteArray;

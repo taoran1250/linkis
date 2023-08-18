@@ -17,6 +17,8 @@
 
 package org.apache.linkis.storage.excel;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -37,7 +39,7 @@ public class ExcelStorageReader {
     } else {
       res = XlsxUtils.getBasicInfo(in, file);
     }
-    if (res == null && res.size() < 2) {
+    if (CollectionUtils.isEmpty(res)) {
       throw new Exception("There is a problem with the file format(文件格式有问题)");
     }
     List<String> headerType = new ArrayList<>();

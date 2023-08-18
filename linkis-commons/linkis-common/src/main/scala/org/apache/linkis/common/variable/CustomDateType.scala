@@ -79,8 +79,9 @@ class CustomMonthType(date: String, std: Boolean = true, isEnd: Boolean = false)
 
   def -(months: Int): String = {
     val dateFormat = DateTypeUtils.dateFormatLocal.get()
+    val dateFormatStd = DateTypeUtils.dateFormatLocal.get()
     if (std) {
-      DateTypeUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), -months))
+      DateTypeUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormatStd.parse(date), -months))
     } else {
       DateTypeUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), -months))
     }
@@ -88,8 +89,9 @@ class CustomMonthType(date: String, std: Boolean = true, isEnd: Boolean = false)
 
   def +(months: Int): String = {
     val dateFormat = DateTypeUtils.dateFormatLocal.get()
+    val dateFormatStd = DateTypeUtils.dateFormatLocal.get()
     if (std) {
-      DateTypeUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), months))
+      DateTypeUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormatStd.parse(date), months))
     } else {
       DateTypeUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), months))
     }
@@ -111,8 +113,9 @@ class CustomMonType(date: String, std: Boolean = true, isEnd: Boolean = false) {
 
   def -(months: Int): String = {
     val dateFormat = DateTypeUtils.dateFormatMonLocal.get()
+    val dateFormatStd = DateTypeUtils.dateFormatMonLocal.get()
     if (std) {
-      DateTypeUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), -months))
+      DateTypeUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormatStd.parse(date), -months))
     } else {
       DateTypeUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), -months))
     }
@@ -120,8 +123,9 @@ class CustomMonType(date: String, std: Boolean = true, isEnd: Boolean = false) {
 
   def +(months: Int): String = {
     val dateFormat = DateTypeUtils.dateFormatMonLocal.get()
+    val dateFormatStd = DateTypeUtils.dateFormatMonLocal.get()
     if (std) {
-      DateTypeUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), months))
+      DateTypeUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormatStd.parse(date), months))
     } else {
       DateTypeUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), months))
     }
