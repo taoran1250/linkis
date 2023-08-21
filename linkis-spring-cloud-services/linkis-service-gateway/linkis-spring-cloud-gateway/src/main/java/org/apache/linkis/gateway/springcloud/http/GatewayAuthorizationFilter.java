@@ -198,13 +198,15 @@ public class GatewayAuthorizationFilter implements GlobalFilter, Ordered {
       exchange.getAttributes().put(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR, realRoute);
     } else {
       RouteDefinition realRd = null;
+      String uri = null;
       String proxyId = gatewayContext.getGatewayRoute().getParams().get("proxyId");
       for (RouteDefinition rd : gatewayProperties.getRoutes()) {
         if ((realRd == null && rd.getId().equals("dws")) || (rd.getId().equals(proxyId))) {
           realRd = rd;
+          uri = realRd.getUri().toString();
         }
       }
-      String uri = realRd.getUri().toString();
+
       if (uri != null) {
         uri =
             uri

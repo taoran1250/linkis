@@ -17,6 +17,7 @@
 
 package org.apache.linkis.entrance.restful;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.linkis.common.conf.Configuration;
 import org.apache.linkis.entrance.EntranceServer;
 import org.apache.linkis.entrance.execute.EntranceJob;
@@ -40,6 +41,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 @Api(tags = "entrance metrice manager")
 @RestController
@@ -94,6 +97,8 @@ public class EntranceMetricRestfulApi {
           queuedNumber++;
         }
       }
+    } else {
+      undoneTasks = new EntranceJob[0];
     }
     Message resp =
         Message.ok("success")

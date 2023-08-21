@@ -28,6 +28,7 @@ import org.apache.linkis.cli.application.operator.ujes.result.OpenLogResult2;
 import org.apache.linkis.cli.application.operator.ujes.result.ResultSetResult2;
 import org.apache.linkis.cli.application.operator.ujes.result.UJESResult;
 import org.apache.linkis.cli.application.utils.CliUtils;
+import org.apache.linkis.governance.common.entity.task.RequestPersistTask;
 import org.apache.linkis.httpclient.dws.response.DWSResult;
 import org.apache.linkis.ujes.client.request.UserAction;
 import org.apache.linkis.ujes.client.response.JobInfoResult;
@@ -70,8 +71,8 @@ public class UJESResultAdapter implements LinkisOperResultAdapter {
       return ((JobSubmitResult) result).getTaskID();
     }
     if (result instanceof JobInfoResult) {
-      if (((JobInfoResult) result).getRequestPersistTask() != null
-          && ((JobInfoResult) result).getRequestPersistTask().getTaskID() != null) {
+      RequestPersistTask requestPersistTask = ((JobInfoResult) result).getRequestPersistTask();
+      if (requestPersistTask != null && requestPersistTask.getTaskID() != null) {
         return String.valueOf(((JobInfoResult) result).getRequestPersistTask().getTaskID());
       }
     }

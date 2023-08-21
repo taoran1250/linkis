@@ -174,12 +174,14 @@ public class CliUtils {
   }
 
   public static String readFile(String path) {
+    InputStream inputStream = null;
+    InputStreamReader iReader = null;
+    BufferedReader bufReader = null;
     try {
       File inputFile = new File(path);
-
-      InputStream inputStream = new FileInputStream(inputFile);
-      InputStreamReader iReader = new InputStreamReader(inputStream);
-      BufferedReader bufReader = new BufferedReader(iReader);
+       inputStream = new FileInputStream(inputFile);
+       iReader = new InputStreamReader(inputStream);
+       bufReader = new BufferedReader(iReader);
 
       StringBuilder sb = new StringBuilder();
       StringBuilder line;
@@ -204,6 +206,20 @@ public class CliUtils {
           CommonErrMsg.BuilderBuildErr,
           "Cannot read user specified script file: " + path,
           e);
+    } finally {
+      try {
+        if (inputStream != null) {
+          inputStream.close();
+        }
+        if (iReader != null) {
+          iReader.close();
+        }
+        if (bufReader != null) {
+          bufReader.close();
+        }
+      } catch (IOException ignored) {
+
+      }
     }
   }
 
