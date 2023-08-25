@@ -21,10 +21,7 @@ import org.apache.linkis.cli.application.exception.PresenterException;
 import org.apache.linkis.cli.application.exception.error.CommonErrMsg;
 import org.apache.linkis.cli.application.exception.error.ErrorLevel;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 
 public class ResultFileWriter {
 
@@ -36,7 +33,10 @@ public class ResultFileWriter {
 
     if (!dir.exists()) {
       try {
-        dir.mkdirs();
+        boolean mkdirs = dir.mkdirs();
+        if (!mkdirs) {
+          throw new IOException("Cannot mkdirs file for path: " + file.getAbsolutePath());
+        }
       } catch (Exception e) {
         throw new PresenterException(
             "PST0005",
@@ -49,7 +49,10 @@ public class ResultFileWriter {
 
     if (overWrite || !file.exists()) {
       try {
-        file.createNewFile();
+        boolean newFile = file.createNewFile();
+        if (!newFile) {
+          throw new IOException("Cannot create file for path: " + file.getAbsolutePath());
+        }
       } catch (Exception e) {
         throw new PresenterException(
             "PST0006",

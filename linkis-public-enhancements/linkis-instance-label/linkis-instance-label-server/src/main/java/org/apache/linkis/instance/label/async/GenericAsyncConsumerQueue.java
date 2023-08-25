@@ -92,7 +92,9 @@ public class GenericAsyncConsumerQueue<T> implements AsyncConsumerQueue<T> {
               LOG.trace("wait until the next time: " + triggerTime);
               consumeLock.lock();
               try {
-                consumeCondition.await(triggerTime - nowMillsTime, TimeUnit.MILLISECONDS);
+                boolean await =
+                    consumeCondition.await(triggerTime - nowMillsTime, TimeUnit.MILLISECONDS);
+                if (!await) LOG.error("Exception in consuming queue, await: [" + await + "]");
               } catch (InterruptedException e) {
                 LOG.error("Interrupt in awaiting action, message: [" + e.getMessage() + "]", e);
                 continue;

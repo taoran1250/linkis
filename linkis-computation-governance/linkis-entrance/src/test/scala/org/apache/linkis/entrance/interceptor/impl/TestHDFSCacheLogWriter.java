@@ -52,8 +52,10 @@ class TestHDFSCacheLogWriter {
         String  username=System.getProperty("user.name");
 
        File file=new File(logPath);
-       file.createNewFile();
-
+        boolean newFile = file.createNewFile();
+        if (!newFile) {
+            throw new IOException("Cannot createNewFile file");
+        }
         HDFSCacheLogWriter logWriter =new HDFSCacheLogWriter(
             //"D:\\DataSphere\\linkis\\docs\\test.log",
             logPath,

@@ -33,10 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
 
 import com.github.pagehelper.PageHelper;
@@ -135,7 +132,10 @@ public class EnginePluginAdminServiceImpl implements EnginePluginAdminService {
     ZipUtils.fileToUnzip(engineConnsHome + "/" + mfile.getOriginalFilename(), engineConnsHome);
     File file = new File(engineConnsHome + "/" + mfile.getOriginalFilename());
     if (file.exists()) {
-      file.delete();
+      boolean delete = file.delete();
+      if (!delete) {
+        log.error("Error deleting  file:" + file.getAbsolutePath());
+      }
       log.info("file {} delete success", mfile.getOriginalFilename());
     }
   }
@@ -146,9 +146,15 @@ public class EnginePluginAdminServiceImpl implements EnginePluginAdminService {
       if (file.isDirectory()) {
         deleteDir(file);
       } else {
-        file.delete();
+        boolean delete = file.delete();
+        if (!delete) {
+          log.error("Error deleting  file:" + file.getAbsolutePath());
+        }
       }
     }
-    directory.delete();
+    boolean delete = directory.delete();
+    if (!delete) {
+      log.error("Error deleting  file:" + directory.getAbsolutePath());
+    }
   }
 }

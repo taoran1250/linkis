@@ -385,21 +385,25 @@ public class LocalFileSystem extends FileSystem {
       throw new IOException("you have on permission to create file " + dest);
     }
     boolean newFile = file.createNewFile();
-    try {
-      setPermission(new FsPath(dest), this.getDefaultFilePerm());
-      if (!user.equals(getOwner(dest))) {
-        setOwner(new FsPath(dest), user, null);
+    if (newFile) {
+      try {
+        setPermission(new FsPath(dest), this.getDefaultFilePerm());
+        if (!user.equals(getOwner(dest))) {
+          setOwner(new FsPath(dest), user, null);
+        }
+      } catch (Throwable e) {
+        boolean delete = file.delete();
+        if (!delete && file.exists()) {
+          throw new IOException("Failed to delete: " + file.getAbsolutePath());
+        }
+        if (e instanceof IOException) {
+          throw (IOException) e;
+        } else {
+          throw new IOException(e);
+        }
       }
-    } catch (Throwable e) {
-      boolean delete = file.delete();
-      if (!delete && file.exists()) {
-        throw new IOException("Failed to delete: " + file.getAbsolutePath());
-      }
-      if (e instanceof IOException) {
-        throw (IOException) e;
-      } else {
-        throw new IOException(e);
-      }
+    } else {
+      throw new IOException("Failed to createNewFile: " + file.getAbsolutePath());
     }
     return true;
   }

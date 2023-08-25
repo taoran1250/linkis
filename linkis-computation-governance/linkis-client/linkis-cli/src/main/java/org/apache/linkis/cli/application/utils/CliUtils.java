@@ -179,9 +179,9 @@ public class CliUtils {
     BufferedReader bufReader = null;
     try {
       File inputFile = new File(path);
-       inputStream = new FileInputStream(inputFile);
-       iReader = new InputStreamReader(inputStream);
-       bufReader = new BufferedReader(iReader);
+      inputStream = new FileInputStream(inputFile);
+      iReader = new InputStreamReader(inputStream);
+      bufReader = new BufferedReader(iReader);
 
       StringBuilder sb = new StringBuilder();
       StringBuilder line;
