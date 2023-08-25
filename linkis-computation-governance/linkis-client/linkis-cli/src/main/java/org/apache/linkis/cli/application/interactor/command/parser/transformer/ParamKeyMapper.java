@@ -46,9 +46,14 @@ public abstract class ParamKeyMapper {
     initMapperRules();
   }
 
-  public ParamKeyMapper(Map<String, String> mapperRulesParms) {
-    mapperRulesParms = new HashMap<>();
-    initMapperRules(mapperRulesParms);
+  public ParamKeyMapper(Map<String, String> mapperRules) {
+    Map<String, String> mapperRulesParm;
+    if (mapperRules != null) {
+      mapperRulesParm = mapperRules;
+    } else {
+      mapperRulesParm = new HashMap<>();
+    }
+    initMapperRules(mapperRulesParm);
   }
 
   /** Executor should overwrite init() method to set key to key mapping */

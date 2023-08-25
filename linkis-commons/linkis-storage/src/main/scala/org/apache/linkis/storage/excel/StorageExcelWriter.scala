@@ -80,9 +80,7 @@ class StorageExcelWriter(
   def createCellStyle(dataType: DataType): CellStyle = {
     val style = workBook.createCellStyle()
     format = workBook.createDataFormat()
-    dataType.toString match {
-      case _ => style.setDataFormat(format.getFormat("@"))
-    }
+    style.setDataFormat(format.getFormat("@"))
     if (autoFormat) {
       dataType match {
         case StringType => style.setDataFormat(format.getFormat("@"))

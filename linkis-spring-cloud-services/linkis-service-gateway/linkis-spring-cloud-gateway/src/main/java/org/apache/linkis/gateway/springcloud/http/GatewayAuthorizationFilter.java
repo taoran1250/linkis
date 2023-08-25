@@ -200,13 +200,13 @@ public class GatewayAuthorizationFilter implements GlobalFilter, Ordered {
       RouteDefinition realRd = null;
       String uri = null;
       String proxyId = gatewayContext.getGatewayRoute().getParams().get("proxyId");
-      for (RouteDefinition rd : gatewayProperties.getRoutes()) {
-        if ((realRd == null && rd.getId().equals("dws")) || (rd.getId().equals(proxyId))) {
+      List<RouteDefinition> routes = gatewayProperties.getRoutes();
+      for (RouteDefinition rd : routes) {
+        if ((rd != null) && (rd.getId().equals("dws") || rd.getId().equals(proxyId))) {
           realRd = rd;
           uri = realRd.getUri().toString();
         }
       }
-
       if (uri != null) {
         uri =
             uri

@@ -72,10 +72,12 @@ public class PropsFileReader implements PropertiesReader {
       throw new PropsException(
           "PRP0002", ErrorLevel.ERROR, CommonErrMsg.PropsReaderErr, "Source: " + propsPath, e);
     } finally {
-      try {
-        in.close();
-      } catch (Exception ignore) {
-        // ignore
+      if (in != null) {
+        try {
+          in.close();
+        } catch (Exception ignore) {
+          // ignore
+        }
       }
     }
 

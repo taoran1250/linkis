@@ -49,8 +49,7 @@ class DSSRouteLabelParser extends RouteLabelParser {
       requestBody match {
         // todo form-data resolve
         case Some(body) =>
-          if (body.contains("form-data")) {}
-//          else {
+//          if (body.contains("form-data")) {} else {
 //          val labelBuilderFactory = LabelBuilderFactoryContext.getLabelBuilderFactory
 //          val json = BDPJettyServerHelper.gson.fromJson(body, classOf[java.util.Map[String, Object]])
 //          val labels: util.List[Label[_]] = json.get(TaskConstant.LABELS) match {

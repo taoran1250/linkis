@@ -220,7 +220,11 @@ public class LocalFileSystem extends FileSystem {
         setOwner(new FsPath(dest), user, null);
       }
     } catch (Throwable e) {
-      file.delete();
+      boolean deleted = file.delete();
+      // Delete can also fail if the file simply did not exist.
+      if (!deleted && file.exists()) {
+        throw new IOException("Failed to delete: " + file.getAbsolutePath());
+      }
       if (e instanceof IOException) {
         throw (IOException) e;
       } else {
@@ -380,14 +384,17 @@ public class LocalFileSystem extends FileSystem {
     if (!isOwner(file.getParent())) {
       throw new IOException("you have on permission to create file " + dest);
     }
-    file.createNewFile();
+    boolean newFile = file.createNewFile();
     try {
       setPermission(new FsPath(dest), this.getDefaultFilePerm());
       if (!user.equals(getOwner(dest))) {
         setOwner(new FsPath(dest), user, null);
       }
     } catch (Throwable e) {
-      file.delete();
+      boolean delete = file.delete();
+      if (!delete && file.exists()) {
+        throw new IOException("Failed to delete: " + file.getAbsolutePath());
+      }
       if (e instanceof IOException) {
         throw (IOException) e;
       } else {
