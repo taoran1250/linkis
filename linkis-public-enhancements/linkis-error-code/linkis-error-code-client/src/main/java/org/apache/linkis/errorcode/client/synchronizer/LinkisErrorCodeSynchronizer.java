@@ -46,7 +46,7 @@ public class LinkisErrorCodeSynchronizer {
   private static final long PERIOD =
       CommonVars.apply("wds.linkis.errorcode.period.time", 1L).getValue();
 
-  private static LinkisErrorCodeSynchronizer linkisErrorCodeSynchronizer;
+  private static volatile LinkisErrorCodeSynchronizer linkisErrorCodeSynchronizer;
 
   /** 一个同步器用一个client就行,不用进行关闭 */
   private final LinkisErrorCodeClient errorCodeClient =
