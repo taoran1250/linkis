@@ -106,7 +106,7 @@ public class VariableRestfulApiTest {
         mvcResult = mvcUtils.getMessage(mvcUtils.buildMvcResultPost(url));
       }
     }
-    assertEquals(MessageStatus.SUCCESS(), mvcResult.getStatus());
+    assertEquals(MessageStatus.SUCCESS(), mvcResult != null ? mvcResult.getStatus() : null);
     logger.info(String.valueOf(mvcResult));
   }
 }

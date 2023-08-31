@@ -153,23 +153,26 @@ public class DefaultContextCacheService implements ContextCacheService {
     if (null == contextID && null == scope) {
       return null;
     }
-    try {
-      ContextIDValue contextIDValue = contextCache.getContextIDValue(contextID);
-      List<ContextKeyValue> valueCSTypeList =
-          contextIDValue.getContextKeyValueContext().getAllValues(csType);
-      if (CollectionUtils.isNotEmpty(valueCSTypeList)) {
-        return valueCSTypeList.stream()
-            .filter(
-                contextKeyValue -> scope.equals(contextKeyValue.getContextKey().getContextScope()))
-            .collect(Collectors.toList());
+    if (null != contextID && null != scope) {
+      try {
+        ContextIDValue contextIDValue = contextCache.getContextIDValue(contextID);
+        List<ContextKeyValue> valueCSTypeList =
+            contextIDValue.getContextKeyValueContext().getAllValues(csType);
+        if (CollectionUtils.isNotEmpty(valueCSTypeList)) {
+          return valueCSTypeList.stream()
+              .filter(
+                  contextKeyValue ->
+                      scope.equals(contextKeyValue.getContextKey().getContextScope()))
+              .collect(Collectors.toList());
+        }
+      } catch (Exception e) {
+        logger.error(
+            "Failed to getAllByScope contextID({}) of ContextScope({}) of csType({})",
+            contextID.getContextId(),
+            scope,
+            csType,
+            e);
       }
-    } catch (Exception e) {
-      logger.error(
-          "Failed to getAllByScope contextID({}) of ContextScope({}) of csType({})",
-          contextID.getContextId(),
-          scope,
-          csType,
-          e);
     }
     return null;
   }

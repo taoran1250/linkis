@@ -249,10 +249,9 @@ public class MongoDbConnection implements Closeable {
       this.database = database;
       if (extraParams != null) {
         this.extraParams = extraParams;
+        this.extraParams.put("connectTimeout", CONNECT_TIMEOUT.getValue());
+        this.extraParams.put("socketTimeout", SOCKET_TIMEOUT.getValue());
       }
-      this.extraParams = extraParams;
-      this.extraParams.put("connectTimeout", CONNECT_TIMEOUT.getValue());
-      this.extraParams.put("socketTimeout", SOCKET_TIMEOUT.getValue());
     }
   }
 }

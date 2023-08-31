@@ -100,13 +100,13 @@ public class CSTableService implements TableService {
         rsList =
             searchService.searchUpstreamContext(
                 contextID, nodeName, Integer.MAX_VALUE, CSTable.class);
+        if (null != rsList)
+          logger.info(
+              "contextID: {} and nodeName: {} succeed to get tables size {}",
+              contextID.getContextId(),
+              nodeName,
+              rsList.size());
       }
-      if (null != rsList)
-        logger.info(
-            "contextID: {} and nodeName: {} succeed to get tables size {}",
-            contextID.getContextId(),
-            nodeName,
-            rsList.size());
       return rsList;
     } catch (ErrorException e) {
       logger.error("Deserialize contextID error. contextIDStr : " + contextIDStr);

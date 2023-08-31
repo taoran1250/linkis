@@ -59,15 +59,15 @@ public class DefaultContextKeyCallbackEngine implements CSKeyListener, ContextKe
           logger.info("要注册的csClient和contextId: " + source + ":" + contextID);
           registerCSIDcsClients.put(source, contextID);
         }
-      }
-      // 针对cskey生成一个bean，cskey对应的value值目前为空
-      if (contextKey != null) {
-        ContextKeyValueBean contextKeyValueBean = new ContextKeyValueBean();
-        contextKeyValueBean.setCsKey(contextKey);
-        contextKeyValueBean.setCsID(contextID);
-        synchronized (registerCSIDcsKeyValues) {
-          logger.info("要注册的contextId: " + contextID.getContextId());
-          registerCSIDcsKeyValues.put(contextID.getContextId(), contextKeyValueBean);
+        // 针对cskey生成一个bean，cskey对应的value值目前为空
+        if (contextKey != null) {
+          ContextKeyValueBean contextKeyValueBean = new ContextKeyValueBean();
+          contextKeyValueBean.setCsKey(contextKey);
+          contextKeyValueBean.setCsID(contextID);
+          synchronized (registerCSIDcsKeyValues) {
+            logger.info("要注册的contextId: " + contextID.getContextId());
+            registerCSIDcsKeyValues.put(contextID.getContextId(), contextKeyValueBean);
+          }
         }
       }
     }

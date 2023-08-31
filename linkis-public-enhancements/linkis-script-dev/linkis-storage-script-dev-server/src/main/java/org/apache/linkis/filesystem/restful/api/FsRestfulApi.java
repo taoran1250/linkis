@@ -779,8 +779,10 @@ public class FsRestfulApi {
         default:
           WorkspaceExceptionManager.createException(80015);
       }
-      fileSource.write(fsWriter);
-      fsWriter.flush();
+      if (fsWriter != null) {
+        fileSource.write(fsWriter);
+        fsWriter.flush();
+      }
     } catch (Exception e) {
       LOGGER.error("output failed", e);
       response.reset();

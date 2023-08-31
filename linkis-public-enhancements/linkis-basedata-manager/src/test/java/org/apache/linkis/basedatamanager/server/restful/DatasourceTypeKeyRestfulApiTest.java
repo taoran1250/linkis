@@ -152,7 +152,7 @@ public class DatasourceTypeKeyRestfulApiTest {
         mvcResult = mvcUtils.getMessage(mvcUtils.buildMvcResultPut(url));
       }
     }
-    assertEquals(MessageStatus.SUCCESS(), mvcResult.getStatus());
+    assertEquals(MessageStatus.SUCCESS(), mvcResult != null ? mvcResult.getStatus() : null);
     logger.info(String.valueOf(mvcResult));
   }
 }
