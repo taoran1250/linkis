@@ -50,11 +50,8 @@ public final class ParserUtils {
 
   public static void generateLogPath(JobRequest jobRequest, Map<String, String> params) {
     String logPath = null;
-    String logPathPrefix = null;
     String logMid = "log";
-    if (StringUtils.isEmpty(logPathPrefix)) {
-      logPathPrefix = EntranceConfiguration$.MODULE$.DEFAULT_LOGPATH_PREFIX().getValue();
-    }
+    String logPathPrefix = EntranceConfiguration$.MODULE$.DEFAULT_LOGPATH_PREFIX().getValue();
     /*Determine whether logPathPrefix is terminated with /, if it is, delete */
     /*判断是否logPathPrefix是否是以 / 结尾， 如果是，就删除*/
     if (StringUtils.isNotBlank(logPathPrefix) && logPathPrefix.endsWith("/")) {

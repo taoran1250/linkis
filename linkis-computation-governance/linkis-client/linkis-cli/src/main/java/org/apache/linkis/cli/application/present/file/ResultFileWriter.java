@@ -34,7 +34,7 @@ public class ResultFileWriter {
       try {
         boolean mkdirs = dir.mkdirs();
         if (!mkdirs) {
-          throw new IOException("Cannot mkdirs file for path: " + file.getAbsolutePath());
+          throw new IOException("Failed to mkdirs file for path: " + dir.getAbsolutePath());
         }
       } catch (Exception e) {
         throw new PresenterException(
@@ -52,7 +52,7 @@ public class ResultFileWriter {
       try {
         boolean newFile = file.createNewFile();
         if (!newFile) {
-          throw new IOException("Cannot create file for path: " + file.getAbsolutePath());
+          throw new IOException("Failed to create file for path: " + file.getAbsolutePath());
         }
       } catch (Exception e) {
         throw new PresenterException(

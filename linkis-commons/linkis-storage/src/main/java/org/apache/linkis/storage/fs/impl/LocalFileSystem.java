@@ -223,7 +223,7 @@ public class LocalFileSystem extends FileSystem {
       boolean deleted = file.delete();
       // Delete can also fail if the file simply did not exist.
       if (!deleted && file.exists()) {
-        throw new IOException("Failed to delete: " + file.getAbsolutePath());
+        LOG.warn("Failed to delete: " + file.getAbsolutePath());
       }
       if (e instanceof IOException) {
         throw (IOException) e;

@@ -148,13 +148,13 @@ public class EnginePluginAdminServiceImpl implements EnginePluginAdminService {
       } else {
         boolean delete = file.delete();
         if (!delete) {
-          log.error("Error deleting  file:" + file.getAbsolutePath());
+          log.warn("Error deleting  file:" + file.getAbsolutePath());
         }
       }
     }
     boolean delete = directory.delete();
     if (!delete) {
-      log.error("Error deleting  file:" + directory.getAbsolutePath());
+      log.warn("Error deleting  file:" + directory.getAbsolutePath());
     }
   }
 }

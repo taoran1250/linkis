@@ -85,8 +85,9 @@ public class EntranceMetricRestfulApi {
     EntranceJob[] undoneTasks = entranceServer.getAllUndoneTask(filterWords, ecType);
     int runningNumber = 0;
     int queuedNumber = 0;
-
+    int taskNumber =0;
     if (null != undoneTasks) {
+      taskNumber = undoneTasks.length;
       for (EntranceJob task : undoneTasks) {
         if (task.isRunning()) {
           runningNumber++;
@@ -94,12 +95,10 @@ public class EntranceMetricRestfulApi {
           queuedNumber++;
         }
       }
-    } else {
-      undoneTasks = new EntranceJob[0];
     }
     Message resp =
         Message.ok("success")
-            .data("taskNumber", undoneTasks.length)
+            .data("taskNumber", taskNumber)
             .data("runningNumber", runningNumber)
             .data("queuedNumber", queuedNumber);
     if (StringUtils.isNoneBlank(creator, ecType)) {
