@@ -39,7 +39,7 @@ public class ExcelStorageReader {
     } else {
       res = XlsxUtils.getBasicInfo(in, file);
     }
-    if (CollectionUtils.isEmpty(res)) {
+    if (res == null || res.size() < 2) {
       throw new Exception("There is a problem with the file format(文件格式有问题)");
     }
     List<String> headerType = new ArrayList<>();

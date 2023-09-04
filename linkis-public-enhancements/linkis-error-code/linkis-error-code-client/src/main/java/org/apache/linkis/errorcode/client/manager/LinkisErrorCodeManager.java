@@ -24,17 +24,22 @@ import java.util.List;
 
 public class LinkisErrorCodeManager {
 
+  private static LinkisErrorCodeManager linkisErrorCodeManager;
+
   private final LinkisErrorCodeSynchronizer linkisErrorCodeSynchronizer =
       LinkisErrorCodeSynchronizer.getInstance();
 
   private LinkisErrorCodeManager() {}
 
-  private static final class LinkisErrorCodeManagerHolder {
-    static final LinkisErrorCodeManager linkisErrorCodeManager = new LinkisErrorCodeManager();
-  }
-
   public static LinkisErrorCodeManager getInstance() {
-    return LinkisErrorCodeManagerHolder.linkisErrorCodeManager;
+    if (linkisErrorCodeManager == null) {
+      synchronized (LinkisErrorCodeManager.class) {
+        if (linkisErrorCodeManager == null) {
+          linkisErrorCodeManager = new LinkisErrorCodeManager();
+        }
+      }
+    }
+    return linkisErrorCodeManager;
   }
 
   public List<LinkisErrorCode> getLinkisErrorCodes() {
