@@ -52,15 +52,15 @@ jobs:
     - if: ${{ matrix.installSpark == 'spark2.4-hadoop2.3' }}
       name: build-spark on init
       run:
-        ./mvnw clean install -Pspark-2.4 -Phadoop-2.3 -Dmaven.test.skip=true
+        ./mvnw clean install -Pspark-2.4 -Phadoop-2.3 -Dmaven.test.skip=true -pl '!linkis-engineconn-plugins/appconn'
     - if: ${{ matrix.installSpark == 'spark3.2-hadoop3.3' }}
       name: build-spark on 3.2
       run:
-        ./mvnw clean install -Pspark-3.2 -Phadoop-3.3 -Dmaven.test.skip=true
+        ./mvnw clean install -Pspark-3.2 -Phadoop-3.3 -Dmaven.test.skip=true -Dmaven.test.skip=true -pl '!linkis-engineconn-plugins/appconn'
     - if: ${{ matrix.installSpark == 'spark2.4-hadoop3.3' }}
       name: build-spark on 2.4
       run:
-        ./mvnw clean install -Pspark-2.4-hadoop-3.3 -Phadoop-3.3 -Dmaven.test.skip=true
+        ./mvnw clean install -Pspark-2.4-hadoop-3.3 -Phadoop-3.3 -Dmaven.test.skip=true -Dmaven.test.skip=true -pl '!linkis-engineconn-plugins/appconn'
 #    - name: Upload coverage to Codecov
 #      uses: codecov/codecov-action@v3.0.0
 #      with:
