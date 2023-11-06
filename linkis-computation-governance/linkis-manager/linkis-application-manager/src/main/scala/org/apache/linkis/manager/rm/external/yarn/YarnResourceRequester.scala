@@ -202,23 +202,34 @@ class YarnResourceRequester extends ExternalResourceRequester with Logging {
           (queueInfo \ "numActiveApps").asInstanceOf[JInt].values.toInt
         )
       } else if ("fairScheduler".equals(schedulerType)) {
-        val childQueues = getChildQueues(resp \ "scheduler" \ "schedulerInfo" \ "rootQueue")
-        val queue = getQueue(childQueues)
-        if (queue.isEmpty || queue.get == null) {
-          logger.debug(s"cannot find any information about queue $queueName, response: " + resp)
-          throw new RMWarnException(
-            YARN_NOT_EXISTS_QUEUE.getErrorCode,
-            MessageFormat.format(YARN_NOT_EXISTS_QUEUE.getErrorDesc, queueName)
+        if ("root".equals(queueName)) {
+          val rootQueue = (resp \ "scheduler" \ "schedulerInfo" \ "rootQueue").asInstanceOf[Option[JValue]]
+          (
+            getYarnResource(rootQueue.map(_ \ "maxResources")).get,
+            getYarnResource(rootQueue.map(_ \ "usedResources")).get,
+            0,
+            0,
+            0
+          )
+        } else {
+          val childQueues = getChildQueues(resp \ "scheduler" \ "schedulerInfo" \ "rootQueue")
+          val queue = getQueue(childQueues)
+          if (queue.isEmpty || queue.get == null) {
+            logger.debug(s"cannot find any information about queue $queueName, response: " + resp)
+            throw new RMWarnException(
+              YARN_NOT_EXISTS_QUEUE.getErrorCode,
+              MessageFormat.format(YARN_NOT_EXISTS_QUEUE.getErrorDesc, queueName)
+            )
+          }
+          val queueInfo = queue.get.asInstanceOf[JObject]
+          (
+            getYarnResource(queue.map(_ \ "maxResources")).get,
+            getYarnResource(queue.map(_ \ "usedResources")).get,
+            (queueInfo \ "maxApps").asInstanceOf[JInt].values.toInt,
+            (queueInfo \ "numPendingApps").asInstanceOf[JInt].values.toInt,
+            (queueInfo \ "numActiveApps").asInstanceOf[JInt].values.toInt
           )
         }
-        val queueInfo = queue.get.asInstanceOf[JObject]
-        (
-          getYarnResource(queue.map(_ \ "maxResources")).get,
-          getYarnResource(queue.map(_ \ "usedResources")).get,
-          (queueInfo \ "maxApps").asInstanceOf[JInt].values.toInt,
-          (queueInfo \ "numPendingApps").asInstanceOf[JInt].values.toInt,
-          (queueInfo \ "numActiveApps").asInstanceOf[JInt].values.toInt
-        )
       } else {
         logger.debug(
           s"only support fairScheduler or capacityScheduler, schedulerType: $schedulerType , response: " + resp
