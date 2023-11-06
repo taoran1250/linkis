@@ -18,6 +18,7 @@
 package org.apache.linkis.manager.rm.utils
 
 import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.manager.am.conf.AMConfiguration
 import org.apache.linkis.manager.common.entity.resource.YarnResource
 import org.apache.linkis.manager.common.exception.RMWarnException
 import org.apache.linkis.manager.rm.exception.RMErrorCode
@@ -35,15 +36,31 @@ object AcrossClusterRulesJudgeUtils extends Logging {
       CPUPercentageThreshold: Double,
       MemoryPercentageThreshold: Double
   ): Unit = {
-    if (leftResource != null && usedResource != null && maxResource != null && clusterMaxCapacity != null && clusterUsedCapacity != null) {
+    if (
+        leftResource != null && usedResource != null && maxResource != null && clusterMaxCapacity != null && clusterUsedCapacity != null
+    ) {
 
-      val clusterUsedCPUPercentage = clusterUsedCapacity.queueCores.asInstanceOf[Double] / clusterMaxCapacity.queueCores.asInstanceOf[Double]
-      val clusterUsedMemoryPercentage = clusterUsedCapacity.queueMemory.asInstanceOf[Double] / clusterMaxCapacity.queueMemory.asInstanceOf[Double]
-      if (clusterUsedCPUPercentage > 0.6 && clusterUsedMemoryPercentage > 0.6) {
+      val clusterUsedCPUPercentage = clusterUsedCapacity.queueCores
+        .asInstanceOf[Double] / clusterMaxCapacity.queueCores.asInstanceOf[Double]
+      val clusterUsedMemoryPercentage = clusterUsedCapacity.queueMemory
+        .asInstanceOf[Double] / clusterMaxCapacity.queueMemory.asInstanceOf[Double]
+      val clusterCPUPercentageThreshold =
+        AMConfiguration.ACROSS_CLUSTER_TOTAL_CPU_PERCENTAGE_THRESHOLD
+      val clusterMemoryPercentageThreshold =
+        AMConfiguration.ACROSS_CLUSTER_TOTAL_MEMORY_PERCENTAGE_THRESHOLD
+
+      logger.info(
+        s"clusterUsedCPUPercentage: $clusterUsedCPUPercentage, CPUPercentageThreshold: $clusterCPUPercentageThreshold" +
+          s"clusterUsedMemoryPercentage: $clusterUsedMemoryPercentage, MemoryPercentageThreshold: $clusterMemoryPercentageThreshold"
+      )
+
+      if (
+          clusterUsedCPUPercentage > clusterCPUPercentageThreshold && clusterUsedMemoryPercentage > clusterMemoryPercentageThreshold
+      ) {
         throw new RMWarnException(
           RMErrorCode.ACROSS_CLUSTER_RULE_FAILED.getErrorCode,
-          s"clusterUsedCPUPercentage: $clusterUsedCPUPercentage, CPUPercentageThreshold: $CPUPercentageThreshold" +
-            s"clusterUsedMemoryPercentage: $clusterUsedMemoryPercentage, MemoryPercentageThreshold: $MemoryPercentageThreshold"
+          s"clusterUsedCPUPercentage: $clusterUsedCPUPercentage, CPUPercentageThreshold: $clusterCPUPercentageThreshold" +
+            s"clusterUsedMemoryPercentage: $clusterUsedMemoryPercentage, MemoryPercentageThreshold: $clusterMemoryPercentageThreshold"
         )
       }
 

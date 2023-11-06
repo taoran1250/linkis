@@ -37,6 +37,10 @@ object AMConfiguration {
 
   val ACROSS_CLUSTER_MEMORY_PERCENTAGE_THRESHOLD = "MemoryPercentageThreshold"
 
+  val ACROSS_CLUSTER_TOTAL_MEMORY_PERCENTAGE_THRESHOLD: Double = 0
+
+  val ACROSS_CLUSTER_TOTAL_CPU_PERCENTAGE_THRESHOLD: Double = 0
+
   val ECM_ADMIN_OPERATIONS = CommonVars("wds.linkis.governance.admin.operations", "")
 
   val ENGINE_START_MAX_TIME =

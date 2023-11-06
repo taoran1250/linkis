@@ -203,11 +203,15 @@ class YarnResourceRequester extends ExternalResourceRequester with Logging {
         )
       } else if ("fairScheduler".equals(schedulerType)) {
         if ("root".equals(queueName)) {
-          val rootQueue = (resp \ "scheduler" \ "schedulerInfo" \ "rootQueue").asInstanceOf[Option[JValue]]
+          // get cluster total resource
+          val queue = (resp \ "scheduler" \ "schedulerInfo" \ "rootQueue")
+          logger.info("clusterResource in root queue:" + resp)
+          val rootQueue: Option[JValue] = Some(queue)
+          val rootQueueInfo = rootQueue.get.asInstanceOf[JObject]
           (
             getYarnResource(rootQueue.map(_ \ "maxResources")).get,
             getYarnResource(rootQueue.map(_ \ "usedResources")).get,
-            0,
+            (rootQueueInfo \ "maxApps").asInstanceOf[JInt].values.toInt,
             0,
             0
           )

@@ -97,7 +97,11 @@ class DriverAndYarnReqResourceService(
       ) {
 
         val clusterYarnResource =
-          externalResourceService.getResource(ResourceType.Yarn, labelContainer, new YarnResourceIdentifier("root"))
+          externalResourceService.getResource(
+            ResourceType.Yarn,
+            labelContainer,
+            new YarnResourceIdentifier("root")
+          )
         val (clusterMaxCapacity, clusterUsedCapacity) =
           (clusterYarnResource.getMaxResource, clusterYarnResource.getUsedResource)
 
