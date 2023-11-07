@@ -135,7 +135,7 @@ class DefaultEngineAskEngineService
 
       if (null != reuseNode) {
         logger.info(
-          s"Task: $taskId  Finished to ask engine for user ${engineAskRequest.getUser} by reuse node $reuseNode"
+          s"Task: $taskId finished to ask engine for user ${engineAskRequest.getUser} by reuse node $reuseNode"
         )
         LoggerUtils.removeJobIdMDC()
         (reuseNode, true)
