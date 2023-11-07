@@ -1081,7 +1081,7 @@ public class FsRestfulApi {
               } catch (StringIndexOutOfBoundsException e) {
                 throw WorkspaceExceptionManager.createException(80017);
               }
-            }else {
+            } else {
               csvMap.put(column[0][i], "string");
             }
           }

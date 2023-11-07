@@ -26,13 +26,13 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import org.junit.jupiter.api.*;
-import org.springframework.util.StringUtils;
 
 /** ExcelStorageReader Tester */
 public class ExcelStorageReaderTest {
@@ -88,7 +88,7 @@ public class ExcelStorageReaderTest {
     return null;
   }
 
-  public  InputStream createCSVInputStream(List<List<String>> data) {
+  public InputStream createCSVInputStream(List<List<String>> data) {
     String csvData = convertToCSV(data);
     return new ByteArrayInputStream(csvData.getBytes(StandardCharsets.UTF_8));
   }
@@ -106,7 +106,8 @@ public class ExcelStorageReaderTest {
     return csvData.toString();
   }
 
-  private Map<String, String> getCsvInfo(InputStream in, boolean escapeQuotes, boolean hasHeader) throws Exception{
+  private Map<String, String> getCsvInfo(InputStream in, boolean escapeQuotes, boolean hasHeader)
+      throws Exception {
     HashMap<String, String> csvMap = new LinkedHashMap<>();
     String[][] column = null;
     // fix csv file with utf-8 with bom chart[&#xFEFF]
@@ -129,7 +130,7 @@ public class ExcelStorageReaderTest {
           } catch (StringIndexOutOfBoundsException e) {
             throw new RuntimeException("处理标题引号异常");
           }
-        }else {
+        } else {
           csvMap.put(column[0][i], "string");
         }
       }
@@ -159,18 +160,18 @@ public class ExcelStorageReaderTest {
   }
 
   @Test
-  public void getCsvSheetInfo() throws Exception{
+  public void getCsvSheetInfo() throws Exception {
     List<List<String>> data = new ArrayList<>();
     data.add(Arrays.asList("Name", "Age", "City"));
     data.add(Arrays.asList("John Doe", "30", "New York"));
     data.add(Arrays.asList("Jane Smith", "25", "San Francisco"));
 
-    //有标题
+    // 有标题
     InputStream inputStream = createCSVInputStream(data);
     Map<String, String> csvMap = getCsvInfo(inputStream, false, true);
     Assertions.assertEquals("string", csvMap.get("Name"));
 
-    //无标题
+    // 无标题
     InputStream inputStream1 = createCSVInputStream(data);
     Map<String, String> csvMap1 = getCsvInfo(inputStream1, false, false);
     Assertions.assertEquals("string", csvMap1.get("col_1"));
@@ -178,17 +179,14 @@ public class ExcelStorageReaderTest {
     List<List<String>> data1 = new ArrayList<>();
     data1.add(Arrays.asList("'Name'", "'Age'", "'City'"));
 
-    //有标题有引号
+    // 有标题有引号
     InputStream inputStream2 = createCSVInputStream(data1);
     Map<String, String> csvMap2 = getCsvInfo(inputStream2, true, true);
     Assertions.assertEquals("string", csvMap2.get("Name"));
 
-    //无标题
+    // 无标题
     InputStream inputStream3 = createCSVInputStream(data1);
     Map<String, String> csvMap3 = getCsvInfo(inputStream3, false, false);
     Assertions.assertEquals("string", csvMap3.get("col_1"));
-
   }
-
-
 }
