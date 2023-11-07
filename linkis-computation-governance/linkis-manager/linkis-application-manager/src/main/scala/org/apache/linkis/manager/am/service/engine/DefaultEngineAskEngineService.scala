@@ -121,11 +121,11 @@ class DefaultEngineAskEngineService
             t match {
               case retryException: LinkisRetryException =>
                 logger.info(
-                  s"task: $taskId user ${engineAskRequest.getUser} reuse engine failed ${t.getMessage}"
+                  s"Task: $taskId user ${engineAskRequest.getUser} reuse engine failed ${t.getMessage}"
                 )
               case _ =>
                 logger.info(
-                  s"task: $taskId user ${engineAskRequest.getUser} reuse engine failed",
+                  s"Task: $taskId user ${engineAskRequest.getUser} reuse engine failed",
                   t
                 )
             }
@@ -135,7 +135,7 @@ class DefaultEngineAskEngineService
 
       if (null != reuseNode) {
         logger.info(
-          s"Finished to ask engine for task: $taskId user ${engineAskRequest.getUser} by reuse node $reuseNode"
+          s"Task: $taskId  Finished to ask engine for user ${engineAskRequest.getUser} by reuse node $reuseNode"
         )
         LoggerUtils.removeJobIdMDC()
         (reuseNode, true)
