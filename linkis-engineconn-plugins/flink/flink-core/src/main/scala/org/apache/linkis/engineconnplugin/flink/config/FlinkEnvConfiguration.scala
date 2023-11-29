@@ -40,7 +40,7 @@ object FlinkEnvConfiguration {
 
   val FLINK_DIST_JAR_PATH = CommonVars(
     "flink.dist.jar.path",
-    FLINK_HOME.getValue + s"/lib/flink-dist_2.11-${FLINK_VERSION.getValue}.jar"
+    FLINK_HOME.getValue + s"/lib/flink-dist-${FLINK_VERSION.getValue}.jar"
   )
 
   val FLINK_CONF_YAML = CommonVars("flink.conf.yaml.dir", "flink-conf.yaml")
@@ -63,7 +63,9 @@ object FlinkEnvConfiguration {
   )
 
   val FLINK_YAML_MERGE_ENABLE = CommonVars("flink.yaml.merge.enable", true)
-  val FLINK_SHIP_DIRECTORIES = CommonVars("flink.yarn.ship-directories", "")
+  val FLINK_SHIP_DIRECTORIES =
+    CommonVars("flink.yarn.ship-directories", FLINK_HOME.getValue + "/lib")
+
   val FLINK_SHIP_REMOTE_DIRECTORIES = CommonVars("flink.yarn.remote.ship-directories", "")
 
   val FLINK_CHECK_POINT_ENABLE = CommonVars("flink.app.checkpoint.enable", false)
