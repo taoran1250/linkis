@@ -224,7 +224,8 @@ public class EntranceExecutionJob extends EntranceJob implements LogHandler {
             : "not submit to  ec";
 
     StringBuffer sb = new StringBuffer();
-    sb.append("[Task creation time(任务创建时间)]  :")
+    sb.append("Task time point information(任务时间节点信息):\n")
+        .append("[Task creation time(任务创建时间)]  :")
         .append(createTime)
         .append("\n")
         .append("[Task scheduling time(任务调度时间)]:")
