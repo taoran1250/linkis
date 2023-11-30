@@ -16,6 +16,19 @@
   ~ limitations under the License.
   -->
 
+<!--DBS-->
+<!--Primiry key  BD_ID-->
+<!--unique  name-->
+
+<!--TBLS-->
+<!--Primiry key TBL_ID-->
+<!--unique (TBL_NAME,DB_ID)-->
+
+<!--PARTITIONS-->
+<!--Primiry key PART_ID-->
+<!--unique(PART_NAME,TBL_ID)-->
+
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 
 <mapper namespace="org.apache.linkis.metadata.hive.dao.HiveMetaDao">
