@@ -65,7 +65,7 @@ public class MybatisConfiguration {
       CommonVars.apply("wds.linkis.server.mybatis.remove.abandoned.enabled", Boolean.TRUE);
   public static final CommonVars<Boolean> MYBATIS_DATASOURCE_KEEPALIVE_ENABLED =
       CommonVars.apply("wds.linkis.server.mybatis.keepalive.enabled", Boolean.TRUE);
-  public static final CommonVars<Boolean> MYBATIS_DATASOURCE_USE_PIND_ENABLED =
+  public static final CommonVars<Boolean> MYBATIS_DATASOURCE_USE_PING_ENABLED =
       CommonVars.apply("wds.linkis.server.mybatis.use.ping.enabled", Boolean.TRUE);
 
   public static final CommonVars<Integer> MYBATIS_DATASOURCE_REMOVE_ABANDONED_TIMEOUT =

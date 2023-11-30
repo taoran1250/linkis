@@ -75,7 +75,7 @@ public class DataSourceUtils {
 
     boolean jdbcKeepAlive = MybatisConfiguration.MYBATIS_DATASOURCE_KEEPALIVE_ENABLED.getValue();
 
-    boolean jdbcUsePingMethod = MybatisConfiguration.MYBATIS_DATASOURCE_USE_PIND_ENABLED.getValue();
+    boolean jdbcUsePingMethod = MybatisConfiguration.MYBATIS_DATASOURCE_USE_PING_ENABLED.getValue();
 
     DruidDataSource datasource = new DruidDataSource();
     logger.info("Database connection address information(数据库连接地址信息)=" + dbUrl);
@@ -97,7 +97,7 @@ public class DataSourceUtils {
     datasource.setKeepAlive(jdbcKeepAlive);
 
     if (!jdbcUsePingMethod) {
-      // 强制使用test sql 为保活方法，而不是ping。
+      // use test sql for keepalive
       MySqlValidConnectionChecker checker = new MySqlValidConnectionChecker();
       checker.setUsePingMethod(false);
       datasource.setValidConnectionChecker(checker);
