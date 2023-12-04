@@ -80,7 +80,7 @@ public class AcrossClusterRuleRestfulApi {
       acrossClusterRuleService.validAcrossClusterRule(id, isValid);
     } catch (Exception e) {
       log.info("valid acrossClusterRule failed：" + e.getMessage());
-      return Message.error("valid acrossClusterRule failed, please check logs");
+      return Message.error("valid acrossClusterRule failed");
     }
 
     return Message.ok();
@@ -124,7 +124,7 @@ public class AcrossClusterRuleRestfulApi {
               creator, username, clusterName, pageNow, pageSize);
     } catch (Exception e) {
       log.info("query acrossClusterRule List failed：" + e.getMessage());
-      return Message.error("query acrossClusterRule List failed, please check logs");
+      return Message.error("query acrossClusterRule List failed");
     }
 
     Message msg = Message.ok();
@@ -161,7 +161,7 @@ public class AcrossClusterRuleRestfulApi {
       acrossClusterRuleService.deleteAcrossClusterRule(creator, username);
     } catch (Exception e) {
       log.info("delete acrossClusterRule failed：" + e.getMessage());
-      return Message.error("delete acrossClusterRule failed, please check logs");
+      return Message.error("delete acrossClusterRule failed");
     }
 
     return Message.ok();
@@ -251,7 +251,7 @@ public class AcrossClusterRuleRestfulApi {
       acrossClusterRuleService.updateAcrossClusterRule(acrossClusterRule);
     } catch (Exception e) {
       log.info("update acrossClusterRule failed：" + e.getMessage());
-      return Message.error("update acrossClusterRule failed, please check logs");
+      return Message.error("update acrossClusterRule failed, rule already exits");
     }
     return Message.ok();
   }
@@ -336,7 +336,7 @@ public class AcrossClusterRuleRestfulApi {
       acrossClusterRuleService.insertAcrossClusterRule(acrossClusterRule);
     } catch (Exception e) {
       log.info("add acrossClusterRule failed：" + e.getMessage());
-      return Message.error("add acrossClusterRule failed, please check logs");
+      return Message.error("add acrossClusterRule failed, rule already exits");
     }
 
     return Message.ok();
