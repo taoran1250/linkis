@@ -34,11 +34,11 @@
 <mapper namespace="org.apache.linkis.metadata.hive.dao.HiveMetaDao">
 
     <select id="getLocationByDbAndTable" resultType="java.lang.String" parameterType="map">
-        select LOCATION from SDS where SD_ID = (
-        select SD_ID from TBLS
-        where TBL_NAME = #{tableName,jdbcType=VARCHAR}
-        and DB_ID = (select DB_ID from `DBS` where NAME = #{dbName,jdbcType=VARCHAR})
-        )
+        select SDS.LOCATION  FROM SDS
+        inner join TBLS ON SDS.SD_ID = TBLS.SD_ID
+        inner join `DBS` ON TBLS.DB_ID=`DBS`.DB_ID
+        where  TBLS.TBL_NAME = #{tableName,jdbcType=VARCHAR}
+          and `DBS`.NAME = #{dbName,jdbcType=VARCHAR};
     </select>
 
     <select id="getRolesByUser" resultType="java.lang.String" parameterType="map">
@@ -125,26 +125,23 @@
     </select>
 
     <select id="getPartitionSize" resultType="java.lang.Long"  parameterType="map">
-        select PARAM_VALUE from PARTITION_PARAMS
-        where PARAM_KEY = 'totalSize'
-        and PART_ID = (
-            select PART_ID from PARTITIONS
-            where PART_NAME = #{partitionName,jdbcType=VARCHAR}
-            and TBL_ID =(
-                select TBL_ID from `TBLS`
-                where TBL_NAME = #{tableName,jdbcType=VARCHAR}
-                and DB_ID = (select DB_ID from `DBS` where NAME = #{dbName,jdbcType=VARCHAR})
-            )
-        );
+        select PARTITION_PARAMS.PARAM_VALUE from PARTITION_PARAMS
+        inner join `PARTITIONS` ON `PARTITIONS`.PART_ID=PARTITION_PARAMS.PART_ID
+        inner join TBLS ON `PARTITIONS`.TBL_ID = TBLS.TBL_ID
+        inner join `DBS` ON TBLS.DB_ID=`DBS`.DB_ID
+        where PARTITION_PARAMS.PARAM_KEY = 'totalSize'
+        and  PARTITION_PARAMS.PART_NAME =  #{partitionName,jdbcType=VARCHAR}
+        and  TBLS.TBL_NAME = #{tableName,jdbcType=VARCHAR}
+        and `DBS`.NAME =  #{dbName,jdbcType=VARCHAR};
+
     </select>
 
     <select id="getPartitions" resultType="java.lang.String"  parameterType="map">
-        select PART_NAME from PARTITIONS
-        where TBL_ID = (
-            select TBL_ID from `TBLS`
-            where TBL_NAME = #{tableName,jdbcType=VARCHAR}
-            and DB_ID = (select DB_ID from `DBS` where NAME = #{dbName,jdbcType=VARCHAR})
-        );
+        select `PARTITIONS`.PART_NAME from `PARTITIONS`
+        inner join TBLS ON `PARTITIONS`.TBL_ID = TBLS.TBL_ID
+        inner join `DBS` ON TBLS.DB_ID=`DBS`.DB_ID
+        where  TBLS.TBL_NAME = #{tableName,jdbcType=VARCHAR}
+        and `DBS`.NAME =#{dbName,jdbcType=VARCHAR};
     </select>
 
     <select id="getColumns" resultType="map"  parameterType="map">
@@ -193,12 +190,11 @@
     </select>
 
     <select id="getPartitionKeys" resultType="map"  parameterType="map">
-        select PKEY_COMMENT, PKEY_NAME, PKEY_TYPE from PARTITION_KEYS
-        where TBL_ID =(
-        select TBL_ID from `TBLS`
-        where TBL_NAME = #{tableName,jdbcType=VARCHAR}
-        and DB_ID = (select DB_ID from `DBS` where NAME = #{dbName,jdbcType=VARCHAR})
-        );
+        select  PKEY_COMMENT, PKEY_NAME, PKEY_TYPE from PARTITION_KEYS
+        inner join TBLS ON `PARTITION_KEYS`.TBL_ID = TBLS.TBL_ID
+        inner join `DBS` ON TBLS.DB_ID=`DBS`.DB_ID
+        where TBLS.TBL_NAME = #{tableName,jdbcType=VARCHAR}
+        and `DBS`.NAME =#{dbName,jdbcType=VARCHAR};
     </select>
 
     <select id="getTableComment" resultType="java.lang.String">

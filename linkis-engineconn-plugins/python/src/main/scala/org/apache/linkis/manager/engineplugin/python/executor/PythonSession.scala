@@ -278,7 +278,7 @@ class PythonSession extends Logging {
           GovernanceUtils.killProcess(String.valueOf(p), s"kill pyspark process,pid: $pid", false)
         })
 
-        process.destroy()
+        Utils.tryQuietly(process.destroy())
         process = null
 
         this.pythonScriptInitialized = false
