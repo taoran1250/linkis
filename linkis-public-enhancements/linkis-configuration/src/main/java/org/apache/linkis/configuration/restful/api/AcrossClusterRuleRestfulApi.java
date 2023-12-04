@@ -226,7 +226,7 @@ public class AcrossClusterRuleRestfulApi {
         || StringUtils.isBlank(MemoryThreshold)
         || StringUtils.isBlank(CPUPercentageThreshold)
         || StringUtils.isBlank(MemoryPercentageThreshold)
-        || crossQueue.length() >= KEY_CROSS_QUEUE_LENGTH) {
+        || crossQueue.length() > KEY_CROSS_QUEUE_LENGTH) {
       return Message.error("Failed to add acrossClusterRule: Illegal Input Param");
     }
 
@@ -311,7 +311,7 @@ public class AcrossClusterRuleRestfulApi {
         || StringUtils.isBlank(MemoryThreshold)
         || StringUtils.isBlank(CPUPercentageThreshold)
         || StringUtils.isBlank(MemoryPercentageThreshold)
-        || crossQueue.length() >= KEY_CROSS_QUEUE_LENGTH) {
+        || crossQueue.length() > KEY_CROSS_QUEUE_LENGTH) {
       return Message.error("Failed to add acrossClusterRule: Illegal Input Param");
     }
 
