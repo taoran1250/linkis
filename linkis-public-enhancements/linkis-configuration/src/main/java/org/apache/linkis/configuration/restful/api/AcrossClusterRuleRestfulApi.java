@@ -40,6 +40,8 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.linkis.configuration.conf.AcrossClusterRuleKeys.KEY_CROSS_QUEUE_LENGTH;
+
 @Api(tags = "across cluster rule api")
 @RestController
 @RequestMapping(path = "/configuration/acrossClusterRule")
@@ -224,7 +226,7 @@ public class AcrossClusterRuleRestfulApi {
         || StringUtils.isBlank(MemoryThreshold)
         || StringUtils.isBlank(CPUPercentageThreshold)
         || StringUtils.isBlank(MemoryPercentageThreshold)
-        || crossQueue.length() >= 25) {
+        || crossQueue.length() >= KEY_CROSS_QUEUE_LENGTH) {
       return Message.error("Failed to add acrossClusterRule: Illegal Input Param");
     }
 
@@ -309,7 +311,7 @@ public class AcrossClusterRuleRestfulApi {
         || StringUtils.isBlank(MemoryThreshold)
         || StringUtils.isBlank(CPUPercentageThreshold)
         || StringUtils.isBlank(MemoryPercentageThreshold)
-        || crossQueue.length() >= 25) {
+        || crossQueue.length() >= KEY_CROSS_QUEUE_LENGTH) {
       return Message.error("Failed to add acrossClusterRule: Illegal Input Param");
     }
 
