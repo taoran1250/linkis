@@ -433,7 +433,11 @@ class SparkScalaExecutor(sparkEngineSession: SparkEngineSession, id: Long)
 
     if (null != sparkILoop) {
 
-      val userCreatorLabel = LabelUtil.getUserCreatorLabel(getExecutorLabels())
+      // getExecutorLabels() results maybe not contain all labels
+      val labels =
+        this.engineExecutionContextFactory.getEngineExecutionContext.getLabels.toList.asJava
+      val userCreatorLabel = LabelUtil.getUserCreatorLabel(labels)
+
       val creator = userCreatorLabel.getCreator.toLowerCase(Locale.getDefault())
 
       val findResult = closeIloopCretors.find(_.equalsIgnoreCase(creator))

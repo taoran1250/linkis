@@ -56,7 +56,7 @@ object SparkConfiguration extends Logging {
     CommonVars[Boolean]("linkis.spark.python.test.mode.enable", false)
 
   val SPARK_SCALA_KILL_COLSE_ILOOP_CREATORS =
-    CommonVars[String]("linkis.spark.scala.kill.close.iloop.creator", "QML")
+    CommonVars[String]("linkis.spark.scala.kill.close.iloop.creators", "QML")
 
   val SPARK_PYTHON_TEST_MODE_MIX__PYSHELL_PATH = CommonVars[String](
     "linkis.spark.python.mix.pyshell.path",
