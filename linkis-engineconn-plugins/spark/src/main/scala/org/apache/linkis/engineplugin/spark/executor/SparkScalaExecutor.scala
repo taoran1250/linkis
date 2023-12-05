@@ -443,8 +443,10 @@ class SparkScalaExecutor(sparkEngineSession: SparkEngineSession, id: Long)
       val findResult = closeIloopCretors.find(_.equalsIgnoreCase(creator))
       if (findResult.isDefined || closeIloopCretors.contains("*")) {
         logger.info(s"Start to kill sparkILoop task $taskID for creator:${creator}")
-        Utils.tryAndWarn(sparkILoop.closeInterpreter())
-
+        Utils.tryQuietly(sparkILoop.closeInterpreter())
+        logger.info(s"try to force stop thread:${super.getThread().getName}")
+        // force to stop scala thread
+        Utils.tryQuietly(super.getThread().stop())
         this.bindFlag = false
         this.sparkILoopInited = false
         logger.info(s"Finished to kill sparkILoop task $taskID for creator:${creator}")

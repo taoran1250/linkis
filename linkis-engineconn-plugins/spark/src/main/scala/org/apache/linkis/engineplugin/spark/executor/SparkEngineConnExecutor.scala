@@ -70,6 +70,10 @@ abstract class SparkEngineConnExecutor(val sc: SparkContext, id: Long)
 
   private var thread: Thread = _
 
+  def getThread(): Thread = {
+    thread
+  }
+
   override def init(): Unit = {
     logger.info(s"Ready to change engine state!")
 //    setCodeParser()  // todo check
