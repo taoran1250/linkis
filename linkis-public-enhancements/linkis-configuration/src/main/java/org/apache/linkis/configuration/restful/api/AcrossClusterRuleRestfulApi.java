@@ -17,6 +17,7 @@
 
 package org.apache.linkis.configuration.restful.api;
 
+import io.swagger.models.auth.In;
 import org.apache.linkis.common.conf.Configuration;
 import org.apache.linkis.configuration.entity.AcrossClusterRule;
 import org.apache.linkis.configuration.service.AcrossClusterRuleService;
@@ -61,9 +62,9 @@ public class AcrossClusterRuleRestfulApi {
   @RequestMapping(path = "/isValid", method = RequestMethod.PUT)
   public Message isValidRule(HttpServletRequest req, @RequestBody Map<String, Object> json) {
     String operationUser = ModuleUserUtils.getOperationUser(req, "execute valid acrossClusterRule");
+    String username = null;
     if (!Configuration.isAdmin(operationUser)) {
-      return Message.error(
-          "Failed to valid acrossClusterRule List,msg: only administrators can configure");
+      username = operationUser;
     }
 
     Integer idInt = (Integer) json.get("id");
@@ -75,7 +76,7 @@ public class AcrossClusterRuleRestfulApi {
     }
 
     try {
-      acrossClusterRuleService.validAcrossClusterRule(id, isValid);
+      acrossClusterRuleService.validAcrossClusterRule(id, isValid, username);
     } catch (Exception e) {
       log.info("valid acrossClusterRule failed：" + e.getMessage());
       return Message.error("valid acrossClusterRule failed");
@@ -105,8 +106,7 @@ public class AcrossClusterRuleRestfulApi {
     String operationUser =
         ModuleUserUtils.getOperationUser(req, "execute query acrossClusterRule List");
     if (!Configuration.isAdmin(operationUser)) {
-      return Message.error(
-          "Failed to query acrossClusterRule List,msg: only administrators can configure");
+      username = operationUser;
     }
 
     if (StringUtils.isBlank(username)) username = null;
@@ -136,14 +136,12 @@ public class AcrossClusterRuleRestfulApi {
       response = Message.class)
   @ApiImplicitParams({
     @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
-    @ApiImplicitParam(name = "creator", dataType = "String", value = "creator"),
-    @ApiImplicitParam(name = "username", dataType = "String", value = "username"),
+    @ApiImplicitParam(name = "id", dataType = "Integer", value = "id"),
   })
   @RequestMapping(path = "/delete", method = RequestMethod.DELETE)
   public Message deleteAcrossClusterRule(
       HttpServletRequest req,
-      @RequestParam(value = "creator", required = false) String creator,
-      @RequestParam(value = "username", required = false) String username) {
+      @RequestParam(value = "id", required = false) Integer id) {
     String operationUser =
         ModuleUserUtils.getOperationUser(req, "execute delete acrossClusterRule");
     if (!Configuration.isAdmin(operationUser)) {
@@ -151,12 +149,74 @@ public class AcrossClusterRuleRestfulApi {
           "Failed to delete acrossClusterRule,msg: only administrators can configure");
     }
 
-    if (StringUtils.isBlank(creator) || StringUtils.isBlank(username)) {
+    try {
+      acrossClusterRuleService.deleteAcrossClusterRule(id.longValue());
+    } catch (Exception e) {
+      log.info("delete acrossClusterRule failed：" + e.getMessage());
+      return Message.error("delete acrossClusterRule failed");
+    }
+
+    return Message.ok();
+  }
+
+  @ApiOperation(
+          value = "delete acrossClusterRule",
+          notes = "delete acrossClusterRule",
+          response = Message.class)
+  @ApiImplicitParams({
+          @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+          @ApiImplicitParam(name = "username", dataType = "String", value = "username"),
+  })
+  @RequestMapping(path = "/deleteByUsername", method = RequestMethod.DELETE)
+  public Message deleteAcrossClusterRuleByUsername(
+          HttpServletRequest req,
+          @RequestParam(value = "username", required = false) String username) {
+    String operationUser =
+            ModuleUserUtils.getOperationUser(req, "execute delete acrossClusterRule");
+    if (!Configuration.isAdmin(operationUser)) {
+      return Message.error(
+              "Failed to delete acrossClusterRule,msg: only administrators can configure");
+    }
+
+    if (StringUtils.isBlank(username)) {
       return Message.error("Failed to delete acrossClusterRule: Illegal Input Param");
     }
 
     try {
-      acrossClusterRuleService.deleteAcrossClusterRule(creator, username);
+      acrossClusterRuleService.deleteAcrossClusterRuleByUsername(username);
+    } catch (Exception e) {
+      log.info("delete acrossClusterRule failed：" + e.getMessage());
+      return Message.error("delete acrossClusterRule failed");
+    }
+
+    return Message.ok();
+  }
+
+  @ApiOperation(
+          value = "delete acrossClusterRule",
+          notes = "delete acrossClusterRule",
+          response = Message.class)
+  @ApiImplicitParams({
+          @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+          @ApiImplicitParam(name = "crossQueue", dataType = "String", value = "crossQueue"),
+  })
+  @RequestMapping(path = "/deleteByCrossQueue", method = RequestMethod.DELETE)
+  public Message deleteAcrossClusterRuleByCrossQueue(
+          HttpServletRequest req,
+          @RequestParam(value = "crossQueue", required = false) String crossQueue) {
+    String operationUser =
+            ModuleUserUtils.getOperationUser(req, "execute delete acrossClusterRule");
+    if (!Configuration.isAdmin(operationUser)) {
+      return Message.error(
+              "Failed to delete acrossClusterRule,msg: only administrators can configure");
+    }
+
+    if (StringUtils.isBlank(crossQueue)) {
+      return Message.error("Failed to delete acrossClusterRule: Illegal Input Param");
+    }
+
+    try {
+      acrossClusterRuleService.deleteAcrossClusterRuleByCrossQueue(crossQueue);
     } catch (Exception e) {
       log.info("delete acrossClusterRule failed：" + e.getMessage());
       return Message.error("delete acrossClusterRule failed");
