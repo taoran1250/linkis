@@ -17,7 +17,6 @@
 
 package org.apache.linkis.configuration.restful.api;
 
-import io.swagger.models.auth.In;
 import org.apache.linkis.common.conf.Configuration;
 import org.apache.linkis.configuration.entity.AcrossClusterRule;
 import org.apache.linkis.configuration.service.AcrossClusterRuleService;
