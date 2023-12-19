@@ -42,5 +42,6 @@ public interface AcrossClusterRuleMapper {
       @Param("creator") String creator,
       @Param("clusterName") String clusterName);
 
-  void validAcrossClusterRule(@Param("isValid") String isValid, @Param("id") Long id, @Param("username") String username);
+  void validAcrossClusterRule(
+      @Param("isValid") String isValid, @Param("id") Long id, @Param("username") String username);
 }

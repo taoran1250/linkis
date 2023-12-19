@@ -104,6 +104,7 @@ public class AcrossClusterRuleRestfulApi {
       @RequestParam(value = "pageSize", required = false) Integer pageSize) {
     String operationUser =
         ModuleUserUtils.getOperationUser(req, "execute query acrossClusterRule List");
+
     if (!Configuration.isAdmin(operationUser)) {
       username = operationUser;
     }
@@ -139,8 +140,7 @@ public class AcrossClusterRuleRestfulApi {
   })
   @RequestMapping(path = "/delete", method = RequestMethod.DELETE)
   public Message deleteAcrossClusterRule(
-      HttpServletRequest req,
-      @RequestParam(value = "id", required = false) Integer id) {
+      HttpServletRequest req, @RequestParam(value = "id", required = false) Integer id) {
     String operationUser =
         ModuleUserUtils.getOperationUser(req, "execute delete acrossClusterRule");
     if (!Configuration.isAdmin(operationUser)) {
@@ -159,22 +159,21 @@ public class AcrossClusterRuleRestfulApi {
   }
 
   @ApiOperation(
-          value = "delete acrossClusterRule",
-          notes = "delete acrossClusterRule",
-          response = Message.class)
+      value = "delete acrossClusterRule",
+      notes = "delete acrossClusterRule",
+      response = Message.class)
   @ApiImplicitParams({
-          @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
-          @ApiImplicitParam(name = "username", dataType = "String", value = "username"),
+    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+    @ApiImplicitParam(name = "username", dataType = "String", value = "username"),
   })
   @RequestMapping(path = "/deleteByUsername", method = RequestMethod.DELETE)
   public Message deleteAcrossClusterRuleByUsername(
-          HttpServletRequest req,
-          @RequestParam(value = "username", required = false) String username) {
+      HttpServletRequest req, @RequestParam(value = "username", required = false) String username) {
     String operationUser =
-            ModuleUserUtils.getOperationUser(req, "execute delete acrossClusterRule");
+        ModuleUserUtils.getOperationUser(req, "execute delete acrossClusterRule");
     if (!Configuration.isAdmin(operationUser)) {
       return Message.error(
-              "Failed to delete acrossClusterRule,msg: only administrators can configure");
+          "Failed to delete acrossClusterRule,msg: only administrators can configure");
     }
 
     if (StringUtils.isBlank(username)) {
@@ -192,22 +191,22 @@ public class AcrossClusterRuleRestfulApi {
   }
 
   @ApiOperation(
-          value = "delete acrossClusterRule",
-          notes = "delete acrossClusterRule",
-          response = Message.class)
+      value = "delete acrossClusterRule",
+      notes = "delete acrossClusterRule",
+      response = Message.class)
   @ApiImplicitParams({
-          @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
-          @ApiImplicitParam(name = "crossQueue", dataType = "String", value = "crossQueue"),
+    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+    @ApiImplicitParam(name = "crossQueue", dataType = "String", value = "crossQueue"),
   })
   @RequestMapping(path = "/deleteByCrossQueue", method = RequestMethod.DELETE)
   public Message deleteAcrossClusterRuleByCrossQueue(
-          HttpServletRequest req,
-          @RequestParam(value = "crossQueue", required = false) String crossQueue) {
+      HttpServletRequest req,
+      @RequestParam(value = "crossQueue", required = false) String crossQueue) {
     String operationUser =
-            ModuleUserUtils.getOperationUser(req, "execute delete acrossClusterRule");
+        ModuleUserUtils.getOperationUser(req, "execute delete acrossClusterRule");
     if (!Configuration.isAdmin(operationUser)) {
       return Message.error(
-              "Failed to delete acrossClusterRule,msg: only administrators can configure");
+          "Failed to delete acrossClusterRule,msg: only administrators can configure");
     }
 
     if (StringUtils.isBlank(crossQueue)) {
@@ -215,7 +214,8 @@ public class AcrossClusterRuleRestfulApi {
     }
 
     try {
-      acrossClusterRuleService.deleteAcrossClusterRuleByCrossQueue(crossQueue);
+      acrossClusterRuleService.deleteAcrossClusterRuleByCrossQueue(
+          CommonUtils.concatQueue(crossQueue));
     } catch (Exception e) {
       log.info("delete acrossClusterRule failed：" + e.getMessage());
       return Message.error("delete acrossClusterRule failed");

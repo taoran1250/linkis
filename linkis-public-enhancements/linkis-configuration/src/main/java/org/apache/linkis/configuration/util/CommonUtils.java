@@ -66,4 +66,8 @@ public class CommonUtils {
 
     return rules;
   }
+
+  public static String concatQueue(String crossQueue) {
+    return String.format("\"crossQueue\":\"%s\"", crossQueue);
+  }
 }
