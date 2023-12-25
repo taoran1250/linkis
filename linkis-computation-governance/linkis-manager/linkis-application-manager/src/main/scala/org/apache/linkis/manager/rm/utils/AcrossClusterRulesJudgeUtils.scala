@@ -21,18 +21,18 @@ import org.apache.linkis.common.utils.Logging
 import org.apache.linkis.manager.am.conf.AMConfiguration
 import org.apache.linkis.manager.common.entity.resource.YarnResource
 import org.apache.linkis.manager.common.exception.RMWarnException
-import org.apache.linkis.manager.rm.exception.RMErrorCode
+import org.apache.linkis.manager.rm.exception.{OriginRetryException, RMErrorCode, TargetClusterRetryException}
 
 object AcrossClusterRulesJudgeUtils extends Logging {
 
-  def acrossClusterRuleCheck(
+  def targetClusterRuleCheck(
       leftResource: YarnResource,
       usedResource: YarnResource,
       maxResource: YarnResource,
       clusterMaxCapacity: YarnResource,
       clusterUsedCapacity: YarnResource,
-      leftCPUThreshold: Int,
-      leftMemoryThreshold: Int,
+      CPUThreshold: Int,
+      MemoryThreshold: Int,
       CPUPercentageThreshold: Double,
       MemoryPercentageThreshold: Double,
       clusterCPUPercentageThreshold: Double,
@@ -50,15 +50,15 @@ object AcrossClusterRulesJudgeUtils extends Logging {
       if (
           clusterUsedCPUPercentage > clusterCPUPercentageThreshold || clusterUsedMemoryPercentage > clusterMemoryPercentageThreshold
       ) {
-        throw new RMWarnException(
-          RMErrorCode.ACROSS_CLUSTER_RULE_FAILED.getErrorCode,
+        throw new TargetClusterRetryException(
+          RMErrorCode.TARGET_CLUSTER_RULE_FAILED.getErrorCode,
           s"clusterUsedCPUPercentage: $clusterUsedCPUPercentage, CPUPercentageThreshold: $clusterCPUPercentageThreshold" +
             s"clusterUsedMemoryPercentage: $clusterUsedMemoryPercentage, MemoryPercentageThreshold: $clusterMemoryPercentageThreshold"
         )
       }
 
       val leftQueueMemory = leftResource.queueMemory / Math.pow(1024, 3).toLong
-      if (leftResource.queueCores > leftCPUThreshold && leftQueueMemory > leftMemoryThreshold) {
+      if (leftResource.queueCores > CPUThreshold && leftQueueMemory > MemoryThreshold) {
         val usedCPUPercentage =
           usedResource.queueCores.asInstanceOf[Double] / maxResource.queueCores
             .asInstanceOf[Double]
@@ -66,21 +66,48 @@ object AcrossClusterRulesJudgeUtils extends Logging {
           .asInstanceOf[Double] / maxResource.queueMemory.asInstanceOf[Double]
 
         if (
-            usedCPUPercentage < CPUPercentageThreshold && usedMemoryPercentage < MemoryPercentageThreshold
+            usedCPUPercentage > CPUPercentageThreshold || usedMemoryPercentage > MemoryPercentageThreshold
         ) {
-          return
-        } else {
-          throw new RMWarnException(
-            RMErrorCode.ACROSS_CLUSTER_RULE_FAILED.getErrorCode,
+          throw new TargetClusterRetryException(
+            RMErrorCode.TARGET_CLUSTER_RULE_FAILED.getErrorCode,
             s"usedCPUPercentage: $usedCPUPercentage, CPUPercentageThreshold: $CPUPercentageThreshold" +
               s"usedMemoryPercentage: $usedMemoryPercentage, MemoryPercentageThreshold: $MemoryPercentageThreshold"
           )
         }
       } else {
-        throw new RMWarnException(
-          RMErrorCode.ACROSS_CLUSTER_RULE_FAILED.getErrorCode,
-          s"leftResource.queueCores: ${leftResource.queueCores}, leftCPUThreshold: $leftCPUThreshold," +
-            s"leftQueueMemory: $leftQueueMemory, leftMemoryThreshold: $leftMemoryThreshold"
+        throw new TargetClusterRetryException(
+          RMErrorCode.TARGET_CLUSTER_RULE_FAILED.getErrorCode,
+          s"leftResource.queueCores: ${leftResource.queueCores}, CPUThreshold: $CPUThreshold," +
+            s"leftQueueMemory: $leftQueueMemory, MemoryThreshold: $MemoryThreshold"
+        )
+      }
+    }
+  }
+
+
+  def originClusterRuleCheck(
+      usedResource: YarnResource,
+      maxResource: YarnResource,
+      CPUPercentageThreshold: Double,
+      MemoryPercentageThreshold: Double
+  ): Unit = {
+    if (
+      usedResource != null && maxResource != null
+    ) {
+
+      val usedCPUPercentage =
+        usedResource.queueCores.asInstanceOf[Double] / maxResource.queueCores
+          .asInstanceOf[Double]
+      val usedMemoryPercentage = usedResource.queueMemory
+        .asInstanceOf[Double] / maxResource.queueMemory.asInstanceOf[Double]
+
+      if (
+        usedCPUPercentage > CPUPercentageThreshold || usedMemoryPercentage > MemoryPercentageThreshold
+      ) {
+        throw new OriginRetryException(
+          RMErrorCode.ORIGIN_CLUSTER_RULE_FAILED.getErrorCode,
+          s"usedCPUPercentage: $usedCPUPercentage, CPUPercentageThreshold: $CPUPercentageThreshold" +
+            s"usedMemoryPercentage: $usedMemoryPercentage, MemoryPercentageThreshold: $MemoryPercentageThreshold"
         )
       }
     }

@@ -40,8 +40,6 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.linkis.configuration.conf.AcrossClusterRuleKeys.KEY_CROSS_QUEUE_LENGTH;
-
 @Api(tags = "across cluster rule api")
 @RestController
 @RequestMapping(path = "/configuration/acrossClusterRule")
@@ -240,16 +238,31 @@ public class AcrossClusterRuleRestfulApi {
     @ApiImplicitParam(name = "startTime", dataType = "String", value = "startTime"),
     @ApiImplicitParam(name = "endTime", dataType = "String", value = "endTime"),
     @ApiImplicitParam(name = "crossQueue", dataType = "String", value = "crossQueue"),
-    @ApiImplicitParam(name = "CPUThreshold", dataType = "String", value = "CPUThreshold"),
-    @ApiImplicitParam(name = "MemoryThreshold", dataType = "String", value = "MemoryThreshold"),
+    @ApiImplicitParam(name = "priorityCluster", dataType = "String", value = "priorityCluster"),
     @ApiImplicitParam(
-        name = "CPUPercentageThreshold",
+        name = "targetCPUThreshold",
         dataType = "String",
-        value = "CPUPercentageThreshold"),
+        value = "targetCPUThreshold"),
     @ApiImplicitParam(
-        name = "MemoryPercentageThreshold",
+        name = "targetMemoryThreshold",
         dataType = "String",
-        value = "MemoryPercentageThreshold"),
+        value = "targetMemoryThreshold"),
+    @ApiImplicitParam(
+        name = "originCPUPercentageThreshold",
+        dataType = "String",
+        value = "originCPUPercentageThreshold"),
+    @ApiImplicitParam(
+        name = "originMemoryPercentageThreshold",
+        dataType = "String",
+        value = "originMemoryPercentageThreshold"),
+    @ApiImplicitParam(
+        name = "targetCPUPercentageThreshold",
+        dataType = "String",
+        value = "targetCPUPercentageThreshold"),
+    @ApiImplicitParam(
+        name = "targetMemoryPercentageThreshold",
+        dataType = "String",
+        value = "targetMemoryPercentageThreshold"),
   })
   @RequestMapping(path = "/update", method = RequestMethod.PUT)
   public Message updateAcrossClusterRule(
@@ -270,10 +283,13 @@ public class AcrossClusterRuleRestfulApi {
     String startTime = (String) json.get("startTime");
     String endTime = (String) json.get("endTime");
     String crossQueue = (String) json.get("crossQueue");
-    String CPUThreshold = (String) json.get("CPUThreshold");
-    String MemoryThreshold = (String) json.get("MemoryThreshold");
-    String CPUPercentageThreshold = (String) json.get("CPUPercentageThreshold");
-    String MemoryPercentageThreshold = (String) json.get("MemoryPercentageThreshold");
+    String priorityCluster = (String) json.get("priorityCluster");
+    String targetCPUThreshold = (String) json.get("targetCPUThreshold");
+    String targetMemoryThreshold = (String) json.get("targetMemoryThreshold");
+    String targetCPUPercentageThreshold = (String) json.get("targetCPUPercentageThreshold");
+    String targetMemoryPercentageThreshold = (String) json.get("targetMemoryPercentageThreshold");
+    String originCPUPercentageThreshold = (String) json.get("originCPUPercentageThreshold");
+    String originMemoryPercentageThreshold = (String) json.get("originMemoryPercentageThreshold");
     if (StringUtils.isBlank(clusterName)
         || StringUtils.isBlank(creator)
         || StringUtils.isBlank(username)
@@ -281,11 +297,13 @@ public class AcrossClusterRuleRestfulApi {
         || StringUtils.isBlank(startTime)
         || StringUtils.isBlank(endTime)
         || StringUtils.isBlank(crossQueue)
-        || StringUtils.isBlank(CPUThreshold)
-        || StringUtils.isBlank(MemoryThreshold)
-        || StringUtils.isBlank(CPUPercentageThreshold)
-        || StringUtils.isBlank(MemoryPercentageThreshold)
-        || crossQueue.length() > KEY_CROSS_QUEUE_LENGTH) {
+        || StringUtils.isBlank(priorityCluster)
+        || StringUtils.isBlank(targetCPUThreshold)
+        || StringUtils.isBlank(targetMemoryThreshold)
+        || StringUtils.isBlank(targetCPUPercentageThreshold)
+        || StringUtils.isBlank(targetMemoryPercentageThreshold)
+        || StringUtils.isBlank(originCPUPercentageThreshold)
+        || StringUtils.isBlank(originMemoryPercentageThreshold)) {
       return Message.error("Failed to add acrossClusterRule: Illegal Input Param");
     }
 
@@ -295,10 +313,13 @@ public class AcrossClusterRuleRestfulApi {
               startTime,
               endTime,
               crossQueue,
-              CPUThreshold,
-              MemoryThreshold,
-              CPUPercentageThreshold,
-              MemoryPercentageThreshold);
+              priorityCluster,
+              targetCPUThreshold,
+              targetMemoryThreshold,
+              targetCPUPercentageThreshold,
+              targetMemoryPercentageThreshold,
+              originCPUPercentageThreshold,
+              originMemoryPercentageThreshold);
       AcrossClusterRule acrossClusterRule = new AcrossClusterRule();
       acrossClusterRule.setId(id);
       acrossClusterRule.setClusterName(clusterName.toLowerCase());
@@ -328,16 +349,31 @@ public class AcrossClusterRuleRestfulApi {
     @ApiImplicitParam(name = "startTime", dataType = "String", value = "startTime"),
     @ApiImplicitParam(name = "endTime", dataType = "String", value = "endTime"),
     @ApiImplicitParam(name = "crossQueue", dataType = "String", value = "crossQueue"),
-    @ApiImplicitParam(name = "CPUThreshold", dataType = "String", value = "CPUThreshold"),
-    @ApiImplicitParam(name = "MemoryThreshold", dataType = "String", value = "MemoryThreshold"),
+    @ApiImplicitParam(name = "priorityCluster", dataType = "String", value = "priorityCluster"),
     @ApiImplicitParam(
-        name = "CPUPercentageThreshold",
+        name = "targetCPUThreshold",
         dataType = "String",
-        value = "CPUPercentageThreshold"),
+        value = "targetCPUThreshold"),
     @ApiImplicitParam(
-        name = "MemoryPercentageThreshold",
+        name = "targetMemoryThreshold",
         dataType = "String",
-        value = "MemoryPercentageThreshold"),
+        value = "targetMemoryThreshold"),
+    @ApiImplicitParam(
+        name = "originCPUPercentageThreshold",
+        dataType = "String",
+        value = "originCPUPercentageThreshold"),
+    @ApiImplicitParam(
+        name = "originMemoryPercentageThreshold",
+        dataType = "String",
+        value = "originMemoryPercentageThreshold"),
+    @ApiImplicitParam(
+        name = "targetCPUPercentageThreshold",
+        dataType = "String",
+        value = "targetCPUPercentageThreshold"),
+    @ApiImplicitParam(
+        name = "targetMemoryPercentageThreshold",
+        dataType = "String",
+        value = "targetMemoryPercentageThreshold"),
   })
   @RequestMapping(path = "/add", method = RequestMethod.POST)
   public Message insertAcrossClusterRule(
@@ -355,10 +391,13 @@ public class AcrossClusterRuleRestfulApi {
     String startTime = (String) json.get("startTime");
     String endTime = (String) json.get("endTime");
     String crossQueue = (String) json.get("crossQueue");
-    String CPUThreshold = (String) json.get("CPUThreshold");
-    String MemoryThreshold = (String) json.get("MemoryThreshold");
-    String CPUPercentageThreshold = (String) json.get("CPUPercentageThreshold");
-    String MemoryPercentageThreshold = (String) json.get("MemoryPercentageThreshold");
+    String priorityCluster = (String) json.get("priorityCluster");
+    String targetCPUThreshold = (String) json.get("targetCPUThreshold");
+    String targetMemoryThreshold = (String) json.get("targetMemoryThreshold");
+    String targetCPUPercentageThreshold = (String) json.get("targetCPUPercentageThreshold");
+    String targetMemoryPercentageThreshold = (String) json.get("targetMemoryPercentageThreshold");
+    String originCPUPercentageThreshold = (String) json.get("originCPUPercentageThreshold");
+    String originMemoryPercentageThreshold = (String) json.get("originMemoryPercentageThreshold");
     if (StringUtils.isBlank(clusterName)
         || StringUtils.isBlank(creator)
         || StringUtils.isBlank(username)
@@ -366,11 +405,13 @@ public class AcrossClusterRuleRestfulApi {
         || StringUtils.isBlank(startTime)
         || StringUtils.isBlank(endTime)
         || StringUtils.isBlank(crossQueue)
-        || StringUtils.isBlank(CPUThreshold)
-        || StringUtils.isBlank(MemoryThreshold)
-        || StringUtils.isBlank(CPUPercentageThreshold)
-        || StringUtils.isBlank(MemoryPercentageThreshold)
-        || crossQueue.length() > KEY_CROSS_QUEUE_LENGTH) {
+        || StringUtils.isBlank(priorityCluster)
+        || StringUtils.isBlank(targetCPUThreshold)
+        || StringUtils.isBlank(targetMemoryThreshold)
+        || StringUtils.isBlank(targetCPUPercentageThreshold)
+        || StringUtils.isBlank(targetMemoryPercentageThreshold)
+        || StringUtils.isBlank(originCPUPercentageThreshold)
+        || StringUtils.isBlank(originMemoryPercentageThreshold)) {
       return Message.error("Failed to add acrossClusterRule: Illegal Input Param");
     }
 
@@ -380,10 +421,13 @@ public class AcrossClusterRuleRestfulApi {
               startTime,
               endTime,
               crossQueue,
-              CPUThreshold,
-              MemoryThreshold,
-              CPUPercentageThreshold,
-              MemoryPercentageThreshold);
+              priorityCluster,
+              targetCPUThreshold,
+              targetMemoryThreshold,
+              targetCPUPercentageThreshold,
+              targetMemoryPercentageThreshold,
+              originCPUPercentageThreshold,
+              originMemoryPercentageThreshold);
       AcrossClusterRule acrossClusterRule = new AcrossClusterRule();
       acrossClusterRule.setClusterName(clusterName.toLowerCase());
       acrossClusterRule.setCreator(creator);

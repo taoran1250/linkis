@@ -54,7 +54,6 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.linkis.manager.am.vo.CanCreateECRes
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-
 import java.util
 import java.util.concurrent.{TimeUnit, TimeoutException}
 import scala.collection.JavaConverters._
@@ -323,7 +322,7 @@ class DefaultEngineCreateService
       })
     }
 
-    val crossQueue = props.get(AMConfiguration.ACROSS_CLUSTER_QUEUE_NAME)
+    val crossQueue = props.get(AMConfiguration.CROSS_QUEUE)
     if (StringUtils.isNotBlank(crossQueue)) {
       val queueName = props.getOrDefault(AMConfiguration.YARN_QUEUE_NAME_CONFIG_KEY, "default")
       props.put(AMConfiguration.YARN_QUEUE_NAME_CONFIG_KEY, crossQueue)
