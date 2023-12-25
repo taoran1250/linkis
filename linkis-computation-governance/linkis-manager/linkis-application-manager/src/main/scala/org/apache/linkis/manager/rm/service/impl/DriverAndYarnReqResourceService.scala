@@ -25,12 +25,18 @@ import org.apache.linkis.manager.common.entity.resource.ResourceType.DriverAndYa
 import org.apache.linkis.manager.common.exception.RMWarnException
 import org.apache.linkis.manager.common.protocol.engine.EngineCreateRequest
 import org.apache.linkis.manager.rm.domain.RMLabelContainer
-import org.apache.linkis.manager.rm.exception.{OriginRetryException, RMErrorCode, TargetClusterRetryException}
+import org.apache.linkis.manager.rm.exception.{
+  OriginRetryException,
+  RMErrorCode,
+  TargetClusterRetryException
+}
 import org.apache.linkis.manager.rm.external.service.ExternalResourceService
 import org.apache.linkis.manager.rm.external.yarn.YarnResourceIdentifier
 import org.apache.linkis.manager.rm.service.{LabelResourceService, RequestResourceService}
 import org.apache.linkis.manager.rm.utils.{AcrossClusterRulesJudgeUtils, RMUtils}
+
 import org.apache.commons.lang3.StringUtils
+
 import org.json4s.DefaultFormats
 
 class DriverAndYarnReqResourceService(
@@ -120,16 +126,24 @@ class DriverAndYarnReqResourceService(
       val priorityCluster = properties.get(AMConfiguration.PRIORITY_CLUSTER)
 
       if (
-        StringUtils.isNotBlank(acrossClusterTask) && acrossClusterTask.toBoolean && StringUtils.isNotBlank(priorityCluster) && priorityCluster.equals(AMConfiguration.PRIORITY_CLUSTER_TARGET)
+          StringUtils.isNotBlank(acrossClusterTask) && acrossClusterTask.toBoolean && StringUtils
+            .isNotBlank(priorityCluster) && priorityCluster.equals(
+            AMConfiguration.PRIORITY_CLUSTER_TARGET
+          )
       ) {
         val targetCPUThreshold = properties.get(AMConfiguration.TARGET_CPU_THRESHOLD)
         val targetMemoryThreshold = properties.get(AMConfiguration.TARGET_MEMORY_THRESHOLD)
-        val targetCPUPercentageThreshold = properties.get(AMConfiguration.TARGET_CPU_PERCENTAGE_THRESHOLD)
-        val targetMemoryPercentageThreshold = properties.get(AMConfiguration.TARGET_MEMORY_PERCENTAGE_THRESHOLD)
+        val targetCPUPercentageThreshold =
+          properties.get(AMConfiguration.TARGET_CPU_PERCENTAGE_THRESHOLD)
+        val targetMemoryPercentageThreshold =
+          properties.get(AMConfiguration.TARGET_MEMORY_PERCENTAGE_THRESHOLD)
 
         if (
-          StringUtils.isNotBlank(targetCPUThreshold) && StringUtils.isNotBlank(targetMemoryThreshold)
-            && StringUtils.isNotBlank(targetCPUPercentageThreshold) && StringUtils.isNotBlank(targetMemoryPercentageThreshold)
+            StringUtils
+              .isNotBlank(targetCPUThreshold) && StringUtils.isNotBlank(targetMemoryThreshold)
+            && StringUtils.isNotBlank(targetCPUPercentageThreshold) && StringUtils.isNotBlank(
+              targetMemoryPercentageThreshold
+            )
         ) {
 
           val clusterYarnResource =
@@ -147,11 +161,10 @@ class DriverAndYarnReqResourceService(
             AMConfiguration.ACROSS_CLUSTER_TOTAL_MEMORY_PERCENTAGE_THRESHOLD
 
           logger.info(
-            s"user: $user, creator: $creator task enter cross cluster resource judgment," +
-            s"priorityCluster: $priorityCluster," +
-            s"targetCPUThreshold: $targetCPUThreshold, targetMemoryThreshold: $targetMemoryThreshold," +
-            s"targetCPUPercentageThreshold: $targetCPUPercentageThreshold, targetMemoryPercentageThreshold: $targetMemoryPercentageThreshold" +
-            s"clusterCPUPercentageThreshold: $clusterCPUPercentageThreshold, clusterMemoryPercentageThreshold: $clusterMemoryPercentageThreshold"
+            s"user: $user, creator: $creator, priorityCluster: $priorityCluster, " +
+              s"targetCPUThreshold: $targetCPUThreshold, targetMemoryThreshold: $targetMemoryThreshold," +
+              s"targetCPUPercentageThreshold: $targetCPUPercentageThreshold, targetMemoryPercentageThreshold: $targetMemoryPercentageThreshold" +
+              s"clusterCPUPercentageThreshold: $clusterCPUPercentageThreshold, clusterMemoryPercentageThreshold: $clusterMemoryPercentageThreshold"
           )
 
           try {
@@ -170,8 +183,8 @@ class DriverAndYarnReqResourceService(
             )
           } catch {
             case ex: Exception =>
-              throw new TargetClusterRetryException(
-                RMErrorCode.TARGET_CLUSTER_RULE_FAILED.getErrorCode,
+              throw new RMWarnException(
+                RMErrorCode.ACROSS_CLUSTER_RULE_FAILED.getErrorCode,
                 ex.getMessage
               )
           }
@@ -180,18 +193,24 @@ class DriverAndYarnReqResourceService(
           logger.info(s"user: $user, creator: $creator task skip cross cluster resource judgment")
         }
       } else if (
-        StringUtils.isNotBlank(acrossClusterTask) && acrossClusterTask.toBoolean && StringUtils.isNotBlank(priorityCluster) && priorityCluster.equals(AMConfiguration.PRIORITY_CLUSTER_ORIGIN)
+          StringUtils.isNotBlank(acrossClusterTask) && acrossClusterTask.toBoolean && StringUtils
+            .isNotBlank(priorityCluster) && priorityCluster.equals(
+            AMConfiguration.PRIORITY_CLUSTER_ORIGIN
+          )
       ) {
-        val originCPUPercentageThreshold = properties.get(AMConfiguration.ORIGIN_CPU_PERCENTAGE_THRESHOLD)
-        val originMemoryPercentageThreshold = properties.get(AMConfiguration.ORIGIN_MEMORY_PERCENTAGE_THRESHOLD)
+        val originCPUPercentageThreshold =
+          properties.get(AMConfiguration.ORIGIN_CPU_PERCENTAGE_THRESHOLD)
+        val originMemoryPercentageThreshold =
+          properties.get(AMConfiguration.ORIGIN_MEMORY_PERCENTAGE_THRESHOLD)
 
         if (
-          StringUtils.isNotBlank(originCPUPercentageThreshold) && StringUtils.isNotBlank(originMemoryPercentageThreshold)
+            StringUtils.isNotBlank(originCPUPercentageThreshold) && StringUtils.isNotBlank(
+              originMemoryPercentageThreshold
+            )
         ) {
 
           logger.info(
-            s"user: $user, creator: $creator task enter cross cluster resource judgment," +
-              s"priorityCluster: $priorityCluster," +
+            s"user: $user, creator: $creator, priorityCluster: $priorityCluster, " +
               s"originCPUPercentageThreshold: $originCPUPercentageThreshold, originMemoryPercentageThreshold: $originMemoryPercentageThreshold"
           )
 
@@ -204,8 +223,8 @@ class DriverAndYarnReqResourceService(
             )
           } catch {
             case ex: Exception =>
-              throw new OriginRetryException(
-                RMErrorCode.ORIGIN_CLUSTER_RULE_FAILED.getErrorCode,
+              throw new RMWarnException(
+                RMErrorCode.ACROSS_CLUSTER_RULE_FAILED.getErrorCode,
                 ex.getMessage
               )
           }

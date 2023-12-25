@@ -117,7 +117,8 @@ class ComputationEngineConnManager extends AbstractEngineConnManager with Loggin
           retryException = t
 
           // add isCrossClusterRetryException flag
-          if (retryException.getDesc.equals("origin cluster retry")) {
+          logger.info("cross cluster retry info " + retryException.getDesc)
+          if (retryException.getDesc.contains("origin cluster retry")) {
             engineAskRequest.getProperties.put("originClusterRetry", "true")
           } else {
             engineAskRequest.getProperties.put("targetClusterRetry", "true")
