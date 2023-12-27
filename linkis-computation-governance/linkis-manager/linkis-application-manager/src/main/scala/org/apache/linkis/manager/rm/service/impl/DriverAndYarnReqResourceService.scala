@@ -223,7 +223,6 @@ class DriverAndYarnReqResourceService(
               )
           }
           logger.info(s"user: $user, creator: $creator task meet the threshold rule")
-
         } else {
           logger.info(s"user: $user, creator: $creator task skip cross cluster resource judgment")
         }
