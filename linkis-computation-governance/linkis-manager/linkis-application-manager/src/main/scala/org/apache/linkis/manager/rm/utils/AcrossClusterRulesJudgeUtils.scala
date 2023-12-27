@@ -18,14 +18,9 @@
 package org.apache.linkis.manager.rm.utils
 
 import org.apache.linkis.common.utils.Logging
-import org.apache.linkis.manager.am.conf.AMConfiguration
 import org.apache.linkis.manager.common.entity.resource.YarnResource
 import org.apache.linkis.manager.common.exception.RMWarnException
-import org.apache.linkis.manager.rm.exception.{
-  OriginRetryException,
-  RMErrorCode,
-  TargetClusterRetryException
-}
+import org.apache.linkis.manager.rm.exception.RMErrorCode
 
 object AcrossClusterRulesJudgeUtils extends Logging {
 
@@ -115,7 +110,6 @@ object AcrossClusterRulesJudgeUtils extends Logging {
       if (
           usedCPUPercentage > CPUPercentageThreshold || usedMemoryPercentage > MemoryPercentageThreshold
       ) {
-        logger.info("origin cluster retry")
         throw new RMWarnException(
           RMErrorCode.ACROSS_CLUSTER_RULE_FAILED.getErrorCode,
           "origin cluster retry"
