@@ -77,7 +77,7 @@ public class AcrossClusterRuleRestfulApi {
     try {
       acrossClusterRuleService.validAcrossClusterRule(id, isValid, username);
     } catch (Exception e) {
-      log.info("valid acrossClusterRule failed: " + e.getStackTrace());
+      log.info("valid acrossClusterRule failed: ", e);
       return Message.error("valid acrossClusterRule failed");
     }
 
@@ -124,7 +124,7 @@ public class AcrossClusterRuleRestfulApi {
           acrossClusterRuleService.queryAcrossClusterRuleList(
               creator, username, clusterName, pageNow, pageSize);
     } catch (Exception e) {
-      log.info("query acrossClusterRule List failed: " +e.getStackTrace());
+      log.info("query acrossClusterRule List failed: ", e);
       return Message.error("query acrossClusterRule List failed");
     }
 
@@ -154,7 +154,7 @@ public class AcrossClusterRuleRestfulApi {
     try {
       acrossClusterRuleService.deleteAcrossClusterRule(id.longValue());
     } catch (Exception e) {
-      log.info("delete acrossClusterRule failed: " + e.getStackTrace());
+      log.info("delete acrossClusterRule failed: ", e);
       return Message.error("delete acrossClusterRule failed");
     }
 
@@ -186,7 +186,7 @@ public class AcrossClusterRuleRestfulApi {
     try {
       acrossClusterRuleService.deleteAcrossClusterRuleByUsername(username);
     } catch (Exception e) {
-      log.info("delete acrossClusterRule failed：" + e.getStackTrace());
+      log.info("delete acrossClusterRule failed：", e);
       return Message.error("delete acrossClusterRule failed, username is: " + username);
     }
 
@@ -220,7 +220,7 @@ public class AcrossClusterRuleRestfulApi {
       acrossClusterRuleService.deleteAcrossClusterRuleByCrossQueue(
           CommonUtils.concatQueue(crossQueue));
     } catch (Exception e) {
-      log.info("delete acrossClusterRule failed：" + e.getStackTrace());
+      log.info("delete acrossClusterRule failed：", e);
       return Message.error("delete acrossClusterRule failed, crossQueue is: " + crossQueue);
     }
 
@@ -333,7 +333,7 @@ public class AcrossClusterRuleRestfulApi {
       acrossClusterRule.setIsValid(isValid);
       acrossClusterRuleService.updateAcrossClusterRule(acrossClusterRule);
     } catch (Exception e) {
-      log.info("update acrossClusterRule failed：" + e.getStackTrace());
+      log.info("update acrossClusterRule failed：", e);
       return Message.error("update acrossClusterRule failed, rule already exits");
     }
     return Message.ok();
@@ -441,7 +441,7 @@ public class AcrossClusterRuleRestfulApi {
       acrossClusterRule.setIsValid(isValid);
       acrossClusterRuleService.insertAcrossClusterRule(acrossClusterRule);
     } catch (Exception e) {
-      log.info("add acrossClusterRule failed：" + e.getStackTrace());
+      log.info("add acrossClusterRule failed：", e);
       return Message.error("add acrossClusterRule failed, rule already exits");
     }
 
