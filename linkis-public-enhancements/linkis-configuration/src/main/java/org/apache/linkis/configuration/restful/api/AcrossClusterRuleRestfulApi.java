@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import io.swagger.annotations.Api;
@@ -76,6 +78,47 @@ public class AcrossClusterRuleRestfulApi {
 
     try {
       acrossClusterRuleService.validAcrossClusterRule(id, isValid, username);
+    } catch (Exception e) {
+      log.info("valid acrossClusterRule failed: ", e);
+      return Message.error("valid acrossClusterRule failed");
+    }
+
+    return Message.ok();
+  }
+
+  @ApiOperation(
+      value = "valid acrossClusterRules by batch",
+      notes = "valid acrossClusterRules by batch",
+      response = Message.class)
+  @ApiImplicitParams({
+    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+    @ApiImplicitParam(name = "ids", dataType = "List<Integer>", value = "ids"),
+    @ApiImplicitParam(name = "isValid", dataType = "String", value = "isValid"),
+  })
+  @RequestMapping(path = "/isValidByBatch", method = RequestMethod.PUT)
+  public Message isValidRulesByBatch(
+      HttpServletRequest req, @RequestBody Map<String, Object> json) {
+    String operationUser = ModuleUserUtils.getOperationUser(req, "execute valid acrossClusterRule");
+    if (!Configuration.isAdmin(operationUser)) {
+      return Message.error(
+          "Failed to valid acrossClusterRule batch, msg: only administrators can configure");
+    }
+
+    @SuppressWarnings("unchecked")
+    ArrayList<Integer> ids = (ArrayList<Integer>) json.get("ids");
+    List<Long> ruleIds = new ArrayList<>();
+    for (Integer id : ids) {
+      ruleIds.add(id.longValue());
+    }
+
+    String isValid = (String) json.get("isValid");
+
+    if (StringUtils.isBlank(isValid)) {
+      return Message.error("Failed to valid acrossClusterRule, Illegal Input Param: isValid");
+    }
+
+    try {
+      acrossClusterRuleService.validAcrossClusterRuleByBatch(ruleIds, isValid);
     } catch (Exception e) {
       log.info("valid acrossClusterRule failed: ", e);
       return Message.error("valid acrossClusterRule failed");
@@ -153,6 +196,41 @@ public class AcrossClusterRuleRestfulApi {
 
     try {
       acrossClusterRuleService.deleteAcrossClusterRule(id.longValue());
+    } catch (Exception e) {
+      log.info("delete acrossClusterRule failed: ", e);
+      return Message.error("delete acrossClusterRule failed");
+    }
+
+    return Message.ok();
+  }
+
+  @ApiOperation(
+      value = "delete acrossClusterRule by batch",
+      notes = "delete acrossClusterRule by batch",
+      response = Message.class)
+  @ApiImplicitParams({
+    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+    @ApiImplicitParam(name = "ids", dataType = "List<Integer>", value = "ids"),
+  })
+  @RequestMapping(path = "/deleteByBatch", method = RequestMethod.DELETE)
+  public Message deleteAcrossClusterRuleByBatch(
+      HttpServletRequest req, @RequestBody Map<String, Object> json) {
+    String operationUser =
+        ModuleUserUtils.getOperationUser(req, "execute delete acrossClusterRule");
+    if (!Configuration.isAdmin(operationUser)) {
+      return Message.error(
+          "Failed to delete acrossClusterRule,msg: only administrators can configure");
+    }
+
+    @SuppressWarnings("unchecked")
+    ArrayList<Integer> ids = (ArrayList<Integer>) json.get("ids");
+    List<Long> ruleIds = new ArrayList<>();
+    for (Integer id : ids) {
+      ruleIds.add(id.longValue());
+    }
+
+    try {
+      acrossClusterRuleService.deleteAcrossClusterRuleByBatch(ruleIds);
     } catch (Exception e) {
       log.info("delete acrossClusterRule failed: ", e);
       return Message.error("delete acrossClusterRule failed");
@@ -333,6 +411,118 @@ public class AcrossClusterRuleRestfulApi {
       acrossClusterRule.setRules(rules);
       acrossClusterRule.setIsValid(isValid);
       acrossClusterRuleService.updateAcrossClusterRule(acrossClusterRule);
+    } catch (Exception e) {
+      log.info("update acrossClusterRule failed：", e);
+      return Message.error("update acrossClusterRule failed, rule already exits");
+    }
+    return Message.ok();
+  }
+
+  @ApiOperation(
+      value = "update acrossClusterRule by batch",
+      notes = "update acrossClusterRule by batch",
+      response = Message.class)
+  @ApiImplicitParams({
+    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+    @ApiImplicitParam(name = "ids", dataType = "List<Integer>", value = "ids"),
+    @ApiImplicitParam(name = "clusterName", dataType = "String", value = "clusterName"),
+    @ApiImplicitParam(name = "creator", dataType = "String", value = "creator"),
+    @ApiImplicitParam(name = "isValid", dataType = "String", value = "isValid"),
+    @ApiImplicitParam(name = "startTime", dataType = "String", value = "startTime"),
+    @ApiImplicitParam(name = "endTime", dataType = "String", value = "endTime"),
+    @ApiImplicitParam(name = "crossQueue", dataType = "String", value = "crossQueue"),
+    @ApiImplicitParam(name = "priorityCluster", dataType = "String", value = "priorityCluster"),
+    @ApiImplicitParam(
+        name = "targetCPUThreshold",
+        dataType = "String",
+        value = "targetCPUThreshold"),
+    @ApiImplicitParam(
+        name = "targetMemoryThreshold",
+        dataType = "String",
+        value = "targetMemoryThreshold"),
+    @ApiImplicitParam(
+        name = "originCPUPercentageThreshold",
+        dataType = "String",
+        value = "originCPUPercentageThreshold"),
+    @ApiImplicitParam(
+        name = "originMemoryPercentageThreshold",
+        dataType = "String",
+        value = "originMemoryPercentageThreshold"),
+    @ApiImplicitParam(
+        name = "targetCPUPercentageThreshold",
+        dataType = "String",
+        value = "targetCPUPercentageThreshold"),
+    @ApiImplicitParam(
+        name = "targetMemoryPercentageThreshold",
+        dataType = "String",
+        value = "targetMemoryPercentageThreshold"),
+  })
+  @RequestMapping(path = "/updateByBatch", method = RequestMethod.PUT)
+  public Message updateAcrossClusterRuleByBatch(
+      HttpServletRequest req, @RequestBody Map<String, Object> json) {
+    String operationUser =
+        ModuleUserUtils.getOperationUser(req, "execute update acrossClusterRule");
+    if (!Configuration.isAdmin(operationUser)) {
+      return Message.error(
+          "Failed to update acrossClusterRule,msg: only administrators can configure");
+    }
+
+    @SuppressWarnings("unchecked")
+    ArrayList<Integer> ids = (ArrayList<Integer>) json.get("ids");
+    List<Long> ruleIds = new ArrayList<>();
+    for (Integer id : ids) {
+      ruleIds.add(id.longValue());
+    }
+
+    String clusterName = (String) json.get("clusterName");
+    String creator = (String) json.get("creator");
+    String isValid = (String) json.get("isValid");
+    String startTime = (String) json.get("startTime");
+    String endTime = (String) json.get("endTime");
+    String crossQueue = (String) json.get("crossQueue");
+    String priorityCluster = (String) json.get("priorityCluster");
+    String targetCPUThreshold = (String) json.get("targetCPUThreshold");
+    String targetMemoryThreshold = (String) json.get("targetMemoryThreshold");
+    String targetCPUPercentageThreshold = (String) json.get("targetCPUPercentageThreshold");
+    String targetMemoryPercentageThreshold = (String) json.get("targetMemoryPercentageThreshold");
+    String originCPUPercentageThreshold = (String) json.get("originCPUPercentageThreshold");
+    String originMemoryPercentageThreshold = (String) json.get("originMemoryPercentageThreshold");
+    if (StringUtils.isBlank(clusterName)
+        || StringUtils.isBlank(creator)
+        || StringUtils.isBlank(isValid)
+        || StringUtils.isBlank(startTime)
+        || StringUtils.isBlank(endTime)
+        || StringUtils.isBlank(crossQueue)
+        || StringUtils.isBlank(priorityCluster)
+        || StringUtils.isBlank(targetCPUThreshold)
+        || StringUtils.isBlank(targetMemoryThreshold)
+        || StringUtils.isBlank(targetCPUPercentageThreshold)
+        || StringUtils.isBlank(targetMemoryPercentageThreshold)
+        || StringUtils.isBlank(originCPUPercentageThreshold)
+        || StringUtils.isBlank(originMemoryPercentageThreshold)) {
+      return Message.error("Failed to add acrossClusterRule, Illegal Input Param");
+    }
+
+    try {
+      String rules =
+          CommonUtils.ruleMap2String(
+              startTime,
+              endTime,
+              crossQueue,
+              priorityCluster,
+              targetCPUThreshold,
+              targetMemoryThreshold,
+              targetCPUPercentageThreshold,
+              targetMemoryPercentageThreshold,
+              originCPUPercentageThreshold,
+              originMemoryPercentageThreshold);
+      AcrossClusterRule acrossClusterRule = new AcrossClusterRule();
+      acrossClusterRule.setClusterName(clusterName.toLowerCase());
+      acrossClusterRule.setCreator(creator);
+      acrossClusterRule.setUpdateBy(operationUser);
+      acrossClusterRule.setRules(rules);
+      acrossClusterRule.setIsValid(isValid);
+      acrossClusterRuleService.updateAcrossClusterRuleByBatch(ruleIds, acrossClusterRule);
     } catch (Exception e) {
       log.info("update acrossClusterRule failed：", e);
       return Message.error("update acrossClusterRule failed, rule already exits");

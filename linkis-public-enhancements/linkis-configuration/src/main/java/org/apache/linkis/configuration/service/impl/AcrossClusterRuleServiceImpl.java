@@ -49,6 +49,11 @@ public class AcrossClusterRuleServiceImpl implements AcrossClusterRuleService {
   }
 
   @Override
+  public void deleteAcrossClusterRuleByBatch(List<Long> ids) throws Exception {
+    ruleMapper.deleteAcrossClusterRuleByBatch(ids);
+  }
+
+  @Override
   public void deleteAcrossClusterRuleByUsername(String username) throws Exception {
     ruleMapper.deleteAcrossClusterRuleByUsername(username);
   }
@@ -71,6 +76,15 @@ public class AcrossClusterRuleServiceImpl implements AcrossClusterRuleService {
     newRule.setUpdateTime(time);
 
     ruleMapper.updateAcrossClusterRule(newRule);
+  }
+
+  @Override
+  public void updateAcrossClusterRuleByBatch(List<Long> ids, AcrossClusterRule newRule)
+      throws Exception {
+    Date time = new Date();
+    newRule.setUpdateTime(time);
+
+    ruleMapper.updateAcrossClusterRuleByBatch(ids, newRule);
   }
 
   @Override
@@ -113,5 +127,10 @@ public class AcrossClusterRuleServiceImpl implements AcrossClusterRuleService {
     }
 
     ruleMapper.validAcrossClusterRule(isValid, id, username);
+  }
+
+  @Override
+  public void validAcrossClusterRuleByBatch(List<Long> ids, String isValid) throws Exception {
+    ruleMapper.validAcrossClusterRuleByBatch(ids, isValid);
   }
 }
