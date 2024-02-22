@@ -212,7 +212,7 @@ public class AcrossClusterRuleRestfulApi {
     @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
     @ApiImplicitParam(name = "ids", dataType = "List<Integer>", value = "ids"),
   })
-  @RequestMapping(path = "/deleteByBatch", method = RequestMethod.DELETE)
+  @RequestMapping(path = "/deleteByBatch", method = RequestMethod.PUT)
   public Message deleteAcrossClusterRuleByBatch(
       HttpServletRequest req, @RequestBody Map<String, Object> json) {
     String operationUser =
