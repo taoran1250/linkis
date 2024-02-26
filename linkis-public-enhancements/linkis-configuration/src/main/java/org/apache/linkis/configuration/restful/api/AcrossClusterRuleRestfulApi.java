@@ -56,7 +56,8 @@ public class AcrossClusterRuleRestfulApi {
       notes = "valid acrossClusterRule",
       response = Message.class)
   @ApiImplicitParams({
-    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+          @ApiImplicitParam(name = "id", dataType = "Integer", value = "id"),
+          @ApiImplicitParam(name = "isValid", dataType = "String", value = "isValid"),
   })
   @RequestMapping(path = "/isValid", method = RequestMethod.PUT)
   public Message isValidRule(HttpServletRequest req, @RequestBody Map<String, Object> json) {
@@ -89,7 +90,8 @@ public class AcrossClusterRuleRestfulApi {
       notes = "valid acrossClusterRules by batch",
       response = Message.class)
   @ApiImplicitParams({
-    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+          @ApiImplicitParam(name = "ids", dataType = "List<Integer>", value = "ids"),
+          @ApiImplicitParam(name = "isValid", dataType = "String", value = "isValid"),
   })
   @RequestMapping(path = "/isValidByBatch", method = RequestMethod.PUT)
   public Message isValidRulesByBatch(
@@ -128,10 +130,11 @@ public class AcrossClusterRuleRestfulApi {
       notes = "query acrossClusterRule list",
       response = Message.class)
   @ApiImplicitParams({
-    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
     @ApiImplicitParam(name = "creator", dataType = "String", value = "creator"),
     @ApiImplicitParam(name = "username", dataType = "String", value = "username"),
     @ApiImplicitParam(name = "clusterName", dataType = "String", value = "clusterName"),
+    @ApiImplicitParam(name = "pageNow", dataType = "Integer", value = "pageNow"),
+    @ApiImplicitParam(name = "pageSize", dataType = "Integer", value = "pageSize"),
   })
   @RequestMapping(path = "/list", method = RequestMethod.GET)
   public Message queryAcrossClusterRuleList(
@@ -177,7 +180,6 @@ public class AcrossClusterRuleRestfulApi {
       notes = "delete acrossClusterRule",
       response = Message.class)
   @ApiImplicitParams({
-    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
     @ApiImplicitParam(name = "id", dataType = "Integer", value = "id"),
   })
   @RequestMapping(path = "/delete", method = RequestMethod.DELETE)
@@ -205,7 +207,7 @@ public class AcrossClusterRuleRestfulApi {
       notes = "delete acrossClusterRule by batch",
       response = Message.class)
   @ApiImplicitParams({
-    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+          @ApiImplicitParam(name = "ids", dataType = "List<Integer>", value = "ids"),
   })
   @RequestMapping(path = "/deleteByBatch", method = RequestMethod.PUT)
   public Message deleteAcrossClusterRuleByBatch(
@@ -239,7 +241,6 @@ public class AcrossClusterRuleRestfulApi {
       notes = "delete acrossClusterRule",
       response = Message.class)
   @ApiImplicitParams({
-    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
     @ApiImplicitParam(name = "username", dataType = "String", value = "username"),
   })
   @RequestMapping(path = "/deleteByUsername", method = RequestMethod.DELETE)
@@ -271,7 +272,6 @@ public class AcrossClusterRuleRestfulApi {
       notes = "delete acrossClusterRule",
       response = Message.class)
   @ApiImplicitParams({
-    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
     @ApiImplicitParam(name = "crossQueue", dataType = "String", value = "crossQueue"),
   })
   @RequestMapping(path = "/deleteByCrossQueue", method = RequestMethod.DELETE)
@@ -306,7 +306,39 @@ public class AcrossClusterRuleRestfulApi {
       notes = "update acrossClusterRule ",
       response = Message.class)
   @ApiImplicitParams({
-    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+          @ApiImplicitParam(name = "id", dataType = "Integer", value = "id"),
+          @ApiImplicitParam(name = "clusterName", dataType = "String", value = "clusterName"),
+          @ApiImplicitParam(name = "creator", dataType = "String", value = "creator"),
+          @ApiImplicitParam(name = "username", dataType = "String", value = "username"),
+          @ApiImplicitParam(name = "isValid", dataType = "String", value = "isValid"),
+          @ApiImplicitParam(name = "startTime", dataType = "String", value = "startTime"),
+          @ApiImplicitParam(name = "endTime", dataType = "String", value = "endTime"),
+          @ApiImplicitParam(name = "crossQueue", dataType = "String", value = "crossQueue"),
+          @ApiImplicitParam(name = "priorityCluster", dataType = "String", value = "priorityCluster"),
+          @ApiImplicitParam(
+                  name = "targetCPUThreshold",
+                  dataType = "String",
+                  value = "targetCPUThreshold"),
+          @ApiImplicitParam(
+                  name = "targetMemoryThreshold",
+                  dataType = "String",
+                  value = "targetMemoryThreshold"),
+          @ApiImplicitParam(
+                  name = "originCPUPercentageThreshold",
+                  dataType = "String",
+                  value = "originCPUPercentageThreshold"),
+          @ApiImplicitParam(
+                  name = "originMemoryPercentageThreshold",
+                  dataType = "String",
+                  value = "originMemoryPercentageThreshold"),
+          @ApiImplicitParam(
+                  name = "targetCPUPercentageThreshold",
+                  dataType = "String",
+                  value = "targetCPUPercentageThreshold"),
+          @ApiImplicitParam(
+                  name = "targetMemoryPercentageThreshold",
+                  dataType = "String",
+                  value = "targetMemoryPercentageThreshold"),
   })
   @RequestMapping(path = "/update", method = RequestMethod.PUT)
   public Message updateAcrossClusterRule(
@@ -385,7 +417,38 @@ public class AcrossClusterRuleRestfulApi {
       notes = "update acrossClusterRule by batch",
       response = Message.class)
   @ApiImplicitParams({
-    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+          @ApiImplicitParam(name = "ids", dataType = "List<Integer>", value = "ids"),
+          @ApiImplicitParam(name = "clusterName", dataType = "String", value = "clusterName"),
+          @ApiImplicitParam(name = "creator", dataType = "String", value = "creator"),
+          @ApiImplicitParam(name = "isValid", dataType = "String", value = "isValid"),
+          @ApiImplicitParam(name = "startTime", dataType = "String", value = "startTime"),
+          @ApiImplicitParam(name = "endTime", dataType = "String", value = "endTime"),
+          @ApiImplicitParam(name = "crossQueue", dataType = "String", value = "crossQueue"),
+          @ApiImplicitParam(name = "priorityCluster", dataType = "String", value = "priorityCluster"),
+          @ApiImplicitParam(
+                  name = "targetCPUThreshold",
+                  dataType = "String",
+                  value = "targetCPUThreshold"),
+          @ApiImplicitParam(
+                  name = "targetMemoryThreshold",
+                  dataType = "String",
+                  value = "targetMemoryThreshold"),
+          @ApiImplicitParam(
+                  name = "originCPUPercentageThreshold",
+                  dataType = "String",
+                  value = "originCPUPercentageThreshold"),
+          @ApiImplicitParam(
+                  name = "originMemoryPercentageThreshold",
+                  dataType = "String",
+                  value = "originMemoryPercentageThreshold"),
+          @ApiImplicitParam(
+                  name = "targetCPUPercentageThreshold",
+                  dataType = "String",
+                  value = "targetCPUPercentageThreshold"),
+          @ApiImplicitParam(
+                  name = "targetMemoryPercentageThreshold",
+                  dataType = "String",
+                  value = "targetMemoryPercentageThreshold"),
   })
   @RequestMapping(path = "/updateByBatch", method = RequestMethod.PUT)
   public Message updateAcrossClusterRuleByBatch(
@@ -465,7 +528,38 @@ public class AcrossClusterRuleRestfulApi {
       notes = "add acrossClusterRule ",
       response = Message.class)
   @ApiImplicitParams({
-    @ApiImplicitParam(name = "req", dataType = "HttpServletRequest", value = "req"),
+          @ApiImplicitParam(name = "clusterName", dataType = "String", value = "clusterName"),
+          @ApiImplicitParam(name = "creator", dataType = "String", value = "creator"),
+          @ApiImplicitParam(name = "username", dataType = "String", value = "username"),
+          @ApiImplicitParam(name = "isValid", dataType = "String", value = "isValid"),
+          @ApiImplicitParam(name = "startTime", dataType = "String", value = "startTime"),
+          @ApiImplicitParam(name = "endTime", dataType = "String", value = "endTime"),
+          @ApiImplicitParam(name = "crossQueue", dataType = "String", value = "crossQueue"),
+          @ApiImplicitParam(name = "priorityCluster", dataType = "String", value = "priorityCluster"),
+          @ApiImplicitParam(
+                  name = "targetCPUThreshold",
+                  dataType = "String",
+                  value = "targetCPUThreshold"),
+          @ApiImplicitParam(
+                  name = "targetMemoryThreshold",
+                  dataType = "String",
+                  value = "targetMemoryThreshold"),
+          @ApiImplicitParam(
+                  name = "originCPUPercentageThreshold",
+                  dataType = "String",
+                  value = "originCPUPercentageThreshold"),
+          @ApiImplicitParam(
+                  name = "originMemoryPercentageThreshold",
+                  dataType = "String",
+                  value = "originMemoryPercentageThreshold"),
+          @ApiImplicitParam(
+                  name = "targetCPUPercentageThreshold",
+                  dataType = "String",
+                  value = "targetCPUPercentageThreshold"),
+          @ApiImplicitParam(
+                  name = "targetMemoryPercentageThreshold",
+                  dataType = "String",
+                  value = "targetMemoryPercentageThreshold"),
   })
   @RequestMapping(path = "/add", method = RequestMethod.POST)
   public Message insertAcrossClusterRule(
