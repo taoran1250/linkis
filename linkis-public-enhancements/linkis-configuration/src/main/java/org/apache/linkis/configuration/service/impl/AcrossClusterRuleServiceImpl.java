@@ -39,6 +39,9 @@ import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.linkis.configuration.conf.AcrossClusterRuleKeys.KEY_CROSS_QUEUE;
+import static org.apache.linkis.configuration.conf.AcrossClusterRuleKeys.KEY_QUEUE_RULE;
+
 @Service
 public class AcrossClusterRuleServiceImpl implements AcrossClusterRuleService {
 
@@ -154,8 +157,8 @@ public class AcrossClusterRuleServiceImpl implements AcrossClusterRuleService {
     try {
       Gson gson = BDPJettyServerHelper.gson();
       rulesMap = gson.fromJson(acrossClusterRuleDto.getRules(), rulesMap.getClass());
-      Map<String, String> queueRule = rulesMap.get("queueRule");
-      String crossQueueName = queueRule.get("crossQueue");
+      Map<String, String> queueRule = rulesMap.get(KEY_QUEUE_RULE);
+      String crossQueueName = queueRule.get(KEY_CROSS_QUEUE);
       logger.info("{} configure across cluster name is {}, queue name is {}", username, acrossClusterRuleDto.getClusterName(), crossQueueName);
       return new AcrossClusterResponse(clusterName, crossQueueName);
     } catch (Exception e) {
