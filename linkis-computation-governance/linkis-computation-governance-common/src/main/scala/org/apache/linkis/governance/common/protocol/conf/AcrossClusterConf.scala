@@ -15,27 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.linkis.manager.common.entity.metrics;
+package org.apache.linkis.governance.common.protocol.conf
 
-import org.apache.linkis.common.ServiceInstance;
+import org.apache.linkis.protocol.message.RequestProtocol
 
-import java.util.Date;
+trait AcrossClusterConf extends RequestProtocol
 
-public interface NodeMetrics {
+case class AcrossClusterRequest(username: String) extends AcrossClusterConf
 
-  ServiceInstance getServiceInstance();
+case class AcrossClusterResponse(clusterName: String, queueName: String)
 
-  Integer getStatus();
-
-  String getOverLoad();
-
-  String getHeartBeatMsg();
-
-  String getHealthy();
-
-  void setHealthy(String healthy);
-
-  Date getUpdateTime();
-
-  String getDescription();
-}

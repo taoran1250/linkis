@@ -579,6 +579,7 @@ public class FsRestfulApi {
       throw WorkspaceExceptionManager.createException(80004, path);
     }
     String userName = ModuleUserUtils.getOperationUser(req, "openFile " + path);
+    Long startTime = System.currentTimeMillis();
     if (!checkIsUsersDirectory(path, userName)) {
       throw WorkspaceExceptionManager.createException(80010, userName, path);
     }
@@ -599,6 +600,9 @@ public class FsRestfulApi {
         if (!StringUtils.isEmpty(nullValue)) {
           fileSource.addParams("nullValue", nullValue);
         }
+        if (pageSize > FILESYSTEM_RESULTSET_ROW_LIMIT.getValue()) {
+          throw WorkspaceExceptionManager.createException(80034);
+        }
         fileSource = fileSource.page(page, pageSize);
       } else if (fileSystem.getLength(fsPath)
           > ByteTimeUtils.byteStringAsBytes(FILESYSTEM_FILE_CHECK_SIZE.getValue())) {
@@ -606,6 +610,8 @@ public class FsRestfulApi {
         throw WorkspaceExceptionManager.createException(80032);
       }
       Pair<Object, ArrayList<String[]>> result = fileSource.collect()[0];
+      LOGGER.info(
+          "Finished to open File {}, taken {} ms", path, System.currentTimeMillis() - startTime);
       IOUtils.closeQuietly(fileSource);
       message.data("metadata", result.getFirst()).data("fileContent", result.getSecond());
       message.data("type", fileSource.getFileSplits()[0].type());

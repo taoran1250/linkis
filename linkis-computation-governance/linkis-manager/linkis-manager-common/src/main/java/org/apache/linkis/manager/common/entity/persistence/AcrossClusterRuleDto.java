@@ -15,27 +15,44 @@
  * limitations under the License.
  */
 
-package org.apache.linkis.manager.common.entity.metrics;
+package org.apache.linkis.manager.common.entity.persistence;
 
-import org.apache.linkis.common.ServiceInstance;
+public class AcrossClusterRuleDto {
 
-import java.util.Date;
+  private String clusterName;
+  private String username;
+  private String rules;
+  private String queueName;
 
-public interface NodeMetrics {
+  public String getClusterName() {
+    return clusterName;
+  }
 
-  ServiceInstance getServiceInstance();
+  public void setClusterName(String clusterName) {
+    this.clusterName = clusterName;
+  }
 
-  Integer getStatus();
+  public String getUsername() {
+    return username;
+  }
 
-  String getOverLoad();
+  public void setUsername(String username) {
+    this.username = username;
+  }
 
-  String getHeartBeatMsg();
+  public String getRules() {
+    return rules;
+  }
 
-  String getHealthy();
+  public void setRules(String rules) {
+    this.rules = rules;
+  }
 
-  void setHealthy(String healthy);
+  public String getQueueName() {
+    return queueName;
+  }
 
-  Date getUpdateTime();
-
-  String getDescription();
+  public void setQueueName(String queueName) {
+    this.queueName = queueName;
+  }
 }
