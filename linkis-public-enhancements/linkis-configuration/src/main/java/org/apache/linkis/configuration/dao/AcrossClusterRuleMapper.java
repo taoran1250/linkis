@@ -17,10 +17,8 @@
 
 package org.apache.linkis.configuration.dao;
 
-import org.apache.linkis.configuration.entity.AcrossClusterRule;
-
 import org.apache.ibatis.annotations.Param;
-import org.apache.linkis.manager.common.entity.persistence.AcrossClusterRuleDto;
+import org.apache.linkis.configuration.entity.AcrossClusterRule;
 
 import java.util.List;
 
@@ -51,5 +49,5 @@ public interface AcrossClusterRuleMapper {
    * @param username
    * @return
    */
-  AcrossClusterRuleDto queryAcrossClusterRuleByUserName(@Param("username") String username);
+  AcrossClusterRule queryAcrossClusterRuleByUserName(@Param("username") String username);
 }
