@@ -470,7 +470,7 @@ class RMMonitorRest extends Logging {
     } else {
       if (responseObject.isInstanceOf[AcrossClusterResponse]) {
         val response: AcrossClusterResponse = isInstanceOf.asInstanceOf[AcrossClusterResponse]
-        logger.info("across cluster info: cluster name: {}, queue: {}", response.clusterName, response.queueName)
+        logger.info(s"across cluster info: cluster name: ${response.clusterName}, queue: ${response.queueName}")
         val acrossClusterInfo = new mutable.HashMap[String, Any]()
         acrossClusterInfo.put("clustername", response.clusterName)
         val acrossQueues = new mutable.LinkedHashSet[String]()
@@ -478,7 +478,7 @@ class RMMonitorRest extends Logging {
         acrossClusterInfo.put("queues", acrossQueues)
         clusters.append(acrossClusterInfo)
       } else {
-        logger.warn("get {} across cluster info failed.", userName)
+        logger.warn(s"get ${userName} across cluster info failed.")
       }
     }
 
