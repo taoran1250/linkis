@@ -24,6 +24,7 @@ class LoopArray[T](maxCapacity: Int) {
   def this() = this(32)
 
   // realSize 游标之前的数据 已经被重写覆盖了
+  // The data before realSize cursor has been overwritten by rewriting
   protected[this] var realSize = 0
 
   // the loop begin indx
