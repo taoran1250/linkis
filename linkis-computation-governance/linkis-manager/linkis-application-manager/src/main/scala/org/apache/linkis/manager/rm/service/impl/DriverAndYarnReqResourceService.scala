@@ -19,7 +19,7 @@ package org.apache.linkis.manager.rm.service.impl
 
 import org.apache.linkis.manager.am.conf.AMConfiguration
 import org.apache.linkis.manager.am.vo.CanCreateECRes
-import org.apache.linkis.manager.common.constant.RMConstant
+import org.apache.linkis.manager.common.constant.{AMConstant, RMConstant}
 import org.apache.linkis.manager.common.entity.resource._
 import org.apache.linkis.manager.common.entity.resource.ResourceType.DriverAndYarn
 import org.apache.linkis.manager.common.exception.RMWarnException
@@ -116,10 +116,10 @@ class DriverAndYarnReqResourceService(
         engineCreateRequest.getProperties.getOrDefault(AMConfiguration.ACROSS_CLUSTER_TASK, "false")
       val priorityCluster = engineCreateRequest.getProperties.get(AMConfiguration.PRIORITY_CLUSTER)
       if (
-          StringUtils.isNotBlank(acrossClusterTask) && acrossClusterTask.toBoolean && StringUtils
-            .isNotBlank(priorityCluster) && priorityCluster.equals(
-            AMConfiguration.PRIORITY_CLUSTER_ORIGIN
-          )
+        StringUtils.isNotBlank(acrossClusterTask) && acrossClusterTask.toBoolean && StringUtils
+          .isNotBlank(priorityCluster) && priorityCluster.equals(
+          AMConfiguration.PRIORITY_CLUSTER_ORIGIN
+        )
       ) {
 
         // get origin cluster resource threshold
@@ -129,9 +129,9 @@ class DriverAndYarnReqResourceService(
           engineCreateRequest.getProperties.get(AMConfiguration.ORIGIN_MEMORY_PERCENTAGE_THRESHOLD)
 
         if (
-            StringUtils.isNotBlank(originCPUPercentageThreshold) && StringUtils.isNotBlank(
-              originMemoryPercentageThreshold
-            )
+          StringUtils.isNotBlank(originCPUPercentageThreshold) && StringUtils.isNotBlank(
+            originMemoryPercentageThreshold
+          )
         ) {
 
           // judge origin cluster resource in origin threshold

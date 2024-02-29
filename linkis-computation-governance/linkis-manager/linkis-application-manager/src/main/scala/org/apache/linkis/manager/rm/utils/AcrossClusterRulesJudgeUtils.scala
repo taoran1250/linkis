@@ -58,7 +58,7 @@ object AcrossClusterRulesJudgeUtils extends Logging {
       }
 
       val leftQueueMemory = leftResource.queueMemory / Math.pow(1024, 3).toLong
-      if (leftResource.queueCores > CPUThreshold && leftQueueMemory > MemoryThreshold) {
+      if (leftResource.queueCores >= CPUThreshold && leftQueueMemory >= MemoryThreshold) {
         val usedCPUPercentage =
           usedResource.queueCores.asInstanceOf[Double] / maxResource.queueCores
             .asInstanceOf[Double]
