@@ -31,9 +31,9 @@ class LoopArray[T](maxCapacity: Int) {
   private var front = 0
 
   // the loop last index
+  // 尾部 下一个存储的游标
   private var tail = 0
 
-  // update when do fake clear, to Record the number of lines written to a file
   private var clearEleNums = 0
 
   def add(event: T): T = {
@@ -86,24 +86,33 @@ class LoopArray[T](maxCapacity: Int) {
     if (_size == 0) {
       _size = 1
     }
-    realSize + _size - 1
+    realSize + _size
   }
 
   def fakeClearEleNums: Int = clearEleNums
 
-  private def filledSize = if (tail >= front) tail - front + 1 else tail + maxCapacity - front + 1
+  private def filledSize = {
+    if (tail == front && tail == 0)
+    {
+      0
+    }
+    else if (tail > front) {
+      tail - front
+    } else {
+        tail + maxCapacity - front
+      }
+    }
+
 
   def size: Int = filledSize
 
-  def isFull: Boolean = filledSize == maxCapacity
+  def isFull: Boolean = filledSize == maxCapacity -1
 
   // If it is not empty, it means that the loop queue is full this round.
   // 不为空 说明本轮 循环队列满了
   def isNextOneEmpty(): Boolean = {
 
-    val nextIndex = (tail + 1) % maxCapacity
-
-    eventQueue(nextIndex).asInstanceOf[T] == null
+    eventQueue(tail).asInstanceOf[T] == null
 
   }
 
