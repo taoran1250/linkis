@@ -216,7 +216,7 @@ public class DataSourceRestfulApi implements DataSourceRestfulRemote {
       @RequestParam(value = "table") String table,
       HttpServletRequest req) {
     String userName = ModuleUserUtils.getOperationUser(req, "get size ");
-    if (StringUtils.isNoneBlank(database, table)) {
+    if (! StringUtils.isNoneBlank(database, table)) {
       return Message.error("DB and table cannot be null");
     }
     MetadataQueryParam queryParam =
