@@ -20,6 +20,7 @@ package org.apache.linkis.engineconnplugin.flink.client.shims.config.entries;
 import org.apache.linkis.engineconnplugin.flink.client.shims.config.ConfigUtil;
 
 import org.apache.flink.table.descriptors.DescriptorProperties;
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,10 +30,17 @@ import static org.apache.linkis.engineconnplugin.flink.client.shims.config.Envir
 /** Configuration for configuring {@link org.apache.flink.table.api.TableConfig}. */
 public class ConfigurationEntry extends ConfigEntry {
 
-  public static final ConfigurationEntry DEFAULT_INSTANCE =
-      new ConfigurationEntry(new DescriptorProperties(true));
+  public static final ConfigurationEntry DEFAULT_INSTANCE;
 
-  private ConfigurationEntry(DescriptorProperties properties) {
+    static {
+        try {
+            DEFAULT_INSTANCE = new ConfigurationEntry(new DescriptorProperties(true));
+        } catch (FlinkInitFailedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ConfigurationEntry(DescriptorProperties properties) throws FlinkInitFailedException {
     super(properties);
   }
 
@@ -43,7 +51,7 @@ public class ConfigurationEntry extends ConfigEntry {
 
   // --------------------------------------------------------------------------------------------
 
-  public static ConfigurationEntry create(Map<String, Object> config) {
+  public static ConfigurationEntry create(Map<String, Object> config) throws FlinkInitFailedException {
     return new ConfigurationEntry(ConfigUtil.normalizeYaml(config));
   }
 
@@ -52,7 +60,7 @@ public class ConfigurationEntry extends ConfigEntry {
    * overwritten by the second one.
    */
   public static ConfigurationEntry merge(
-      ConfigurationEntry configuration1, ConfigurationEntry configuration2) {
+      ConfigurationEntry configuration1, ConfigurationEntry configuration2) throws FlinkInitFailedException {
     final Map<String, String> mergedProperties = new HashMap<>(configuration1.asMap());
     mergedProperties.putAll(configuration2.asMap());
 
@@ -63,7 +71,7 @@ public class ConfigurationEntry extends ConfigEntry {
   }
 
   public static ConfigurationEntry enrich(
-      ConfigurationEntry configuration, Map<String, String> prefixedProperties) {
+      ConfigurationEntry configuration, Map<String, String> prefixedProperties) throws FlinkInitFailedException {
     final Map<String, String> enrichedProperties = new HashMap<>(configuration.asMap());
 
     prefixedProperties.forEach(

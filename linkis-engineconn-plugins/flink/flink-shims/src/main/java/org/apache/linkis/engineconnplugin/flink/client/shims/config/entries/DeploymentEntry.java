@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,16 +47,23 @@ public class DeploymentEntry extends ConfigEntry {
 
   private static final Logger LOG = LoggerFactory.getLogger(DeploymentEntry.class);
 
-  public static final DeploymentEntry DEFAULT_INSTANCE =
-      new DeploymentEntry(new DescriptorProperties(true));
+  public static final DeploymentEntry DEFAULT_INSTANCE;
 
-  private static final String DEPLOYMENT_RESPONSE_TIMEOUT = "response-timeout";
+    static {
+        try {
+            DEFAULT_INSTANCE = new DeploymentEntry(new DescriptorProperties(true));
+        } catch (FlinkInitFailedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final String DEPLOYMENT_RESPONSE_TIMEOUT = "response-timeout";
 
   private static final String DEPLOYMENT_GATEWAY_ADDRESS = "gateway-address";
 
   private static final String DEPLOYMENT_GATEWAY_PORT = "gateway-port";
 
-  private DeploymentEntry(DescriptorProperties properties) {
+  private DeploymentEntry(DescriptorProperties properties) throws FlinkInitFailedException {
     super(properties);
   }
 
@@ -137,7 +145,7 @@ public class DeploymentEntry extends ConfigEntry {
 
   // --------------------------------------------------------------------------------------------
 
-  public static DeploymentEntry create(Map<String, Object> config) {
+  public static DeploymentEntry create(Map<String, Object> config) throws FlinkInitFailedException {
     return new DeploymentEntry(ConfigUtil.normalizeYaml(config));
   }
 
@@ -145,7 +153,7 @@ public class DeploymentEntry extends ConfigEntry {
    * Merges two deployments entries. The properties of the first deployment entry might be
    * overwritten by the second one.
    */
-  public static DeploymentEntry merge(DeploymentEntry deployment1, DeploymentEntry deployment2) {
+  public static DeploymentEntry merge(DeploymentEntry deployment1, DeploymentEntry deployment2) throws FlinkInitFailedException {
     final Map<String, String> mergedProperties = new HashMap<>(deployment1.asMap());
     mergedProperties.putAll(deployment2.asMap());
 
@@ -156,7 +164,7 @@ public class DeploymentEntry extends ConfigEntry {
   }
 
   public static DeploymentEntry enrich(
-      DeploymentEntry deployment, Map<String, String> prefixedProperties) {
+      DeploymentEntry deployment, Map<String, String> prefixedProperties) throws FlinkInitFailedException {
     final Map<String, String> enrichedProperties = new HashMap<>(deployment.asMap());
 
     prefixedProperties.forEach(

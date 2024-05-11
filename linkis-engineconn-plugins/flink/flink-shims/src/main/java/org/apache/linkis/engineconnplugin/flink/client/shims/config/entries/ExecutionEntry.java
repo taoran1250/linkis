@@ -40,10 +40,19 @@ import static org.apache.linkis.engineconnplugin.flink.client.shims.config.Envir
 
 public class ExecutionEntry extends ConfigEntry {
 
-  public static final ExecutionEntry DEFAULT_INSTANCE =
-      new ExecutionEntry(new DescriptorProperties(true));
-
   private static final Logger LOG = LoggerFactory.getLogger(ExecutionEntry.class);
+
+  public static final ExecutionEntry DEFAULT_INSTANCE;
+
+    static {
+        try {
+            DEFAULT_INSTANCE = new ExecutionEntry(new DescriptorProperties(true));
+        } catch (FlinkInitFailedException e) {
+            LOG.error("DEFAULT_INSTANCE init error : {}", e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
 
   public static final List<String> AVAILABLE_PLANNERS =
       Arrays.asList(

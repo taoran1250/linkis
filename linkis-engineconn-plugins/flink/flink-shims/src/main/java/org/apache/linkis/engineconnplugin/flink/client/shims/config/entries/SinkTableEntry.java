@@ -18,11 +18,12 @@
 package org.apache.linkis.engineconnplugin.flink.client.shims.config.entries;
 
 import org.apache.flink.table.descriptors.DescriptorProperties;
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 
 /** Configuration of a table sink. */
 public class SinkTableEntry extends TableEntry {
 
-  SinkTableEntry(String name, DescriptorProperties properties) {
+  SinkTableEntry(String name, DescriptorProperties properties) throws FlinkInitFailedException {
     super(name, properties);
   }
 

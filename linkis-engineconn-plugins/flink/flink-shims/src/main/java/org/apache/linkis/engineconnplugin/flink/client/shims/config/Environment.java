@@ -22,6 +22,7 @@ import org.apache.linkis.engineconnplugin.flink.client.shims.errorcode.FlinkErro
 import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonMappingException;
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.SqlExecutionException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -106,7 +107,7 @@ public class Environment {
     return tables;
   }
 
-  public void setTables(List<Map<String, Object>> tables) throws FlinkInitFailedException {
+  public void setTables(List<Map<String, Object>> tables) throws FlinkInitFailedException, SqlExecutionException {
     this.tables = new LinkedHashMap<>(tables.size());
 
     for (Map<String, Object> config : tables) {
@@ -138,7 +139,7 @@ public class Environment {
     }
   }
 
-  public void setExecution(Map<String, Object> config) {
+  public void setExecution(Map<String, Object> config) throws FlinkInitFailedException {
     this.execution = ExecutionEntry.create(config);
   }
 
@@ -146,7 +147,7 @@ public class Environment {
     return execution;
   }
 
-  public void setConfiguration(Map<String, Object> config) {
+  public void setConfiguration(Map<String, Object> config) throws FlinkInitFailedException {
     this.configuration = ConfigurationEntry.create(config);
   }
 
@@ -154,7 +155,7 @@ public class Environment {
     return configuration;
   }
 
-  public void setDeployment(Map<String, Object> config) {
+  public void setDeployment(Map<String, Object> config) throws FlinkInitFailedException {
     this.deployment = DeploymentEntry.create(config);
   }
 
@@ -268,16 +269,28 @@ public class Environment {
     mergedEnv.functions = functions;
 
     // merge execution properties
-    mergedEnv.execution = ExecutionEntry.merge(env1.getExecution(), env2.getExecution());
+      try {
+          mergedEnv.execution = ExecutionEntry.merge(env1.getExecution(), env2.getExecution());
+      } catch (FlinkInitFailedException e) {
+          throw new RuntimeException(e);
+      }
 
-    // merge configuration properties
-    mergedEnv.configuration =
-        ConfigurationEntry.merge(env1.getConfiguration(), env2.getConfiguration());
+      // merge configuration properties
+      try {
+          mergedEnv.configuration =
+              ConfigurationEntry.merge(env1.getConfiguration(), env2.getConfiguration());
+      } catch (FlinkInitFailedException e) {
+          throw new RuntimeException(e);
+      }
 
-    // merge deployment properties
-    mergedEnv.deployment = DeploymentEntry.merge(env1.getDeployment(), env2.getDeployment());
+      // merge deployment properties
+      try {
+          mergedEnv.deployment = DeploymentEntry.merge(env1.getDeployment(), env2.getDeployment());
+      } catch (FlinkInitFailedException e) {
+          throw new RuntimeException(e);
+      }
 
-    return mergedEnv;
+      return mergedEnv;
   }
 
   @Override
@@ -302,15 +315,19 @@ public class Environment {
     // merge functions
     enrichedEnv.functions = new HashMap<>(env.getFunctions());
 
-    // enrich execution properties
-    enrichedEnv.execution = ExecutionEntry.enrich(env.execution, properties);
+    try {
+      // enrich execution properties
+      enrichedEnv.execution = ExecutionEntry.enrich(env.execution, properties);
 
-    // enrich configuration properties
-    enrichedEnv.configuration = ConfigurationEntry.enrich(env.configuration, properties);
+      // enrich configuration properties
+      enrichedEnv.configuration = ConfigurationEntry.enrich(env.configuration, properties);
 
-    // enrich deployment properties
-    enrichedEnv.deployment = DeploymentEntry.enrich(env.deployment, properties);
+      // enrich deployment properties
+      enrichedEnv.deployment = DeploymentEntry.enrich(env.deployment, properties);
 
+    } catch (FlinkInitFailedException e) {
+      throw new RuntimeException(e);
+    }
     return enrichedEnv;
   }
 }

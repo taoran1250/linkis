@@ -18,6 +18,7 @@
 package org.apache.linkis.engineconnplugin.flink.client.shims.config.entries;
 
 import org.apache.flink.table.descriptors.DescriptorProperties;
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class TemporalTableEntry extends TableEntry {
 
   private final String timeAttribute;
 
-  TemporalTableEntry(String name, DescriptorProperties properties) {
+  TemporalTableEntry(String name, DescriptorProperties properties) throws FlinkInitFailedException {
     super(name, properties);
 
     historyTable = properties.getString(TABLES_HISTORY_TABLE);

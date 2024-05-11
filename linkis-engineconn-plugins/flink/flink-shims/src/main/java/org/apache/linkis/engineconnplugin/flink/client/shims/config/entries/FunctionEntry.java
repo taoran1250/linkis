@@ -21,6 +21,7 @@ import org.apache.linkis.engineconnplugin.flink.client.shims.config.ConfigUtil;
 
 import org.apache.flink.table.descriptors.DescriptorProperties;
 import org.apache.flink.table.descriptors.FunctionDescriptor;
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 
 import java.util.Collections;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class FunctionEntry extends ConfigEntry {
 
   private String name;
 
-  private FunctionEntry(String name, DescriptorProperties properties) {
+  private FunctionEntry(String name, DescriptorProperties properties) throws FlinkInitFailedException {
     super(properties);
     this.name = name;
   }
@@ -48,11 +49,11 @@ public class FunctionEntry extends ConfigEntry {
     return new FunctionEntryDescriptor();
   }
 
-  public static FunctionEntry create(Map<String, Object> config) {
+  public static FunctionEntry create(Map<String, Object> config) throws FlinkInitFailedException {
     return create(ConfigUtil.normalizeYaml(config));
   }
 
-  private static FunctionEntry create(DescriptorProperties properties) {
+  private static FunctionEntry create(DescriptorProperties properties) throws FlinkInitFailedException {
     properties.validateString(FUNCTIONS_NAME, false, 1);
 
     final String name = properties.getString(FUNCTIONS_NAME);

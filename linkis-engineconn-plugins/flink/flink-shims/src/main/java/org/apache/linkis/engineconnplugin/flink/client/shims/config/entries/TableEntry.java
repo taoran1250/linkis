@@ -18,6 +18,7 @@
 package org.apache.linkis.engineconnplugin.flink.client.shims.config.entries;
 
 import org.apache.linkis.engineconnplugin.flink.client.shims.config.ConfigUtil;
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 import org.apache.linkis.engineconnplugin.flink.client.shims.exception.SqlExecutionException;
 
 import org.apache.flink.table.descriptors.DescriptorProperties;
@@ -50,7 +51,7 @@ public abstract class TableEntry extends ConfigEntry {
 
   private final String name;
 
-  protected TableEntry(String name, DescriptorProperties properties) {
+  protected TableEntry(String name, DescriptorProperties properties) throws FlinkInitFailedException {
     super(properties);
     this.name = name;
   }
@@ -59,11 +60,11 @@ public abstract class TableEntry extends ConfigEntry {
     return name;
   }
 
-  public static TableEntry create(Map<String, Object> config) {
+  public static TableEntry create(Map<String, Object> config) throws FlinkInitFailedException, SqlExecutionException {
     return create(ConfigUtil.normalizeYaml(config));
   }
 
-  private static TableEntry create(DescriptorProperties properties) {
+  private static TableEntry create(DescriptorProperties properties) throws FlinkInitFailedException, SqlExecutionException {
     properties.validateString(TABLES_NAME, false, 1);
     properties.validateEnumValues(
         TABLES_TYPE,

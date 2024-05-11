@@ -18,6 +18,7 @@
 package org.apache.linkis.engineconnplugin.flink.client.shims.config.entries;
 
 import org.apache.flink.table.descriptors.DescriptorProperties;
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 
 /** Configuration of a table view. */
 public class ViewEntry extends TableEntry {
@@ -26,7 +27,7 @@ public class ViewEntry extends TableEntry {
 
   private final String query;
 
-  ViewEntry(String name, DescriptorProperties properties) {
+  ViewEntry(String name, DescriptorProperties properties) throws FlinkInitFailedException {
     super(name, properties);
 
     query = properties.getString(TABLES_QUERY);
@@ -41,7 +42,7 @@ public class ViewEntry extends TableEntry {
     properties.validateString(TABLES_QUERY, false, 1);
   }
 
-  public static ViewEntry create(String name, String query) {
+  public static ViewEntry create(String name, String query) throws FlinkInitFailedException {
     final DescriptorProperties properties = new DescriptorProperties(true);
     properties.putString(TABLES_QUERY, query);
     return new ViewEntry(name, properties);

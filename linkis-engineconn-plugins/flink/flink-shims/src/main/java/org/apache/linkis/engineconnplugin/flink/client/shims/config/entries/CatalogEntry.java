@@ -20,6 +20,7 @@ package org.apache.linkis.engineconnplugin.flink.client.shims.config.entries;
 import org.apache.linkis.engineconnplugin.flink.client.shims.config.ConfigUtil;
 
 import org.apache.flink.table.descriptors.DescriptorProperties;
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 
 import java.util.Collections;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class CatalogEntry extends ConfigEntry {
 
   private final String name;
 
-  protected CatalogEntry(String name, DescriptorProperties properties) {
+  protected CatalogEntry(String name, DescriptorProperties properties) throws FlinkInitFailedException {
     super(properties);
     this.name = name;
   }
@@ -57,11 +58,11 @@ public class CatalogEntry extends ConfigEntry {
     // further validation is performed by the discovered factory
   }
 
-  public static CatalogEntry create(Map<String, Object> config) {
+  public static CatalogEntry create(Map<String, Object> config) throws FlinkInitFailedException {
     return create(ConfigUtil.normalizeYaml(config));
   }
 
-  private static CatalogEntry create(DescriptorProperties properties) {
+  private static CatalogEntry create(DescriptorProperties properties) throws FlinkInitFailedException {
     properties.validateString(CATALOG_NAME, false, 1);
 
     final String name = properties.getString(CATALOG_NAME);

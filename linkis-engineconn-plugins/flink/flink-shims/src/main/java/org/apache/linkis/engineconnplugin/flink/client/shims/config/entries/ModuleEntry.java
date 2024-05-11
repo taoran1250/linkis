@@ -20,6 +20,7 @@ package org.apache.linkis.engineconnplugin.flink.client.shims.config.entries;
 import org.apache.linkis.engineconnplugin.flink.client.shims.config.ConfigUtil;
 
 import org.apache.flink.table.descriptors.DescriptorProperties;
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 
 import java.util.Collections;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class ModuleEntry extends ConfigEntry {
 
   private final String name;
 
-  protected ModuleEntry(String name, DescriptorProperties properties) {
+  protected ModuleEntry(String name, DescriptorProperties properties)  throws FlinkInitFailedException {
     super(properties);
     this.name = name;
   }
@@ -47,11 +48,11 @@ public class ModuleEntry extends ConfigEntry {
     properties.validateString(MODULE_TYPE, false, 1);
   }
 
-  public static ModuleEntry create(Map<String, Object> config) {
+  public static ModuleEntry create(Map<String, Object> config)  throws FlinkInitFailedException {
     return create(ConfigUtil.normalizeYaml(config));
   }
 
-  private static ModuleEntry create(DescriptorProperties properties) {
+  private static ModuleEntry create(DescriptorProperties properties)  throws FlinkInitFailedException {
     properties.validateString(MODULE_NAME, false, 1);
 
     final String name = properties.getString(MODULE_NAME);

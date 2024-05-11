@@ -19,8 +19,7 @@ package org.apache.linkis.engineconnplugin.flink.config
 
 import org.apache.linkis.common.conf.{CommonVars, TimeType}
 import org.apache.linkis.engineconnplugin.flink.client.shims.config.entries.ExecutionEntry
-import org.apache.linkis.engineconnplugin.flink.shims.constants.FlinkECConstant
-import org.apache.linkis.engineconnplugin.flink.client.shims.config.entries.ExecutionEntry
+import org.apache.linkis.engineconnplugin.flink.constants.FlinkECConstant
 
 object FlinkEnvConfiguration {
 
