@@ -18,6 +18,7 @@
 package org.apache.linkis.engineconnplugin.flink.client.sql.operation.impl;
 
 import org.apache.linkis.engineconnplugin.flink.client.context.ExecutionContext;
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 import org.apache.linkis.engineconnplugin.flink.client.shims.exception.SqlExecutionException;
 import org.apache.linkis.engineconnplugin.flink.client.sql.operation.NonJobOperation;
 import org.apache.linkis.engineconnplugin.flink.client.sql.operation.result.ColumnInfo;
@@ -44,7 +45,7 @@ public class ExplainOperation implements NonJobOperation {
   }
 
   @Override
-  public ResultSet execute() throws SqlExecutionException {
+  public ResultSet execute() throws SqlExecutionException, FlinkInitFailedException {
     final TableEnvironment tableEnv = context.getTableEnvironment();
     // translate
     try {
@@ -56,8 +57,6 @@ public class ExplainOperation implements NonJobOperation {
                   ConstantNames.EXPLAIN_RESULT, new VarCharType(false, explanation.length())))
           .data(Row.of(explanation))
           .build();
-    } catch (SqlExecutionException t) {
-      throw t;
     } catch (Exception t) {
       // catch everything such that the query does not crash the executor
       throw new SqlExecutionException(INVALID_SQL_STATEMENT.getErrorDesc(), t);

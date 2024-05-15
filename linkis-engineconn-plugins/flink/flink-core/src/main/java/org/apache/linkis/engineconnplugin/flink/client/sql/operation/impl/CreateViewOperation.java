@@ -21,6 +21,7 @@ import org.apache.linkis.engineconnplugin.flink.client.context.ExecutionContext;
 import org.apache.linkis.engineconnplugin.flink.client.shims.config.Environment;
 import org.apache.linkis.engineconnplugin.flink.client.shims.config.entries.TableEntry;
 import org.apache.linkis.engineconnplugin.flink.client.shims.config.entries.ViewEntry;
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 import org.apache.linkis.engineconnplugin.flink.client.shims.exception.SqlExecutionException;
 import org.apache.linkis.engineconnplugin.flink.client.sql.operation.NonJobOperation;
 import org.apache.linkis.engineconnplugin.flink.client.sql.operation.OperationUtil;
@@ -45,7 +46,7 @@ public class CreateViewOperation implements NonJobOperation {
   }
 
   @Override
-  public ResultSet execute() throws SqlExecutionException {
+  public ResultSet execute() throws SqlExecutionException, FlinkInitFailedException {
     Environment env = context.getEnvironment();
     TableEntry tableEntry = env.getTables().get(viewName);
     if (tableEntry instanceof ViewEntry) {

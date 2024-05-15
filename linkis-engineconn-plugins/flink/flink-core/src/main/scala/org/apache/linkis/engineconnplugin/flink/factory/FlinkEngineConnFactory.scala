@@ -149,7 +149,6 @@ class FlinkEngineConnFactory extends MultiExecutorEngineConnFactory with Logging
       flinkExecutionTarget,
       flinkVersion,
       otherParams
-      flinkExecutionTarget
     )
     // Step1: environment-level configurations
     val jobName = options.getOrDefault("flink.app.name", "EngineConn-Flink")

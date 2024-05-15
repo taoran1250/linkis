@@ -17,11 +17,12 @@
 
 package org.apache.linkis.engineconnplugin.flink.client.sql.operation;
 
+import org.apache.linkis.engineconnplugin.flink.client.shims.exception.FlinkInitFailedException;
 import org.apache.linkis.engineconnplugin.flink.client.shims.exception.SqlExecutionException;
 import org.apache.linkis.engineconnplugin.flink.client.sql.operation.result.ResultSet;
 
 public interface Operation {
 
   /** Execute the command and return the result. */
-  ResultSet execute() throws SqlExecutionException;
+  ResultSet execute() throws SqlExecutionException, FlinkInitFailedException;
 }
