@@ -21,11 +21,11 @@ import org.apache.linkis.common.io.FsPath
 import org.apache.linkis.common.utils.{Logging, Utils}
 import org.apache.linkis.filesystem.cache.FsCache
 import org.apache.linkis.filesystem.conf.WorkSpaceConfiguration
+import org.apache.linkis.filesystem.constant.WorkSpaceConstants
 import org.apache.linkis.filesystem.entity.FSInfo
 import org.apache.linkis.filesystem.exception.{WorkSpaceException, WorkspaceExceptionManager}
 import org.apache.linkis.storage.FSFactory
 import org.apache.linkis.storage.fs.FileSystem
-
 import org.springframework.stereotype.Service
 
 import java.util.concurrent.{Callable, ExecutionException, FutureTask, TimeoutException, TimeUnit}
@@ -122,6 +122,19 @@ class FsService extends Logging {
         } */
         throw WorkspaceExceptionManager.createException(80001)
     }
+  }
+
+  def getFileSystemForRead(user: String, fsPath: FsPath): FileSystem = {
+    var fs = getFileSystem(user, fsPath)
+    if (!fsPath.getFsType.equals(WorkSpaceConstants.FILE_TYPE)) {
+      // only hdfs change
+      if (fs.canRead(fsPath, user)) {
+        fs = getFileSystem(WorkSpaceConstants.ADMIN_USER, fsPath)
+      } else {
+        throw WorkspaceExceptionManager.createException(80012)
+      }
+    }
+    fs
   }
 
 }
