@@ -18,7 +18,6 @@
 package org.apache.linkis.errorcode.client;
 
 import org.apache.linkis.common.conf.CommonVars;
-import org.apache.linkis.common.conf.Configuration;
 
 public class ClientConfiguration {
 
