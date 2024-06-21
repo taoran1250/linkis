@@ -17,7 +17,7 @@
 
 package org.apache.linkis.configuration.constant
 
-import org.apache.linkis.common.conf.CommonVars
+import org.apache.linkis.common.conf.{CommonVars, Configuration}
 
 object Constants {
 
@@ -27,8 +27,7 @@ object Constants {
   val AUTH_TOKEN_KEY: CommonVars[String] =
     CommonVars[String]("linkis.configuration.linkisclient.auth.token.key", "Validation-Code")
 
-  val AUTH_TOKEN_VALUE: CommonVars[String] =
-    CommonVars[String]("linkis.configuration.linkisclient.auth.token.value", "BML-AUTH")
+  val AUTH_TOKEN_VALUE: CommonVars[String] = Configuration.LINKIS_TOKEN
 
   val CONNECTION_MAX_SIZE: CommonVars[Int] =
     CommonVars[Int]("linkis.configuration.linkisclient.connection.max.size", 10)

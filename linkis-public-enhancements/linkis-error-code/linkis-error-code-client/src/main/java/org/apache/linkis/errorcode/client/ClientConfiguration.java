@@ -18,6 +18,7 @@
 package org.apache.linkis.errorcode.client;
 
 import org.apache.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.Configuration;
 
 public class ClientConfiguration {
 
@@ -36,8 +37,7 @@ public class ClientConfiguration {
   public static final CommonVars<Long> DEFAULT_READ_TIME_OUT =
       CommonVars.apply("wds.linkis.errorcode.read.timeout", 10 * 60 * 1000L);
 
-  public static final CommonVars<String> AUTH_TOKEN_VALUE =
-      CommonVars.apply("wds.linkis.errorcode.auth.token", "BML-AUTH");
+  public static final CommonVars<String> AUTH_TOKEN_VALUE = Configuration.LINKIS_TOKEN();
 
   public static final CommonVars<Long> FUTURE_TIME_OUT =
       CommonVars.apply("wds.linkis.errorcode.future.timeout", 2000L);
