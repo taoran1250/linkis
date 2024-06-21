@@ -17,7 +17,7 @@
 
 package org.apache.linkis.filesystem.conf
 
-import org.apache.linkis.common.conf.{CommonVars, Configuration}
+import org.apache.linkis.common.conf.CommonVars
 
 object WorkspaceClientConf {
 
@@ -36,7 +36,8 @@ object WorkspaceClientConf {
   val tokenKey: String =
     CommonVars[String]("wds.linkis.filesystem.token.key", "Validation-Code").getValue
 
-  val tokenValue: String = Configuration.LINKIS_TOKEN.getValue
+  val tokenValue: String =
+    CommonVars[String]("wds.linkis.filesystem.token.value", "LINKIS-AUTH-eTaYLbQpmIulPyrXcMl").getValue
 
   val scriptFromBMLUrl: String = prefix + scriptFromBML
 }

@@ -17,14 +17,15 @@
 
 package org.apache.linkis.cs.client.utils
 
-import org.apache.linkis.common.conf.{CommonVars, Configuration}
+import org.apache.linkis.common.conf.CommonVars
 
 object ContextClientConf {
 
   val CONTEXT_CLIENT_AUTH_KEY: CommonVars[String] =
     CommonVars[String]("wds.linkis.context.client.auth.key", "Token-Code")
 
-  val CONTEXT_CLIENT_AUTH_VALUE: CommonVars[String] = Configuration.LINKIS_TOKEN
+  val CONTEXT_CLIENT_AUTH_VALUE: CommonVars[String] =
+    CommonVars[String]("wds.linkis.context.client.auth.value", "LINKIS-AUTH-eTaYLbQpmIulPyrXcMl")
 
   val URL_PREFIX: CommonVars[String] =
     CommonVars[String]("wds.linkis.cs.url.prefix", "/api/rest_j/v1/contextservice", "cs服务的url前缀")
