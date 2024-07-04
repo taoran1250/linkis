@@ -129,7 +129,7 @@ class DefaultEngineStopService extends AbstractEngineService with EngineStopServ
     var killEngineNum = 0;
 
     // get all unlock ec node of the specified ecm
-    val engineNodes = getEMNodeByEM(ecmInstance)
+    val engineNodes = getEngineNodeListByEM(ecmInstance)
 
     val unlockEngineNodes = engineNodes
       .filter(node => NodeStatus.Unlock.equals(node.getNodeStatus))
@@ -285,7 +285,7 @@ class DefaultEngineStopService extends AbstractEngineService with EngineStopServ
     // get all ECM list
     val emList = AMUtils.copyToEMVo(emInfoService.getAllEM()).asScala.map(_.getInstance()).toList
     emList.foreach(ecmInstance => {
-      val engineNodes = getEMNodeByEM(ecmInstance)
+      val engineNodes = getEngineNodeListByEM(ecmInstance)
       // update userName all EMnode to unhealthy
       if (StringUtils.isEmpty(engineType) && creator.equals("*")) {
         engineNodes
@@ -314,7 +314,10 @@ class DefaultEngineStopService extends AbstractEngineService with EngineStopServ
             filterResult
           })
           .foreach(node => {
-            if (NodeStatus.Unlock.equals(node.getNodeStatus)) {
+            if (
+                NodeStatus.Unlock.equals(node.getNodeStatus) && AMConfiguration
+                  .isAllowKilledEngineType(LabelUtil.getEngineType(node.getLabels))
+            ) {
               // stop engine
               val stopEngineRequest = new EngineStopRequest(node.getServiceInstance, userName)
               stopEngine(stopEngineRequest, Sender.getSender(Sender.getThisServiceInstance))
@@ -328,7 +331,7 @@ class DefaultEngineStopService extends AbstractEngineService with EngineStopServ
     })
   }
 
-  private def getEMNodeByEM(ecmInstance: String): mutable.Buffer[EngineNode] = {
+  private def getEngineNodeListByEM(ecmInstance: String): mutable.Buffer[EngineNode] = {
     val ecmInstanceService = new ServiceInstance
     ecmInstanceService.setInstance(ecmInstance)
     ecmInstanceService.setApplicationName(

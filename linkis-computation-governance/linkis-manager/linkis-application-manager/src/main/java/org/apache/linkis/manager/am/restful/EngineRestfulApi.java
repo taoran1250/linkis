@@ -741,7 +741,11 @@ public class EngineRestfulApi {
       response = Message.class)
   @ApiImplicitParams({
     @ApiImplicitParam(name = "creator", dataType = "String", required = true, example = "IDE"),
-    @ApiImplicitParam(name = "engineType", dataType = "String", required = true, example = "hive-2.3.3"),
+    @ApiImplicitParam(
+        name = "engineType",
+        dataType = "String",
+        required = true,
+        example = "hive-2.3.3"),
   })
   @ApiOperationSupport(ignoreParameters = {"param"})
   @RequestMapping(path = "/rm/killEngineByUpdateConfig", method = RequestMethod.POST)
@@ -749,7 +753,7 @@ public class EngineRestfulApi {
       throws AMErrorException {
     String userName = ModuleUserUtils.getOperationUser(req);
     if (StorageUtils.getJvmUser().equals(userName)) {
-      throw new AMErrorException(210004, "JVM users do not support this feature (JVM 用户不支持此功能)");
+      return Message.error("JVM users do not support this feature (JVM 用户不支持此功能)");
     }
     JsonNode creator = jsonNode.get("creator");
     if (null == creator || StringUtils.isBlank(creator.textValue())) {
@@ -757,9 +761,9 @@ public class EngineRestfulApi {
           210003, "instance is null in the parameters of the request(请求参数中【creator】为空)");
     }
     String creatorStr = creator.textValue();
-    if (creatorStr.equals(AMConfiguration.GLOBAL_CONF_CHN_NAME())
-        || creatorStr.equals(AMConfiguration.GLOBAL_CONF_CHN_OLDNAME())
-        || creatorStr.equals(AMConfiguration.GLOBAL_CONF_CHN_EN_NAME())) {
+    if (creatorStr.equals(Configuration.GLOBAL_CONF_CHN_NAME())
+        || creatorStr.equals(Configuration.GLOBAL_CONF_CHN_OLDNAME())
+        || creatorStr.equals(Configuration.GLOBAL_CONF_CHN_EN_NAME())) {
       creatorStr = "*";
     }
     String engineType = "";

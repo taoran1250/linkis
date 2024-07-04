@@ -47,12 +47,6 @@ object AMConfiguration {
 
   val ORIGIN_MEMORY_PERCENTAGE_THRESHOLD = "originMemoryPercentageThreshold"
 
-  val GLOBAL_CONF_CHN_NAME = "全局设置"
-
-  val GLOBAL_CONF_CHN_OLDNAME = "通用设置"
-
-  val GLOBAL_CONF_CHN_EN_NAME = "GlobalSettings"
-
   val ACROSS_CLUSTER_TOTAL_MEMORY_PERCENTAGE_THRESHOLD: Double =
     CommonVars("linkis.yarn.across.cluster.memory.threshold", 0.8).getValue
 
