@@ -757,8 +757,7 @@ public class EngineRestfulApi {
     }
     JsonNode creator = jsonNode.get("creator");
     if (null == creator || StringUtils.isBlank(creator.textValue())) {
-      throw new AMErrorException(
-          210003, "instance is null in the parameters of the request(请求参数中【creator】为空)");
+      return Message.error("instance is null in the parameters of the request(请求参数中【creator】为空)");
     }
     String creatorStr = creator.textValue();
     if (creatorStr.equals(Configuration.GLOBAL_CONF_CHN_NAME())
