@@ -27,20 +27,21 @@ import org.apache.linkis.governance.common.entity.job.JobRequest
 import org.apache.linkis.governance.common.protocol.conf.{TemplateConfRequest, TemplateConfResponse}
 import org.apache.linkis.manager.label.builder.factory.LabelBuilderFactoryContext
 import org.apache.linkis.manager.label.constant.LabelKeyConstant
+import org.apache.linkis.manager.label.entity.engine.FixedEngineConnLabel
 import org.apache.linkis.manager.label.entity.entrance.ExecuteOnceLabel
 import org.apache.linkis.manager.label.utils.LabelUtil
 import org.apache.linkis.protocol.utils.TaskUtils
 import org.apache.linkis.rpc.Sender
+
 import org.apache.commons.lang3.StringUtils
 
 import java.{lang, util}
 import java.util.concurrent.TimeUnit
-import scala.collection.JavaConverters._
-import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
-import org.apache.linkis.manager.label.entity.Label
-import org.apache.linkis.manager.label.entity.engine.FixedEngineConnLabel
 
+import scala.collection.JavaConverters._
 import scala.util.matching.Regex
+
+import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 
 object TemplateConfUtils extends Logging {
 
@@ -188,7 +189,9 @@ object TemplateConfUtils extends Logging {
       return null
     }
     val codeRes = code.replaceAll("\r\n", "\n")
-    val fixECconfPattern = new Regex(s"\\s*---@set\\s+${confFixedEngineConnLabelKey}\\s*=\\s*([^;]+)(?:\\s*;)?")
+    val fixECconfPattern = new Regex(
+      s"\\s*---@set\\s+${confFixedEngineConnLabelKey}\\s*=\\s*([^;]+)(?:\\s*;)?"
+    )
     var sessionId: String = null
     val res = codeRes.split("\n")
     res.foreach(line => {
@@ -200,13 +203,14 @@ object TemplateConfUtils extends Logging {
       }
     })
     // 用户设置任务到固定引擎，添加fixedEngineConn标签
-    if  (StringUtils.isNotBlank(sessionId)) {
+    if (StringUtils.isNotBlank(sessionId)) {
       val fixedEngineConnLabel =
-        LabelBuilderFactoryContext.getLabelBuilderFactory.createLabel(
-          classOf[FixedEngineConnLabel])
+        LabelBuilderFactoryContext.getLabelBuilderFactory.createLabel(classOf[FixedEngineConnLabel])
       fixedEngineConnLabel.setSessionId(sessionId)
       jobRequest.getLabels.add(fixedEngineConnLabel)
-      logger.info(s"The task ${jobRequest.getId} is set to fixed engine conn, labelValue: ${sessionId}")
+      logger.info(
+        s"The task ${jobRequest.getId} is set to fixed engine conn, labelValue: ${sessionId}"
+      )
     } else {
       logger.info(s"The task ${jobRequest.getId} not set fixed engine conn")
     }
