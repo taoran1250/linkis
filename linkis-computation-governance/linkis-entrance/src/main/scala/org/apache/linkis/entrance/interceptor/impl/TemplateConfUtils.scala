@@ -185,7 +185,7 @@ object TemplateConfUtils extends Logging {
           )
         case _ =>
       }
-      // deal with fixedEngineConn configuration
+      // deal with fixedEngineConn configuration, add fixedEngineConn label if setting @set ec.fixed.sessionId=xxx
       dealWithFixEngineConnConf(jobRequest, fixECRegex, codeRes)
     }
     templateConfName
@@ -244,7 +244,7 @@ object TemplateConfUtils extends Logging {
         val (user, creator) = LabelUtil.getUserCreator(jobRequest.getLabels)
         if (EntranceConfiguration.DEFAULT_REQUEST_APPLICATION_NAME.getValue.equals(creator)) {
           val codeType = LabelUtil.getCodeType(jobRequest.getLabels)
-          templateName = TemplateConfUtils.getCustomTemplateConfName(jobRequest, codeType)
+          templateName = getCustomTemplateConfName(jobRequest, codeType)
         }
 
         // code template name > start params template uuid
