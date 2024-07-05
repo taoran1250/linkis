@@ -39,7 +39,7 @@ import java.{lang, util}
 import java.util.concurrent.TimeUnit
 
 import scala.collection.JavaConverters._
-import scala.util.matching.Regex
+import scala.util.matching.{Regex, UnanchoredRegex}
 
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 
@@ -123,30 +123,36 @@ object TemplateConfUtils extends Logging {
    * @return
    *   String the last one of template conf name
    */
-  def getCustomTemplateConfName(code: String, codeType: String): String = {
+  def getCustomTemplateConfName(jobRequest: JobRequest, codeType: String): String = {
+    var code = jobRequest.getExecutionCode
     var templateConfName = "";
 
     var varString: String = null
     var errString: String = null
     var rightVarString: String = null
+    var fixECString: String = null
 
     val languageType = CodeAndRunTypeUtils.getLanguageTypeByCodeType(codeType)
 
     languageType match {
       case CodeAndRunTypeUtils.LANGUAGE_TYPE_SQL =>
         varString = s"""\\s*---@set ${confTemplateNameKey}=\\s*.+\\s*"""
+        fixECString = s"""\\s*---@set\\s+${confFixedEngineConnLabelKey}\\s*=\\s*([^;]+)(?:\\s*;)?"""
         errString = """\s*---@.*"""
       case CodeAndRunTypeUtils.LANGUAGE_TYPE_PYTHON | CodeAndRunTypeUtils.LANGUAGE_TYPE_SHELL =>
         varString = s"""\\s*##@set ${confTemplateNameKey}=\\s*.+\\s*"""
+        fixECString = s"""\\s*##@set\\s+${confFixedEngineConnLabelKey}\\s*=\\s*([^;]+)(?:\\s*;)?"""
         errString = """\s*##@"""
       case CodeAndRunTypeUtils.LANGUAGE_TYPE_SCALA =>
         varString = s"""\\s*///@set ${confTemplateNameKey}=\\s*.+\\s*"""
+        fixECString = s"""\\s*///@set\\s+${confFixedEngineConnLabelKey}\\s*=\\s*([^;]+)(?:\\s*;)?"""
         errString = """\s*///@.+"""
       case _ =>
         return templateConfName
     }
 
     val customRegex = varString.r.unanchored
+    val fixECRegex: UnanchoredRegex = fixECString.r.unanchored
     val errRegex = errString.r.unanchored
     var codeRes = code.replaceAll("\r\n", "\n")
     // only allow set at fisrt line
@@ -179,40 +185,50 @@ object TemplateConfUtils extends Logging {
           )
         case _ =>
       }
+      // deal with fixedEngineConn configuration
+      dealWithFixEngineConnConf(jobRequest, fixECRegex, codeRes)
     }
     templateConfName
   }
 
-  def dealWithFixedEngineConn(jobRequest: JobRequest): Unit = {
-    val code = jobRequest.getExecutionCode
-    if (StringUtils.isBlank(code)) {
-      return null
-    }
-    val codeRes = code.replaceAll("\r\n", "\n")
-    val fixECconfPattern = new Regex(
-      s"\\s*---@set\\s+${confFixedEngineConnLabelKey}\\s*=\\s*([^;]+)(?:\\s*;)?"
-    )
-    var sessionId: String = null
-    val res = codeRes.split("\n")
-    res.foreach(line => {
-      val matchResult = fixECconfPattern.findFirstMatchIn(line)
-      matchResult match {
-        case Some(m) =>
-          sessionId = m.group(1).trim()
-        case None =>
+  /**
+   * deal with fixedEngineConn configuration
+   * @param jobRequest
+   * @param fixECRegex
+   * @param codeRes
+   */
+  private def dealWithFixEngineConnConf(
+      jobRequest: JobRequest,
+      fixECRegex: UnanchoredRegex,
+      codeRes: String
+  ) = {
+    if (codeRes.contains(confFixedEngineConnLabelKey)) {
+      var sessionId: String = null
+      val res = codeRes.split("\n")
+      var flag = true
+      for (line <- res if flag) {
+        val matchResult = fixECRegex.findFirstMatchIn(line)
+        matchResult match {
+          case Some(m) =>
+            sessionId = m.group(1).trim()
+            flag = false
+          case None =>
+        }
       }
-    })
-    // 用户设置任务到固定引擎，添加fixedEngineConn标签
-    if (StringUtils.isNotBlank(sessionId)) {
-      val fixedEngineConnLabel =
-        LabelBuilderFactoryContext.getLabelBuilderFactory.createLabel(classOf[FixedEngineConnLabel])
-      fixedEngineConnLabel.setSessionId(sessionId)
-      jobRequest.getLabels.add(fixedEngineConnLabel)
-      logger.info(
-        s"The task ${jobRequest.getId} is set to fixed engine conn, labelValue: ${sessionId}"
-      )
-    } else {
-      logger.info(s"The task ${jobRequest.getId} not set fixed engine conn")
+      // 用户设置任务到固定引擎，添加fixedEngineConn标签
+      if (StringUtils.isNotBlank(sessionId)) {
+        val fixedEngineConnLabel =
+          LabelBuilderFactoryContext.getLabelBuilderFactory.createLabel(
+            classOf[FixedEngineConnLabel]
+          )
+        fixedEngineConnLabel.setSessionId(sessionId)
+        jobRequest.getLabels.add(fixedEngineConnLabel)
+        logger.info(
+          s"The task ${jobRequest.getId} is set to fixed engine conn, labelValue: ${sessionId}"
+        )
+      } else {
+        logger.info(s"The task ${jobRequest.getId} not set fixed engine conn")
+      }
     }
   }
 
@@ -228,8 +244,7 @@ object TemplateConfUtils extends Logging {
         val (user, creator) = LabelUtil.getUserCreator(jobRequest.getLabels)
         if (EntranceConfiguration.DEFAULT_REQUEST_APPLICATION_NAME.getValue.equals(creator)) {
           val codeType = LabelUtil.getCodeType(jobRequest.getLabels)
-          templateName =
-            TemplateConfUtils.getCustomTemplateConfName(jobRequest.getExecutionCode, codeType)
+          templateName = TemplateConfUtils.getCustomTemplateConfName(jobRequest, codeType)
         }
 
         // code template name > start params template uuid
@@ -305,9 +320,6 @@ object TemplateConfUtils extends Logging {
             TaskUtils.addStartupMap(params, keyList)
           }
         }
-
-        // deal with fixedEngineConn configuration
-        dealWithFixedEngineConn(jobRequest)
       case _ =>
     }
     jobRequest
