@@ -179,57 +179,29 @@ object TemplateConfUtils extends Logging {
               )
             }
           }
+        case fixECRegex(sessionId) =>
+          // deal with fixedEngineConn configuration, add fixedEngineConn label if setting @set ec.fixed.sessionId=xxx
+          if (StringUtils.isNotBlank(sessionId)) {
+            val fixedEngineConnLabel =
+              LabelBuilderFactoryContext.getLabelBuilderFactory.createLabel(
+                classOf[FixedEngineConnLabel]
+              )
+            fixedEngineConnLabel.setSessionId(sessionId)
+            jobRequest.getLabels.add(fixedEngineConnLabel)
+            logger.info(
+              s"The task ${jobRequest.getId} is set to fixed engine conn, labelValue: ${sessionId}"
+            )
+          } else {
+            logger.info(s"The task ${jobRequest.getId} not set fixed engine conn")
+          }
         case errRegex() =>
           logger.warn(
             s"The template conf name var definition is incorrect:$str,if it is not used, it will not run the error, but it is recommended to use the correct specification to define"
           )
         case _ =>
       }
-      // deal with fixedEngineConn configuration, add fixedEngineConn label if setting @set ec.fixed.sessionId=xxx
-      dealWithFixEngineConnConf(jobRequest, fixECRegex, codeRes)
     }
     templateConfName
-  }
-
-  /**
-   * deal with fixedEngineConn configuration
-   * @param jobRequest
-   * @param fixECRegex
-   * @param codeRes
-   */
-  private def dealWithFixEngineConnConf(
-      jobRequest: JobRequest,
-      fixECRegex: UnanchoredRegex,
-      codeRes: String
-  ) = {
-    if (codeRes.contains(confFixedEngineConnLabelKey)) {
-      var sessionId: String = null
-      val res = codeRes.split("\n")
-      var flag = true
-      for (line <- res if flag) {
-        val matchResult = fixECRegex.findFirstMatchIn(line)
-        matchResult match {
-          case Some(m) =>
-            sessionId = m.group(1).trim()
-            flag = false
-          case None =>
-        }
-      }
-      // 用户设置任务到固定引擎，添加fixedEngineConn标签
-      if (StringUtils.isNotBlank(sessionId)) {
-        val fixedEngineConnLabel =
-          LabelBuilderFactoryContext.getLabelBuilderFactory.createLabel(
-            classOf[FixedEngineConnLabel]
-          )
-        fixedEngineConnLabel.setSessionId(sessionId)
-        jobRequest.getLabels.add(fixedEngineConnLabel)
-        logger.info(
-          s"The task ${jobRequest.getId} is set to fixed engine conn, labelValue: ${sessionId}"
-        )
-      } else {
-        logger.info(s"The task ${jobRequest.getId} not set fixed engine conn")
-      }
-    }
   }
 
   def dealWithTemplateConf(jobRequest: JobRequest, logAppender: lang.StringBuilder): JobRequest = {
