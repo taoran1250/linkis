@@ -31,19 +31,21 @@ import org.apache.linkis.manager.label.entity.entrance.ExecuteOnceLabel
 import org.apache.linkis.manager.label.utils.LabelUtil
 import org.apache.linkis.protocol.utils.TaskUtils
 import org.apache.linkis.rpc.Sender
-
 import org.apache.commons.lang3.StringUtils
 
 import java.{lang, util}
 import java.util.concurrent.TimeUnit
-
 import scala.collection.JavaConverters._
-
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
+import org.apache.linkis.manager.label.entity.Label
+import org.apache.linkis.manager.label.entity.engine.FixedEngineConnLabel
+
+import scala.util.matching.Regex
 
 object TemplateConfUtils extends Logging {
 
   val confTemplateNameKey = "ec.resource.name"
+  val confFixedEngineConnLabelKey = "ec.fixed.sessionId"
 
   private val templateCache: LoadingCache[String, util.List[TemplateConfKey]] = CacheBuilder
     .newBuilder()
@@ -180,6 +182,36 @@ object TemplateConfUtils extends Logging {
     templateConfName
   }
 
+  def dealWithFixedEngineConn(jobRequest: JobRequest): Unit = {
+    val code = jobRequest.getExecutionCode
+    if (StringUtils.isBlank(code)) {
+      return null
+    }
+    val codeRes = code.replaceAll("\r\n", "\n")
+    val fixECconfPattern = new Regex(s"\\s*---@set\\s+${confFixedEngineConnLabelKey}\\s*=\\s*([^;]+)(?:\\s*;)?")
+    var sessionId: String = null
+    val res = codeRes.split("\n")
+    res.foreach(line => {
+      val matchResult = fixECconfPattern.findFirstMatchIn(line)
+      matchResult match {
+        case Some(m) =>
+          sessionId = m.group(1).trim()
+        case None =>
+      }
+    })
+    // 用户设置任务到固定引擎，添加fixedEngineConn标签
+    if  (StringUtils.isNotBlank(sessionId)) {
+      val fixedEngineConnLabel =
+        LabelBuilderFactoryContext.getLabelBuilderFactory.createLabel(
+          classOf[FixedEngineConnLabel])
+      fixedEngineConnLabel.setSessionId(sessionId)
+      jobRequest.getLabels.add(fixedEngineConnLabel)
+      logger.info(s"The task ${jobRequest.getId} is set to fixed engine conn, labelValue: ${sessionId}")
+    } else {
+      logger.info(s"The task ${jobRequest.getId} not set fixed engine conn")
+    }
+  }
+
   def dealWithTemplateConf(jobRequest: JobRequest, logAppender: lang.StringBuilder): JobRequest = {
     jobRequest match {
       case requestPersistTask: JobRequest =>
@@ -270,6 +302,8 @@ object TemplateConfUtils extends Logging {
           }
         }
 
+        // deal with fixedEngineConn configuration
+        dealWithFixedEngineConn(jobRequest)
       case _ =>
     }
     jobRequest
