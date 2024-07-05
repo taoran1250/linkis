@@ -76,13 +76,7 @@ object Configuration extends Logging {
       "The request interface %s is abnormal. You can try to troubleshoot common problems in the knowledge base document"
     )
 
-  val GLOBAL_CONF_CHN_NAME = "全局设置"
-
-  val GLOBAL_CONF_CHN_OLDNAME = "通用设置"
-
-  val GLOBAL_CONF_CHN_EN_NAME = "GlobalSettings"
-
-  val GLOBAL_CONF_LABEL = "*-*,*-*"
+  val LINKIS_TOKEN = CommonVars("wds.linkis.token", "LINKIS-AUTH-eTaYLbQpmIulPyrXcMl")
 
   def isAdminToken(token: String): Boolean = {
     if (StringUtils.isBlank(token)) {
