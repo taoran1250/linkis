@@ -769,7 +769,8 @@ public class EngineRestfulApi {
     if (null != jsonNode.get("engineType")) {
       engineType = jsonNode.get("engineType").textValue();
     }
-    if (AMConfiguration.isUnAllowKilledEngineType(engineType)) {
+    if (StringUtils.isNotBlank(engineType)
+        && AMConfiguration.isUnAllowKilledEngineType(engineType)) {
       return Message.error("multi user engine does not support this feature(多用户引擎不支持此功能)");
     }
     engineStopService.stopUnlockEngineBySaveConf(userName, creatorStr, engineType);
