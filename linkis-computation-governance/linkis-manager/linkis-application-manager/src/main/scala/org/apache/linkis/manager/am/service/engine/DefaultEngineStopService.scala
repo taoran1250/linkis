@@ -278,7 +278,7 @@ class DefaultEngineStopService extends AbstractEngineService with EngineStopServ
   ): Unit = {
     // get all engineNodes list
     val engineNodes = rmMonitorRest.getEngineNodes(userName)
-    if (StringUtils.isEmpty(engineType) && creator.equals("*")) {
+    if (StringUtils.isEmpty(engineType) && creator.equals(Configuration.GLOBAL_CONF_SYMBOL)) {
       Future {
         dealEngineByEngineNode(engineNodes.toList, userName)
       }
