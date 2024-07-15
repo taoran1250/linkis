@@ -39,6 +39,7 @@ import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel
 import org.apache.linkis.manager.label.service.NodeLabelService
 import org.apache.linkis.manager.label.service.impl.DefaultNodeLabelRemoveService
 import org.apache.linkis.manager.label.utils.{LabelUtil, LabelUtils}
+import org.apache.linkis.manager.rm.restful.RMMonitorRest
 import org.apache.linkis.manager.rm.service.impl.DefaultResourceManager
 import org.apache.linkis.protocol.label.NodeLabelRemoveRequest
 import org.apache.linkis.rpc.Sender
@@ -80,6 +81,9 @@ class DefaultEngineStopService extends AbstractEngineService with EngineStopServ
 
   @Autowired
   private var emInfoService: EMInfoService = _
+
+  @Autowired
+  private var rmMonitorRest: RMMonitorRest = _
 
   private implicit val executor: ExecutionContextExecutorService =
     Utils.newCachedExecutionContext(
@@ -277,42 +281,41 @@ class DefaultEngineStopService extends AbstractEngineService with EngineStopServ
 
   }
 
-  override def stopUnlockEngineBySaveConf(
+  override def stopUnlockECByUserCreatorAndECType(
       userName: String,
       creator: String,
       engineType: String
   ): Unit = {
-    // get all ECM list
-    val emList = AMUtils.copyToEMVo(emInfoService.getAllEM()).asScala.map(_.getInstance()).toList
-    emList.foreach(ecmInstance => {
-      val engineNodes = getEngineNodeListByEM(ecmInstance)
-      // update userName all EMnode to unhealthy
-      if (StringUtils.isEmpty(engineType) && creator.equals("*")) {
-        engineNodes
-          .filter(_.getOwner.equals(userName))
-          .foreach(dealEngineByEngineNode(_, userName))
+    // get all engineNodes list
+    val engineNodes = rmMonitorRest.getEngineNodes(userName)
+    if (StringUtils.isEmpty(engineType) && creator.equals("*")) {
+      Future {
+        dealEngineByEngineNode(engineNodes.toList, userName)
       }
-      // kill EMnode by user creator
-      if (StringUtils.isNotBlank(engineType) && !creator.equals("*")) {
-        engineNodes
-          .filter(_.getOwner.equals(userName))
-          .filter(node => {
-            var filterResult = false
-            if (!node.getLabels.isEmpty) {
-              val userCreator = LabelUtil.getUserCreatorLabel(node.getLabels)
-              val engineTypeLabel = LabelUtil.getEngineTypeLabel(node.getLabels).getStringValue
-              if (
-                  userCreator.getUser.equals(userName) && userCreator.getCreator
-                    .equals(creator) && engineTypeLabel.equals(engineType)
-              ) {
-                filterResult = true
-              }
+    }
+    // kill EMnode by user creator
+    if (StringUtils.isNotBlank(engineType) && !creator.equals("*")) {
+      val filterEngineNode = engineNodes
+        .filter(_.getOwner.equals(userName))
+        .filter(node => {
+          var filterResult = false
+          if (!node.getLabels.isEmpty) {
+            val userCreator = LabelUtil.getUserCreatorLabel(node.getLabels)
+            val engineTypeLabel = LabelUtil.getEngineTypeLabel(node.getLabels).getStringValue
+            if (
+                userCreator.getUser.equals(userName) && userCreator.getCreator
+                  .equals(creator) && engineTypeLabel.equals(engineType)
+            ) {
+              filterResult = true
             }
-            filterResult
-          })
-          .foreach(dealEngineByEngineNode(_, userName))
+          }
+          filterResult
+        })
+        .toList
+      Future {
+        dealEngineByEngineNode(filterEngineNode, userName)
       }
-    })
+    }
   }
 
   private def getEngineNodeListByEM(ecmInstance: String): mutable.Buffer[EngineNode] = {
@@ -326,19 +329,21 @@ class DefaultEngineStopService extends AbstractEngineService with EngineStopServ
     engineInfoService.listEMEngines(emNode).asScala
   }
 
-  private def dealEngineByEngineNode(node: EngineNode, userName: String): Unit = {
-    if (
-        NodeStatus.Unlock.equals(node.getNodeStatus) && AMConfiguration
-          .isAllowKilledEngineType(LabelUtil.getEngineType(node.getLabels))
-    ) {
-      // stop engine
-      val stopEngineRequest = new EngineStopRequest(node.getServiceInstance, userName)
-      stopEngine(stopEngineRequest, Sender.getSender(Sender.getThisServiceInstance))
-    } else {
-      // set unhealthy
-      engineInfoService
-        .updateEngineHealthyStatus(node.getServiceInstance, NodeHealthy.UnHealthy)
-    }
+  private def dealEngineByEngineNode(engineNodeList: List[EngineNode], userName: String): Unit = {
+    engineNodeList.foreach(node => {
+      if (
+          NodeStatus.Unlock.equals(node.getNodeStatus) && AMConfiguration
+            .isAllowKilledEngineType(LabelUtil.getEngineType(node.getLabels))
+      ) {
+        // stop engine
+        val stopEngineRequest = new EngineStopRequest(node.getServiceInstance, userName)
+        asyncStopEngineWithUpdateMetrics(stopEngineRequest)
+      } else {
+        // set unhealthy
+        engineInfoService
+          .updateEngineHealthyStatus(node.getServiceInstance, NodeHealthy.UnHealthy)
+      }
+    })
   }
 
 }
