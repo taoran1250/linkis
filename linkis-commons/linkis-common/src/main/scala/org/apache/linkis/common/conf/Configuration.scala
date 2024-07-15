@@ -84,6 +84,8 @@ object Configuration extends Logging {
 
   val GLOBAL_CONF_CHN_EN_NAME = "GlobalSettings"
 
+  val GLOBAL_CONF_SYMBOL = "*"
+
   val GLOBAL_CONF_LABEL = "*-*,*-*"
 
   def isAdminToken(token: String): Boolean = {
@@ -148,7 +150,7 @@ object Configuration extends Logging {
   def getGlobalCreator(creator: String): String = creator match {
     case Configuration.GLOBAL_CONF_CHN_NAME | Configuration.GLOBAL_CONF_CHN_OLDNAME |
         Configuration.GLOBAL_CONF_CHN_EN_NAME =>
-      "*"
+      GLOBAL_CONF_SYMBOL
     case _ => creator
   }
 
