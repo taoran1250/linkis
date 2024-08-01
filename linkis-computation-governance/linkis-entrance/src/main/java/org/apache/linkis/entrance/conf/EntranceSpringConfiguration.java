@@ -143,7 +143,6 @@ public class EntranceSpringConfiguration {
       new ParserVarLabelInterceptor(),
       new VarSubstitutionInterceptor(),
       new LogPathCreateInterceptor(),
-      new StorePathEntranceInterceptor(),
       new ScalaCodeInterceptor(),
       new SQLLimitEntranceInterceptor(),
       new CommentInterceptor(),

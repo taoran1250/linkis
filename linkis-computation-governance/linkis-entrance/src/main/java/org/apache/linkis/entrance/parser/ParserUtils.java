@@ -18,8 +18,8 @@
 package org.apache.linkis.entrance.parser;
 
 import org.apache.linkis.common.io.FsPath;
-import org.apache.linkis.entrance.conf.EntranceConfiguration$;
 import org.apache.linkis.entrance.utils.CommonLogPathUtils;
+import org.apache.linkis.governance.common.conf.GovernanceCommonConf;
 import org.apache.linkis.governance.common.entity.job.JobRequest;
 import org.apache.linkis.manager.label.utils.LabelUtil;
 import org.apache.linkis.storage.utils.StorageUtils;
@@ -53,7 +53,7 @@ public final class ParserUtils {
     String logPathPrefix = null;
     String logMid = "log";
     if (StringUtils.isEmpty(logPathPrefix)) {
-      logPathPrefix = EntranceConfiguration$.MODULE$.DEFAULT_LOGPATH_PREFIX().getValue();
+      logPathPrefix = GovernanceCommonConf.DEFAULT_LOGPATH_PREFIX();
     }
     /*Determine whether logPathPrefix is terminated with /, if it is, delete */
     /*判断是否logPathPrefix是否是以 / 结尾， 如果是，就删除*/

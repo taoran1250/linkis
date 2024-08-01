@@ -21,6 +21,8 @@ import org.apache.linkis.common.conf.CommonVars
 
 import org.apache.commons.lang3.StringUtils
 
+import java.util.Locale
+
 import scala.collection.mutable
 
 object CodeAndRunTypeUtils {
@@ -117,7 +119,8 @@ object CodeAndRunTypeUtils {
     if (StringUtils.isBlank(codeType)) {
       return ""
     }
-    getLanguageTypeAndCodeTypeRelationMap.getOrElse(codeType, defaultLanguageType)
+    val lowerCaseCodeType = codeType.toLowerCase(Locale.getDefault)
+    getLanguageTypeAndCodeTypeRelationMap.getOrElse(lowerCaseCodeType, defaultLanguageType)
   }
 
   /**

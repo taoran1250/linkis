@@ -38,7 +38,6 @@ class GovernanceCommonConfTest {
     val entranceservicename = GovernanceCommonConf.ENTRANCE_SERVICE_NAME.getValue
     val enginedefaultlimit = GovernanceCommonConf.ENGINE_DEFAULT_LIMIT.getValue
     val skippythonparser = GovernanceCommonConf.SKIP_PYTHON_PARSER.getValue
-    val resultsetstorepath = GovernanceCommonConf.RESULT_SET_STORE_PATH.getValue
     val errorcodedesclen = GovernanceCommonConf.ERROR_CODE_DESC_LEN
 
     Assertions.assertEquals("wds.linkis.rm", conffilterrm)
@@ -54,7 +53,6 @@ class GovernanceCommonConfTest {
     Assertions.assertEquals("linkis-cg-entrance", entranceservicename)
     Assertions.assertTrue(5000 == enginedefaultlimit.intValue())
     Assertions.assertTrue(skippythonparser)
-    Assertions.assertEquals("hdfs:///tmp/linkis/", resultsetstorepath)
     Assertions.assertTrue(512 == errorcodedesclen)
 
   }

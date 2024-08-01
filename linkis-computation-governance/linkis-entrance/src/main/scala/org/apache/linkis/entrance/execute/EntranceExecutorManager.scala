@@ -39,8 +39,6 @@ abstract class EntranceExecutorManager(groupFactory: GroupFactory)
 
   private val idGenerator = new AtomicLong(0)
 
-  def getOrCreateInterceptors(): Array[ExecuteRequestInterceptor]
-
   override def delete(executor: Executor): Unit = {
     if (null != executor) {
       executor.close()
