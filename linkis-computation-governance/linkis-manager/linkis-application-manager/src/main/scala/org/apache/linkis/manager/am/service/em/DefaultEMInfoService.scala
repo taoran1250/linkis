@@ -192,10 +192,10 @@ class DefaultEMInfoService extends EMInfoService with Logging {
     // 用户资源重置
     if (AMConfiguration.AM_USER_RESET_RESOURCE) {
       // 获取用户的标签
-      var user = if (StringUtils.isNotBlank(username)) {
-        user = username
+      val user = if (StringUtils.isNotBlank(username)) {
+        username
       } else {
-        user = ""
+        ""
       }
       val labelValuePattern =
         MessageFormat.format("%{0}%,%{1}%,%{2}%,%", "", user, "")
