@@ -592,6 +592,24 @@ public class FsRestfulApi {
   @ApiImplicitParams({
     @ApiImplicitParam(name = "path", required = false, dataType = "String", value = "Path"),
     @ApiImplicitParam(name = "page", required = true, dataType = "Integer", defaultValue = "1"),
+    @ApiImplicitParam(name = "pageSize", dataType = "Integer", defaultValue = "5000"),
+    @ApiImplicitParam(name = "nullValue", required = false, dataType = "String", defaultValue = ""),
+    @ApiImplicitParam(
+        name = "enableLimit",
+        required = false,
+        dataType = "String",
+        defaultValue = ""),
+    @ApiImplicitParam(name = "columnIndices", required = false, dataType = "array"),
+    @ApiImplicitParam(
+        name = "columnIndex",
+        required = false,
+        dataType = "Integer",
+        defaultValue = "-1"),
+    @ApiImplicitParam(
+        name = "columnPageSize",
+        required = false,
+        dataType = "Integer",
+        defaultValue = "-1"),
     @ApiImplicitParam(
         name = "pageSize",
         required = true,
@@ -753,7 +771,7 @@ public class FsRestfulApi {
   public Message getResultSetColumns(
       HttpServletRequest req,
       @RequestParam(value = "path", required = false) String path,
-      @RequestParam(value = "path", required = false) String columnName,
+      @RequestParam(value = "columnName", required = false) String columnName,
       @RequestParam(value = "page", defaultValue = "1") Integer page,
       @RequestParam(value = "pageSize", defaultValue = "500") Integer pageSize)
       throws IOException, WorkSpaceException {
