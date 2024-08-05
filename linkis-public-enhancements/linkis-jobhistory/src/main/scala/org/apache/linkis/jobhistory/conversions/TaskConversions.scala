@@ -284,17 +284,17 @@ object TaskConversions extends Logging {
     var requestStartTime: Date = null
     var requestEndTime: Date = null
     if (
-        null != metrics && metrics.containsKey(TaskConstant.JOB_REQUEST_EC_TIME) && metrics
-          .get(TaskConstant.JOB_REQUEST_EC_TIME) != null
+        null != metrics && metrics.containsKey(TaskConstant.JOB_SUBMIT_TIME) && metrics
+          .get(TaskConstant.JOB_SUBMIT_TIME) != null
     ) {
-      requestStartTime = dealString2Date(metrics.get(TaskConstant.JOB_REQUEST_EC_TIME).toString)
+      requestStartTime = dealString2Date(metrics.get(TaskConstant.JOB_SUBMIT_TIME).toString)
       taskVO.setRequestStartTime(requestStartTime)
     }
     if (
-        null != metrics && metrics.containsKey(TaskConstant.JOB_SUBMIT_TO_EC_TIME) && metrics
-          .get(TaskConstant.JOB_SUBMIT_TO_EC_TIME) != null
+        null != metrics && metrics.containsKey(TaskConstant.JOB_SCHEDULE_TIME) && metrics
+          .get(TaskConstant.JOB_SCHEDULE_TIME) != null
     ) {
-      requestEndTime = dealString2Date(metrics.get(TaskConstant.JOB_SUBMIT_TO_EC_TIME).toString)
+      requestEndTime = dealString2Date(metrics.get(TaskConstant.JOB_SCHEDULE_TIME).toString)
       taskVO.setRequestEndTime(requestEndTime)
     }
     if (null != requestStartTime && null != requestStartTime) {
