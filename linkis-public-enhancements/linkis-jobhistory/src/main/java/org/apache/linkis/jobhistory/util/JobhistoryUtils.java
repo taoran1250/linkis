@@ -32,7 +32,7 @@ import java.util.List;
 public class JobhistoryUtils {
 
   public static String headersStr =
-      "任务ID,来源,查询语句,状态,已耗时,关键信息,应用/引擎,创建时间,是否复用,申请开始时间,申请结束时间时间,申请花费时间";
+      "任务ID,来源,查询语句,状态,已耗时,关键信息,应用/引擎,创建时间,是否复用,申请开始时间,申请结束时间,申请花费时间";
   public static String headersEnStr =
       "JobID,Source,Execution Code,Status,Time Elapsed,Key Information,App / Engine,Created at,IsRuse,Application Start Time,Application End Time,Application Takes Time";
 
