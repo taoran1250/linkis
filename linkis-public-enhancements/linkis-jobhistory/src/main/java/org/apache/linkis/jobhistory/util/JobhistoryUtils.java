@@ -31,8 +31,7 @@ import java.util.List;
 
 public class JobhistoryUtils {
 
-  public static String headersStr =
-      "任务ID,来源,查询语句,状态,已耗时,关键信息,应用/引擎,创建时间,是否复用,申请开始时间,申请结束时间,申请花费时间";
+  public static String headersStr = "任务ID,来源,查询语句,状态,已耗时,关键信息,应用/引擎,创建时间,是否复用,申请开始时间,申请结束时间,申请花费时间";
   public static String headersEnStr =
       "JobID,Source,Execution Code,Status,Time Elapsed,Key Information,App / Engine,Created at,IsRuse,Application Start Time,Application End Time,Application Takes Time";
 
@@ -62,7 +61,11 @@ public class JobhistoryUtils {
       Row row = sheet.createRow(rowNum++);
       row.createCell(0).setCellValue(queryTaskVO.getTaskID());
       row.createCell(1).setCellValue(queryTaskVO.getSourceTailor());
-      row.createCell(2).setCellValue(queryTaskVO.getExecutionCode());
+      String executionCode = queryTaskVO.getExecutionCode();
+      if (executionCode.length() >= 32767) {
+        executionCode = executionCode.substring(0, 32767);
+      }
+      row.createCell(2).setCellValue(executionCode);
       row.createCell(3).setCellValue(queryTaskVO.getStatus());
       if (null == queryTaskVO.getCostTime()) {
         queryTaskVO.setCostTime(0L);
@@ -75,7 +78,11 @@ public class JobhistoryUtils {
                   + "/"
                   + queryTaskVO.getRequestApplicationName());
       row.createCell(7).setCellValue(TaskConversions.dateFomat(queryTaskVO.getCreatedTime()));
-      row.createCell(8).setCellValue(queryTaskVO.getIsReuse());
+      if (null == queryTaskVO.getIsReuse()) {
+        row.createCell(8).setCellValue("");
+      } else {
+        row.createCell(8).setCellValue(queryTaskVO.getIsReuse());
+      }
       row.createCell(9).setCellValue(TaskConversions.dateFomat(queryTaskVO.getRequestStartTime()));
       row.createCell(10).setCellValue(TaskConversions.dateFomat(queryTaskVO.getRequestEndTime()));
       if (null == queryTaskVO.getRequestSpendTime()) {

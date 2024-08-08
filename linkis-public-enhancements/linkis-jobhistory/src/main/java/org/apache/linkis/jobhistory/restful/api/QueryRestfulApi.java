@@ -106,10 +106,11 @@ public class QueryRestfulApi {
         || Configuration.isDepartmentAdmin(username)) {
       username = null;
     }
-    JobHistory jobHistory = jobHistoryQueryService.getJobHistoryByIdAndName(jobId, username);
+    JobHistory jobHistory =
+        jobHistoryQueryService.getJobHistoryByIdAndNameNoMetrics(jobId, username);
 
     try {
-      if (JobhistoryConfiguration.JOB_HISTORY_QUERY_EXECUTION_CODE_SWITCH() && null != jobHistory) {
+      if (null != jobHistory) {
         QueryUtils.exchangeExecutionCode(jobHistory);
       }
     } catch (Exception e) {
@@ -502,17 +503,22 @@ public class QueryRestfulApi {
       username = null;
     }
     JobHistory jobHistory = jobHistoryQueryService.getJobHistoryByIdAndName(jobId, username);
-    String runtime = TaskConversions.getJobRuntime(jobHistory);
-    try {
-      if (null != jobHistory) {
+    if (jobHistory == null) {
+      return Message.error(
+          "The corresponding job was not found, or there may be no permission to view the job"
+              + "(没有找到对应的job，也可能是没有查看该job的权限)");
+    } else {
+      try {
         QueryUtils.exchangeExecutionCode(jobHistory);
+      } catch (Exception e) {
+        log.error("Exchange executionCode for job with id : {} failed, {}", jobHistory.getId(), e);
       }
-    } catch (Exception e) {
-      log.error("Exchange executionCode for job with id : {} failed, {}", jobHistory.getId(), e);
     }
-    return Message.ok()
-        .data("runtime", runtime)
-        .data("executionCode", jobHistory.getExecutionCode());
+    Map<String, String> metricsMap =
+        BDPJettyServerHelper.gson().fromJson(jobHistory.getMetrics(), Map.class);
+    metricsMap.put("executionCode", jobHistory.getExecutionCode());
+    metricsMap.put("runtime", TaskConversions.getJobRuntime(metricsMap));
+    return Message.ok().data("metricsMap", metricsMap);
   }
 
   @ApiOperation(
