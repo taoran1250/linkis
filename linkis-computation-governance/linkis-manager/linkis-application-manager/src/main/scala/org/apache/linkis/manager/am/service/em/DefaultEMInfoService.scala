@@ -166,9 +166,6 @@ class DefaultEMInfoService extends EMInfoService with Logging {
           resourceManager.tryLockOneLabel(ecmInstance.getLabels.head, -1, Utils.getJvmUser)
         engineInfoService
           .updateEngineHealthyStatus(ecmInstance.getServiceInstance, NodeHealthy.UnHealthy)
-        if (StringUtils.isNotBlank(serviceInstance)) {
-          Thread.sleep(180000)
-        }
         Utils.tryFinally {
           // 获取ecm下所有node
           val nodeResource =
@@ -232,15 +229,10 @@ class DefaultEMInfoService extends EMInfoService with Logging {
       // 遍历用户标签资源
       userLabelResources.foreach { userLabelResource =>
         val labelUser = LabelUtil.getFromLabelStr(userLabelResource.getCreator, "user")
-        val creator = LabelUtil.getFromLabelStr(userLabelResource.getCreator, "creator")
-        val engine = LabelUtil.getFromLabelStr(userLabelResource.getCreator, "engine")
         val resourceLabel = labelManagerPersistence.getLabelByResource(userLabelResource)
         resourceLabel.head.setStringValue(userLabelResource.getCreator)
         // lock userCreatorEngineTypeLabel
         val lock = resourceManager.tryLockOneLabel(resourceLabel.head, -1, labelUser)
-        if (StringUtils.isNotBlank(username) && creator.equals("IDE") && engine.equals("hive")) {
-          Thread.sleep(180000)
-        }
         Utils.tryFinally {
           val userPersistenceResource = ResourceUtils.fromPersistenceResource(userLabelResource)
           val userLabelResourceSum =
