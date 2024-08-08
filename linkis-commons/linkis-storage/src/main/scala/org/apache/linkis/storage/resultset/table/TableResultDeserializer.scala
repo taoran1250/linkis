@@ -86,15 +86,18 @@ class TableResultDeserializer extends ResultDeserializer[TableMetaData, TableRec
     if (StringUtils.isNotBlank(LinkisStorageConf.enableLimitThreadLocal.get())) {
       enableLimit = true
     }
-    var columnSize =
-      if (enableLimit && metaData.columns.size > LinkisStorageConf.LINKIS_RESULT_COLUMN_SIZE) {
-        LinkisStorageConf.LINKIS_RESULT_COLUMN_SIZE
-      } else {
-        colArray.size
-      }
+    val columnIndices: Array[Int] = LinkisStorageConf.columnIndicesThreadLocal.get()
+
+    val lastIndex = columnIndices(columnIndices.length - 1)
+    var columnSize = colArray.size
+    if (enableLimit && metaData.columns.size > lastIndex) {
+      columnSize = columnIndices.length
+    } else if (enableLimit && metaData.columns.size <= lastIndex) {
+      columnSize = metaData.columns.size % columnIndices.length
+    }
 
     var rowArray = new Array[Any](columnSize)
-    val columnIndices: Array[Int] = LinkisStorageConf.columnIndicesThreadLocal.get()
+
     // use column index if columnIndices is not empty and  the length of columnIndices is less to the column size
     if (columnIndices != null && columnIndices.length > 0 && columnIndices.length <= columnSize) {
       rowArray = new Array[Any](columnIndices.length)
@@ -115,12 +118,10 @@ class TableResultDeserializer extends ResultDeserializer[TableMetaData, TableRec
         )
       }
       index += len
-      // deal with specified column indices
-      if (columnIndices != null && columnIndices.length > 0 && columnIndices.length < columnSize) {
-        if (columnIndices.contains(i)) {
-          rowArray(colIdx) = res
-          colIdx += 1
-        }
+      // 如果enableLimit为true，则采取的是列分页
+      if (enableLimit) {
+        rowArray(colIdx) = res
+        colIdx += 1
       } else {
         if (i >= metaData.columns.length) rowArray(i) = res
         else {
