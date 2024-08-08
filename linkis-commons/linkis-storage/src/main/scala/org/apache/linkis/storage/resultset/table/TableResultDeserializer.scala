@@ -23,7 +23,11 @@ import org.apache.linkis.storage.conf.LinkisStorageConf
 import org.apache.linkis.storage.domain.{Column, DataType, Dolphin}
 import org.apache.linkis.storage.errorcode.LinkisStorageErrorCodeSummary
 import org.apache.linkis.storage.errorcode.LinkisStorageErrorCodeSummary.PARSING_METADATA_FAILED
-import org.apache.linkis.storage.exception.{ColLengthExceedException, StorageErrorException}
+import org.apache.linkis.storage.exception.{
+  ColLengthExceedException,
+  ColumnIndexExceedException,
+  StorageErrorException
+}
 
 import org.apache.commons.lang3.StringUtils
 
@@ -88,20 +92,30 @@ class TableResultDeserializer extends ResultDeserializer[TableMetaData, TableRec
     }
     val columnIndices: Array[Int] = LinkisStorageConf.columnIndicesThreadLocal.get()
 
-    val lastIndex = columnIndices(columnIndices.length - 1)
-    var columnSize = colArray.size
+    val lastIndex =
+      if (columnIndices != null && columnIndices.length > 0) columnIndices(columnIndices.length - 1)
+      else 0
+    var realValueSize = colArray.size
+
+    if (enableLimit && metaData.columns.size <= columnIndices(0)) {
+      throw new ColumnIndexExceedException(
+        LinkisStorageErrorCodeSummary.RESULT_COLUMN_INDEX_OUT_OF_BOUNDS.getErrorCode,
+        MessageFormat.format(
+          LinkisStorageErrorCodeSummary.RESULT_COLUMN_INDEX_OUT_OF_BOUNDS.getErrorDesc,
+          columnIndices(0).asInstanceOf[Object],
+          metaData.columns.size.asInstanceOf[Object]
+        )
+      )
+    }
+
     if (enableLimit && metaData.columns.size > lastIndex) {
-      columnSize = columnIndices.length
+      realValueSize = columnIndices.length
     } else if (enableLimit && metaData.columns.size <= lastIndex) {
-      columnSize = metaData.columns.size % columnIndices.length
+      realValueSize = metaData.columns.size % columnIndices.length
     }
 
-    var rowArray = new Array[Any](columnSize)
-
-    // use column index if columnIndices is not empty and  the length of columnIndices is less to the column size
-    if (columnIndices != null && columnIndices.length > 0 && columnIndices.length <= columnSize) {
-      rowArray = new Array[Any](columnIndices.length)
-    }
+    val columnSize = colArray.size
+    val rowArray = new Array[Any](realValueSize)
 
     var colIdx = 0
     for (i <- 0 until columnSize) {
@@ -120,8 +134,10 @@ class TableResultDeserializer extends ResultDeserializer[TableMetaData, TableRec
       index += len
       // 如果enableLimit为true，则采取的是列分页
       if (enableLimit) {
-        rowArray(colIdx) = res
-        colIdx += 1
+        if (columnIndices.contains(i)) {
+          rowArray(colIdx) = res
+          colIdx += 1
+        }
       } else {
         if (i >= metaData.columns.length) rowArray(i) = res
         else {
