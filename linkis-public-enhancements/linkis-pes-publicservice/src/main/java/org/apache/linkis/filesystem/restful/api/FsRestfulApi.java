@@ -772,24 +772,6 @@ public class FsRestfulApi {
   }
 
   /**
-   * 判断数组是否是升序
-   *
-   * @param array
-   * @return
-   */
-  private static boolean isAscending(int[] array) {
-    if (array == null || array.length < 2) {
-      return true;
-    }
-    for (int i = 0; i < array.length - 1; i++) {
-      if (array[i] >= array[i + 1] || array[i] < 0 || array[i + 1] < 0) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
    * @param req
    * @param json
    * @return
