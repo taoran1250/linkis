@@ -148,15 +148,11 @@ class DefaultEMInfoService extends EMInfoService with Logging {
 
   override def resetResource(serviceInstance: String, username: String): Unit = {
     // ECM开关
-    if (AMConfiguration.AM_ECM_RESET_RESOURCE) {
-      val filteredECMs = if (StringUtils.isNotBlank(serviceInstance)) {
-        if (serviceInstance.equals("*")) {
-          getAllEM()
-        } else {
-          getAllEM().filter(_.getServiceInstance.getInstance.equals(serviceInstance))
-        }
+    if (AMConfiguration.AM_ECM_RESET_RESOURCE && StringUtils.isNotBlank(serviceInstance)) {
+      val filteredECMs = if (serviceInstance.equals("*")) {
+        getAllEM()
       } else {
-        null
+        getAllEM().filter(_.getServiceInstance.getInstance.equals(serviceInstance))
       }
       // 遍历处理ECM
       filteredECMs.foreach { ecmInstance =>
@@ -215,25 +211,21 @@ class DefaultEMInfoService extends EMInfoService with Logging {
     }
 
     // 用户资源重置
-    if (AMConfiguration.AM_USER_RESET_RESOURCE) {
+    if (AMConfiguration.AM_USER_RESET_RESOURCE && StringUtils.isNotBlank(username)) {
       // 获取用户的标签
-      val userLabels = if (StringUtils.isNotBlank(username)) {
-        val user = if (username.equals("*")) {
-          ""
-        } else {
-          username
-        }
-        val labelValuePattern =
-          MessageFormat.format("%{0}%,%{1}%,%{2}%,%", "", user, "")
-        labelManagerPersistence.getLabelByPattern(
-          labelValuePattern,
-          "combined_userCreator_engineType",
-          null,
-          null
-        )
+      val user = if (username.equals("*")) {
+        ""
       } else {
-        null
+        username
       }
+      val labelValuePattern =
+        MessageFormat.format("%{0}%,%{1}%,%{2}%,%", "", user, "")
+      val userLabels = labelManagerPersistence.getLabelByPattern(
+        labelValuePattern,
+        "combined_userCreator_engineType",
+        null,
+        null
+      )
       // 获取与这些标签关联的资源
       val userLabelResources = resourceManagerPersistence.getResourceByLabels(userLabels).asScala
       // 遍历用户标签资源
