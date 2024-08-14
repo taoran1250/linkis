@@ -237,45 +237,38 @@ class DefaultEMInfoService extends EMInfoService with Logging {
         val lock = resourceManager.tryLockOneLabel(resourceLabel.head, -1, labelUser)
         Utils.tryFinally {
           val userPersistenceResource = ResourceUtils.fromPersistenceResource(userLabelResource)
-          val userLabelResourceSum =
-            userPersistenceResource.getUsedResource + userPersistenceResource.getLockedResource
           val userResourceType = ResourceType.valueOf(userLabelResource.getResourceType)
-          val initResource = Resource.initResource(userResourceType)
-          val matchResult =
-            (!(userPersistenceResource.getUsedResource == initResource)) || (!(userPersistenceResource.getLockedResource == initResource))
-          if (matchResult) {
-            val userEngineNodes = nodeLabelService.getEngineNodesWithResourceByUser(labelUser, true)
-            val userEngineNodeFilter = userEngineNodes
-              .filter { node =>
-                val userCreatorLabelStr =
-                  LabelUtil.getUserCreatorLabel(node.getLabels).getStringValue
-                val engineTypeLabelStr = LabelUtil.getEngineTypeLabel(node.getLabels).getStringValue
-                userLabelResource.getCreator.equalsIgnoreCase(
-                  s"${userCreatorLabelStr},${engineTypeLabelStr}"
-                )
-              }
-              .map(_.getNodeResource)
-            // 收集所有node所使用的资源（汇总、已使用、上锁）
-            val (sumResource, uedResource, lockResource) =
-              collectResource(userEngineNodeFilter, userResourceType)
-            if (
-                (!(uedResource == userPersistenceResource.getUsedResource)) || (!(lockResource == userPersistenceResource.getLockedResource))
-            ) {
-              logger.info(
-                MessageFormat.format(
-                  "LabelUser:{0} resources will be reset, Record Resources:{1} ,Real Resources:{2}",
-                  labelUser,
-                  userPersistenceResource.getUsedResource + userPersistenceResource.getLockedResource,
-                  sumResource
-                )
+          val userEngineNodes = nodeLabelService.getEngineNodesWithResourceByUser(labelUser, true)
+          val userEngineNodeFilter = userEngineNodes
+            .filter { node =>
+              val userCreatorLabelStr =
+                LabelUtil.getUserCreatorLabel(node.getLabels).getStringValue
+              val engineTypeLabelStr = LabelUtil.getEngineTypeLabel(node.getLabels).getStringValue
+              userLabelResource.getCreator.equalsIgnoreCase(
+                s"${userCreatorLabelStr},${engineTypeLabelStr}"
               )
-              userPersistenceResource.setLeftResource(
-                userPersistenceResource.getMaxResource - sumResource
-              )
-              userPersistenceResource.setUsedResource(uedResource)
-              userPersistenceResource.setLockedResource(lockResource)
-              resourceManager.resetResource(resourceLabel.head, userPersistenceResource)
             }
+            .map(_.getNodeResource)
+          // 收集所有node所使用的资源（汇总、已使用、上锁）
+          val (sumResource, uedResource, lockResource) =
+            collectResource(userEngineNodeFilter, userResourceType)
+          if (
+              (!(uedResource == userPersistenceResource.getUsedResource)) || (!(lockResource == userPersistenceResource.getLockedResource))
+          ) {
+            logger.info(
+              MessageFormat.format(
+                "LabelUser:{0} resources will be reset, Record Resources:{1} ,Real Resources:{2}",
+                labelUser,
+                userPersistenceResource.getUsedResource + userPersistenceResource.getLockedResource,
+                sumResource
+              )
+            )
+            userPersistenceResource.setLeftResource(
+              userPersistenceResource.getMaxResource - sumResource
+            )
+            userPersistenceResource.setUsedResource(uedResource)
+            userPersistenceResource.setLockedResource(lockResource)
+            resourceManager.resetResource(resourceLabel.head, userPersistenceResource)
           }
         } {
           resourceManager.unLock(lock)
