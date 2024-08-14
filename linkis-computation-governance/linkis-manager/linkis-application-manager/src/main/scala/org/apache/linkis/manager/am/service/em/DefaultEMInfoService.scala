@@ -30,6 +30,7 @@ import org.apache.linkis.manager.common.entity.resource.{NodeResource, Resource,
 import org.apache.linkis.manager.common.protocol.em.GetEMInfoRequest
 import org.apache.linkis.manager.common.protocol.node.NodeHealthyRequest
 import org.apache.linkis.manager.common.utils.ResourceUtils
+import org.apache.linkis.manager.label.entity.em.EMInstanceLabel
 import org.apache.linkis.manager.label.entity.node.AliasServiceInstanceLabel
 import org.apache.linkis.manager.label.service.NodeLabelService
 import org.apache.linkis.manager.label.utils.LabelUtil
@@ -162,8 +163,9 @@ class DefaultEMInfoService extends EMInfoService with Logging {
             ecmInstance.getServiceInstance.getInstance
           )
         )
+        val eMInstanceLabel = ecmInstance.getLabels.filter(_.isInstanceOf[EMInstanceLabel]).head
         val lock =
-          resourceManager.tryLockOneLabel(ecmInstance.getLabels.head, -1, Utils.getJvmUser)
+          resourceManager.tryLockOneLabel(eMInstanceLabel, -1, Utils.getJvmUser)
         engineInfoService
           .updateEngineHealthyStatus(ecmInstance.getServiceInstance, NodeHealthy.UnHealthy)
         Utils.tryFinally {
@@ -174,23 +176,23 @@ class DefaultEMInfoService extends EMInfoService with Logging {
           val (realSumResource, useResource, lockResource) =
             collectResource(nodeResource, ResourceType.LoadInstance)
           // 收集ECM资源
-          val ecmResource =
-            ecmInstance.getNodeResource.getUsedResource + ecmInstance.getNodeResource.getLockedResource
+          val ecmNodeResource = ecmInstance.getNodeResource
           // 资源对比，资源重置
-          if (!(ecmResource == realSumResource)) {
+          if (
+              (!(useResource == ecmNodeResource.getUsedResource)) || (!(lockResource == ecmNodeResource.getLockedResource))
+          ) {
             logger.info(
               MessageFormat.format(
                 "ECM:{0} resources will be reset, Record Resources:{1} ,Real Resources:{2}",
                 ecmInstance.getServiceInstance.getInstance,
-                ecmResource,
+                ecmNodeResource.getUsedResource + ecmNodeResource.getLockedResource,
                 realSumResource
               )
             )
-            val ecmNodeResource = ecmInstance.getNodeResource
             ecmNodeResource.setLockedResource(lockResource)
             ecmNodeResource.setLeftResource(ecmNodeResource.getMaxResource - realSumResource)
             ecmNodeResource.setUsedResource(useResource)
-            val persistence = ResourceUtils.toPersistenceResource(ecmInstance.getNodeResource)
+            val persistence = ResourceUtils.toPersistenceResource(ecmNodeResource)
             val resourceLabel = labelManagerPersistence.getLabelByResource(persistence)
             resourceManager.resetResource(resourceLabel.head, ecmNodeResource)
           }
@@ -238,7 +240,9 @@ class DefaultEMInfoService extends EMInfoService with Logging {
           val userLabelResourceSum =
             userPersistenceResource.getUsedResource + userPersistenceResource.getLockedResource
           val userResourceType = ResourceType.valueOf(userLabelResource.getResourceType)
-          val matchResult = userLabelResourceSum.caseMore(Resource.initResource(userResourceType))
+          val initResource = Resource.initResource(userResourceType)
+          val matchResult =
+            (!(userPersistenceResource.getUsedResource == initResource)) || (!(userPersistenceResource.getLockedResource == initResource))
           if (matchResult) {
             val userEngineNodes = nodeLabelService.getEngineNodesWithResourceByUser(labelUser, true)
             val userEngineNodeFilter = userEngineNodes
@@ -254,12 +258,14 @@ class DefaultEMInfoService extends EMInfoService with Logging {
             // 收集所有node所使用的资源（汇总、已使用、上锁）
             val (sumResource, uedResource, lockResource) =
               collectResource(userEngineNodeFilter, userResourceType)
-            if (!(sumResource == userLabelResourceSum)) {
+            if (
+                (!(uedResource == userPersistenceResource.getUsedResource)) || (!(lockResource == userPersistenceResource.getLockedResource))
+            ) {
               logger.info(
                 MessageFormat.format(
                   "LabelUser:{0} resources will be reset, Record Resources:{1} ,Real Resources:{2}",
                   labelUser,
-                  userLabelResourceSum,
+                  userPersistenceResource.getUsedResource + userPersistenceResource.getLockedResource,
                   sumResource
                 )
               )
