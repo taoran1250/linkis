@@ -97,6 +97,8 @@ object ResultSetAction {
       resultSetAction.setParameter("charset", charset)
       resultSetAction.setParameter("enableLimit", enableLimit)
       resultSetAction.setParameter("nullValue", nullValue)
+      resultSetAction.setParameter("columnPage", columnPage)
+      resultSetAction.setParameter("columnPageSize", columnPageSize)
       resultSetAction.setUser(user)
       resultSetAction
     }
