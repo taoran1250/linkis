@@ -151,7 +151,7 @@ public class JobhistoryUtils {
 
   // 截断executionCode的方法
   private static String abbreviateExecutionCode(String executionCode) {
-    return StringUtils.abbreviate(executionCode, 32767);
+    return StringUtils.abbreviate(executionCode, 1000);
   }
 
   // 格式化isReuse的方法
