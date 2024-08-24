@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,45 +17,45 @@
 
 package org.apache.linkis.engineconn.computation.executor.hook
 
-import org.slf4j.{Logger, Logging}
-import com.yourcompany.yourpackage.labels.{CodeLanguageLabel, EngineTypeLabel}
-import com.yourcompany.yourpackage.engine.{EngineConn, EngineCreationContext}
+import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.engineconn.common.creation.EngineCreationContext
+import org.apache.linkis.engineconn.common.engineconn.EngineConn
+import org.apache.linkis.engineconn.common.hook.EngineConnHook
+import org.apache.linkis.manager.label.entity.Label
+import org.apache.linkis.manager.label.entity.engine.CodeLanguageLabel
 
+abstract class PythonModuleLoadEngineConnHook
+    extends PythonModuleLoad
+    with EngineConnHook
+    with Logging {
 
-
-object PythonModuleLoadEngineConnHook extends PythonModuleLoad with EngineConnHook with Logging {
-
-  override def afterExecutionExecute(engineCreationContext: EngineCreationContext, engineConn: EngineConn): Unit = {
+  override def afterExecutionExecute(
+      engineCreationContext: EngineCreationContext,
+      engineConn: EngineConn
+  ): Unit = {
     val codeLanguageLabel = new CodeLanguageLabel
-    engineCreationContext.getLabels().asScala.find(_.isInstanceOf[EngineTypeLabel]) match {
-      case Some(engineTypeLabel) =>
-        codeLanguageLabel.setCodeType(
-          getRealRunType(engineTypeLabel.asInstanceOf[EngineTypeLabel].getEngineType).toString
-        )
-      case None =>
-        codeLanguageLabel.setCodeType("Python") // Assuming "Python" is the default code type
-        logger.warn("no EngineTypeLabel found, use default runType 'Python'")
-    }
+    codeLanguageLabel.setCodeType(runType.toString)
+    logger.info(s"engineType: ${engineType}")
     val labels = Array[Label[_]](codeLanguageLabel)
-    loadPythonModule(labels)
+    loadPythonModules(labels)
   }
 
-  override def afterEngineServerStartFailed(engineCreationContext: EngineCreationContext, throwable: Throwable): Unit = {
+  override def afterEngineServerStartFailed(
+      engineCreationContext: EngineCreationContext,
+      throwable: Throwable
+  ): Unit = {
     logger.error(s"Failed to start Engine Server: ${throwable.getMessage}", throwable)
   }
 
   override def beforeCreateEngineConn(engineCreationContext: EngineCreationContext): Unit = {
-    logger.info("Preparing to create Python Engine Connection...")
+    logger.info("Preparing to load Python Module...")
   }
 
-  override def beforeExecutionExecute(engineCreationContext: EngineCreationContext, engineConn: EngineConn): Unit = {
-    logger.info(s"Before executing command on Python Engine Connection: ${engineConn}")
+  override def beforeExecutionExecute(
+      engineCreationContext: EngineCreationContext,
+      engineConn: EngineConn
+  ): Unit = {
+    logger.info(s"Before executing command on load Python Module.")
   }
 
-  // Implementation of PythonModuleLoad
-  override def loadPythonModule(labels: Array[Label[_]]): Unit = {
-    // Code to load Python modules based on the labels
-    // This is a placeholder for actual implementation
-    logger.info(s"Loading Python Modules with labels: ${labels.mkString(", ")}")
-  }
 }

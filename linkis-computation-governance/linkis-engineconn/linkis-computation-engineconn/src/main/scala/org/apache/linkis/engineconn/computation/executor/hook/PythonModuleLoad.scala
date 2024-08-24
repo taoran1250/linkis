@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,104 +17,132 @@
 
 package org.apache.linkis.engineconn.computation.executor.hook
 
-/**
- * The PythonModuleLoad class is designed to load Python modules into the
- * execution environment dynamically. This class is not an extension of UDFLoad,
- * but shares a similar philosophy of handling dynamic module loading based on
- * user preferences and system configurations.
- */
-class PythonModuleLoad {
+import org.apache.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.engineconn.computation.executor.conf.ComputationExecutorConf
+import org.apache.linkis.engineconn.computation.executor.execute.{
+  ComputationExecutor,
+  EngineExecutionContext
+}
+import org.apache.linkis.engineconn.core.engineconn.EngineConnManager
+import org.apache.linkis.engineconn.core.executor.ExecutorManager
+import org.apache.linkis.manager.label.entity.Label
+import org.apache.linkis.manager.label.entity.engine.RunType.RunType
+import org.apache.linkis.rpc.Sender
+import org.apache.linkis.udf.UDFClientConfiguration
+import org.apache.linkis.udf.api.rpc.{RequestPythonModuleProtocol, ResponsePythonModuleProtocol}
+import org.apache.linkis.udf.entity.PythonModuleInfoVO
 
-  /** A client for interacting with the BML (Big Model Library) service for remote resource loading */
-  protected val bmlClient: BmlClient = BmlClientFactory.createBmlClient()
+import org.apache.commons.lang3.StringUtils
+
+import java.util
+
+import scala.collection.JavaConverters._
+import scala.collection.mutable
+
+/**
+ * The PythonModuleLoad class is designed to load Python modules into the execution environment
+ * dynamically. This class is not an extension of UDFLoad, but shares a similar philosophy of
+ * handling dynamic module loading based on user preferences and system configurations.
+ */
+abstract class PythonModuleLoad extends Logging {
 
   /** Abstract properties to be defined by the subclass */
-  protected var udfType: String = _
-  protected var category: String = _
-  protected var runType: String = _
+  protected val engineType: String
+  protected val runType: RunType
 
-  /**
-   * Read a file's content from the local file system.
-   * If the file does not exist, log a warning and return an empty string.
-   * 
-   * @param filePath The path of the file to be read.
-   * @return The content of the file if it exists, otherwise an empty string.
-   */
-  protected def readFile(filePath: String): String = {
-    try {
-      val file = new File(filePath)
-      if (file.exists()) {
-        val source = Source.fromFile(file)
-        val content = source.getLines().mkString("\n")
-        source.close()
-        content
-      } else {
-        Logger.warn(s"File not found: $filePath")
-        ""
-      }
-    } catch {
-      case e: Exception => 
-        Logger.error(s"Failed to read file: $filePath", e)
-        ""
-    }
+  protected def getEngineType(): String = engineType
+
+  protected def constructCode(pythonModuleInfo: PythonModuleInfoVO): String
+
+  private def queryPythonModuleRpc(
+      userName: String,
+      engineType: String
+  ): java.util.List[PythonModuleInfoVO] = {
+    val infoList = Sender
+      .getSender(UDFClientConfiguration.UDF_SERVICE_NAME.getValue)
+      .ask(RequestPythonModuleProtocol(userName, engineType))
+      .asInstanceOf[ResponsePythonModuleProtocol]
+      .getModulesInfo()
+    infoList
   }
 
-  /**
-   * Read a file's content from the BML service.
-   * 
-   * @param user The user for whom the resource should be fetched.
-   * @param resourceId The ID of the resource to fetch.
-   * @param resourceVersion The version of the resource to fetch.
-   * @return The content of the file if fetched successfully, otherwise an empty string.
-   */
-  protected def readFile(user: String, resourceId: String, resourceVersion: String): String = {
-    try {
-      bmlClient.downloadResource(user, resourceId, resourceVersion)
-    } catch {
-      case e: Exception => 
-        Logger.error(s"Failed to download resource: $resourceId", e)
-        ""
+  protected def getLoadPythonModuleCode: Array[String] = {
+    val engineCreationContext =
+      EngineConnManager.getEngineConnManager.getEngineConn.getEngineCreationContext
+    val user = engineCreationContext.getUser
+
+    val infoList: util.List[PythonModuleInfoVO] =
+      Utils.tryAndWarn(queryPythonModuleRpc(user, getEngineType()))
+
+    /**
+     * 将 infoList 转化为scala代码
+     */
+    var list = if (infoList == null) null else infoList.asScala.toList
+    if (list == null) {
+      list = List[PythonModuleInfoVO]()
+    }
+    val pmi = new PythonModuleInfoVO()
+    pmi.setPath("viewfs:///apps-data/hadoop/hello_world.py")
+
+    val pmi1 = new PythonModuleInfoVO()
+    pmi1.setPath("viewfs:///apps-data/hadoop/redis2.zip")
+    infoList.add(pmi1)
+
+    logger.info(s"${user} load python modules: ")
+    list.foreach(l => logger.info(s"module name:${l.getName}, path:${l.getPath}\n"))
+
+    // 创建加载code
+    val codes: mutable.Buffer[String] = infoList.asScala
+      .filter { info => StringUtils.isNotEmpty(info.getPath) }
+      .map(constructCode)
+    // 打印codes
+    val str: String = codes.mkString("\n")
+    logger.info(s"python codes: $str")
+    codes.toArray
+  }
+
+  private def executeFunctionCode(codes: Array[String], executor: ComputationExecutor): Unit = {
+    if (null == codes || null == executor) {
+      return
+    }
+    codes.foreach { code =>
+      logger.info("Submit function registration to engine, code: " + code)
+      Utils.tryCatch(executor.executeLine(new EngineExecutionContext(executor), code)) {
+        t: Throwable =>
+          logger.error("Failed to load python module", t)
+          null
+      }
     }
   }
 
   /**
    * Generate and execute the code necessary for loading Python modules.
-   * 
-   * @param executor An object capable of executing code in the current engine context.
+   *
+   * @param executor
+   *   An object capable of executing code in the current engine context.
    */
-  protected def loadModules(executor: Executor): Unit = {
-    val engineCreationContext =
-      EngineConnManager.getEngineConnManager.getEngineConn.getEngineCreationContext
-    val user = engineCreationContext.getUser
-    val loadAllModules =
-      engineCreationContext.getOptions.getOrElse("linkis.user.module.all.load", "true").toBoolean
-    val customModuleIdsStr = 
-      engineCreationContext.getOptions.getOrElse("linkis.user.module.custom.ids", "")
-    val customModuleIds = customModuleIdsStr.split(",").filterNot(_.isEmpty).map(_.trim.toLong)
+  protected def loadPythonModules(labels: Array[Label[_]]): Unit = {
 
-    Logger.info(s"start loading modules, user: $user, load all: $loadAllModules, moduleIds: ${customModuleIds.mkString("[", ",", "]")}")
+    val codes = getLoadPythonModuleCode
+    logger.info(s"codes length: ${codes.length}")
+    if (null != codes && codes.nonEmpty) {
+      val executor = ExecutorManager.getInstance.getExecutorByLabels(labels)
+      if (executor != null) {
+        val className = executor.getClass.getName
+        logger.info(s"executor class: ${className}")
+      } else {
+        logger.error(s"Failed to load python, executor is null")
+      }
 
-    val modulesToLoad = if (loadAllModules) {
-      PythonModuleClient.getAllModulesForUser(user, category, udfType)
-    } else {
-      PythonModuleClient.getModulesByIds(user, customModuleIds, category, udfType)
+      executor match {
+        case computationExecutor: ComputationExecutor =>
+          executeFunctionCode(codes, computationExecutor)
+        case _ =>
+      }
     }
-
-    val codeBuffer = modulesToLoad.flatMap { module =>
-      val code = constructModuleCode(module)
-      if (code.nonEmpty) code.split("\n").filterNot(_.isEmpty) else Array.empty[String]
-    }
-
-    executeFunctionCode(codeBuffer.toArray, executor)
+    logger.info(s"Successful to load python, engineType : ${engineType}")
   }
 
-  /**
-   * Abstract method to construct the code for loading a Python module.
-   * 
-   * @param moduleInfo Information about the Python module to be loaded.
-   * @return A code string that represents the necessary operations to load the module.
-   */
-  protected def constructModuleCode(moduleInfo: ModuleInfoVo): String
 }
 
 // Note: The actual implementation of methods like `executeFunctionCode` and `construct
