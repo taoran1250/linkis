@@ -42,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -1067,16 +1068,13 @@ public class UDFRestfulApi {
     String user = ModuleUserUtils.getOperationUser(req, "pythonList");
 
     // 参数校验
-    if (name == null) name = null;
-    if (engineType == null) engineType = null;
+    if (org.apache.commons.lang3.StringUtils.isBlank(name)) name = null;
+    if (org.apache.commons.lang3.StringUtils.isBlank(engineType)) engineType = null;
     if (pageNow == null) pageNow = 1;
     if (pageSize == null) pageSize = 10;
 
-    // 判断是否是管理员
-    boolean isAdmin = Configuration.isAdmin(user);
-
     // 根据管理员权限设置username
-    if (isAdmin) {
+    if (Configuration.isAdmin(user)) {
       if (username == null) username = null;
     } else {
       username = user;
@@ -1093,9 +1091,9 @@ public class UDFRestfulApi {
       pythonModuleInfo.setIsLoad(isLoad);
       pythonModuleInfo.setIsExpire(isExpire);
       List<PythonModuleInfo> pythonList = pythonModuleInfoService.getByConditions(pythonModuleInfo);
-
+      PageInfo<PythonModuleInfo> pageInfo = new PageInfo<>(pythonList);
       // 封装返回结果
-      return Message.ok().data("pythonList", pythonList);
+      return Message.ok().data("pythonList", pythonList).data("totalPage", pageInfo.getTotal());
     } finally {
       // 关闭分页
       PageHelper.clearPage();
@@ -1109,7 +1107,7 @@ public class UDFRestfulApi {
    * @param isExpire 0-未过期，1-已过期
    */
   @RequestMapping(path = "/python-delete", method = RequestMethod.GET)
-  @ApiOperation(value = "删除Python模块", notes = "根据模块ID删除Python模块��管理员可以删除任何模块，普通用户只能删除自己创建的模块")
+  @ApiOperation(value = "删除Python模块", notes = "根据模块ID删除Python模块,管理员可以删除任何模块，普通用户只能删除自己创建的模块")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "id", value = "模块ID", required = true, dataType = "Long"),
     @ApiImplicitParam(
@@ -1127,8 +1125,11 @@ public class UDFRestfulApi {
     String user = ModuleUserUtils.getOperationUser(req, "pythonDelete");
 
     // 参数校验
-    if (id == null || isExpire < 0 || isExpire > 1) {
-      return Message.error("Invalid parameters");
+    if (id == null) {
+      return Message.error("Invalid parameters: id is null");
+    }
+    if (isExpire != 0 && isExpire != 1) {
+      return Message.error("Invalid parameters: isExpire must be 0 or 1");
     }
     PythonModuleInfo pythonModuleInfo = new PythonModuleInfo();
     pythonModuleInfo.setId(id);
@@ -1170,7 +1171,7 @@ public class UDFRestfulApi {
   })
   @RequestMapping(value = "/python-save", method = RequestMethod.POST)
   public Message request(
-      @RequestBody PythonModuleInfo pythonModuleInfo,
+      @Nullable @RequestBody PythonModuleInfo pythonModuleInfo,
       HttpServletRequest httpReq,
       HttpServletResponse httpResp) {
 
@@ -1254,7 +1255,7 @@ public class UDFRestfulApi {
         paramType = "header")
   })
   public Message pythonFileExist(
-      @RequestParam("fileName") String fileName, HttpServletRequest req) {
+      @RequestParam(value = "fileName", required = false) String fileName, HttpServletRequest req) {
     // 审计日志打印并获取登录用户
     String userName = ModuleUserUtils.getOperationUser(req, "pythonFileExist");
 
@@ -1262,13 +1263,14 @@ public class UDFRestfulApi {
     if (org.apache.commons.lang3.StringUtils.isBlank(fileName)) {
       return Message.error("参数fileName不能为空");
     }
-    if (!fileName.matches("^[a-zA-Z][a-zA-Z0-9_]{0,49}$")) {
+    String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf("."));
+    if (!fileNameWithoutExtension.matches("^[a-zA-Z][a-zA-Z0-9_]{0,49}$")) {
       return Message.error("只支持数字字母下划线，且以字母开头，长度最大50");
     }
 
     // 封装PythonModuleInfo对象并查询数据库
     PythonModuleInfo pythonModuleInfo = new PythonModuleInfo();
-    pythonModuleInfo.setName(fileName);
+    pythonModuleInfo.setName(fileNameWithoutExtension);
     pythonModuleInfo.setCreateUser(userName);
     PythonModuleInfo moduleInfo = pythonModuleInfoService.getByUserAndNameAndId(pythonModuleInfo);
 

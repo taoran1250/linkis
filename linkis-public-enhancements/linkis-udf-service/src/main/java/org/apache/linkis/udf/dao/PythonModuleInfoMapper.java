@@ -33,11 +33,12 @@ public interface PythonModuleInfoMapper {
   int updatePythonModuleInfo(PythonModuleInfo pythonModuleInfo);
 
   // SQL 3: 新增
-  int insertPythonModuleInfo(PythonModuleInfo pythonModuleInfo);
+  Long insertPythonModuleInfo(PythonModuleInfo pythonModuleInfo);
 
   // SQL 4: 带有<if>判断的查询
   PythonModuleInfo selectByUserAndNameAndId(PythonModuleInfo pythonModuleInfo);
 
   // SQL 5: 查询包含多个引擎类型的hdfs路径
-  List<PythonModuleInfo> selectPathsByUsernameAndEnginetypes(String username, List<String> enginetypes);
+  List<PythonModuleInfo> selectPathsByUsernameAndEnginetypes(
+      String username, List<String> enginetypes);
 }

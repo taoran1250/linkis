@@ -64,6 +64,9 @@
         (name, description, path, engine_type, create_user, update_user, is_load, is_expire, create_time, update_time)
         VALUES
         (#{name}, #{description}, #{path}, #{engineType}, #{createUser}, #{updateUser}, #{isLoad}, #{isExpire}, #{createTime}, #{updateTime})
+        <selectKey keyProperty="id" resultType="Long" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
     </insert>
 
     <!-- SQL 4: 带有<if>判断的查询 -->

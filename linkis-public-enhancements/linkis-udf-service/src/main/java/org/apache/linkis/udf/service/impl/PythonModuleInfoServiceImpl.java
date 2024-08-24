@@ -47,7 +47,7 @@ public class PythonModuleInfoServiceImpl implements PythonModuleInfoService {
   }
 
   @Override
-  public int insertPythonModuleInfo(PythonModuleInfo pythonModuleInfo) {
+  public Long insertPythonModuleInfo(PythonModuleInfo pythonModuleInfo) {
     return pythonModuleInfoMapper.insertPythonModuleInfo(pythonModuleInfo);
   }
 
@@ -57,7 +57,8 @@ public class PythonModuleInfoServiceImpl implements PythonModuleInfoService {
   }
 
   @Override
-  public List<PythonModuleInfo> getPathsByUsernameAndEnginetypes(String username, List<String> enginetypes) {
+  public List<PythonModuleInfo> getPathsByUsernameAndEnginetypes(
+      String username, List<String> enginetypes) {
     return pythonModuleInfoMapper.selectPathsByUsernameAndEnginetypes(username, enginetypes);
   }
 }
