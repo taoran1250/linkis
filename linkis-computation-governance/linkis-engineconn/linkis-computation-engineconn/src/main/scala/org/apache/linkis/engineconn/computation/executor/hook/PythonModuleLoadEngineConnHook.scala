@@ -17,7 +17,7 @@
 
 package org.apache.linkis.engineconn.computation.executor.hook
 
-import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.common.utils.{Logging, Utils}
 import org.apache.linkis.engineconn.common.creation.EngineCreationContext
 import org.apache.linkis.engineconn.common.engineconn.EngineConn
 import org.apache.linkis.engineconn.common.hook.EngineConnHook
@@ -33,11 +33,14 @@ abstract class PythonModuleLoadEngineConnHook
       engineCreationContext: EngineCreationContext,
       engineConn: EngineConn
   ): Unit = {
-    val codeLanguageLabel = new CodeLanguageLabel
-    codeLanguageLabel.setCodeType(runType.toString)
-    logger.info(s"engineType: ${engineType}")
-    val labels = Array[Label[_]](codeLanguageLabel)
-    loadPythonModules(labels)
+    Utils.tryAndWarnMsg{
+      val codeLanguageLabel = new CodeLanguageLabel
+      codeLanguageLabel.setCodeType(runType.toString)
+      logger.info(s"engineType: ${engineType}")
+      val labels = Array[Label[_]](codeLanguageLabel)
+      loadPythonModules(labels)
+    }(s"Failed to load Python Modules: ${engineType}")
+
   }
 
   override def afterEngineServerStartFailed(

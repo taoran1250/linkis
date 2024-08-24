@@ -19,10 +19,7 @@ package org.apache.linkis.engineconn.computation.executor.hook
 
 import org.apache.linkis.common.utils.{Logging, Utils}
 import org.apache.linkis.engineconn.computation.executor.conf.ComputationExecutorConf
-import org.apache.linkis.engineconn.computation.executor.execute.{
-  ComputationExecutor,
-  EngineExecutionContext
-}
+import org.apache.linkis.engineconn.computation.executor.execute.{ComputationExecutor, EngineExecutionContext}
 import org.apache.linkis.engineconn.core.engineconn.EngineConnManager
 import org.apache.linkis.engineconn.core.executor.ExecutorManager
 import org.apache.linkis.manager.label.entity.Label
@@ -31,11 +28,10 @@ import org.apache.linkis.rpc.Sender
 import org.apache.linkis.udf.UDFClientConfiguration
 import org.apache.linkis.udf.api.rpc.{RequestPythonModuleProtocol, ResponsePythonModuleProtocol}
 import org.apache.linkis.udf.entity.PythonModuleInfoVO
-
 import org.apache.commons.lang3.StringUtils
+import org.apache.linkis.common.conf.Configuration.IS_VIEW_FS_ENV
 
 import java.util
-
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
@@ -71,25 +67,33 @@ abstract class PythonModuleLoad extends Logging {
       EngineConnManager.getEngineConnManager.getEngineConn.getEngineCreationContext
     val user = engineCreationContext.getUser
 
-    val infoList: util.List[PythonModuleInfoVO] =
+    var infoList: util.List[PythonModuleInfoVO] =
       Utils.tryAndWarn(queryPythonModuleRpc(user, getEngineType()))
-
-    /**
-     * 将 infoList 转化为scala代码
-     */
-    var list = if (infoList == null) null else infoList.asScala.toList
-    if (list == null) {
-      list = List[PythonModuleInfoVO]()
+    if (infoList == null) {
+      logger.info("rpc get info is empty.")
+      infoList = new util.ArrayList[PythonModuleInfoVO]()
     }
-    val pmi = new PythonModuleInfoVO()
-    pmi.setPath("viewfs:///apps-data/hadoop/hello_world.py")
 
-    val pmi1 = new PythonModuleInfoVO()
-    pmi1.setPath("viewfs:///apps-data/hadoop/redis2.zip")
-    infoList.add(pmi1)
+    if (infoList.isEmpty) {
+      val pmi = new PythonModuleInfoVO()
+      pmi.setPath("viewfs:///apps-data/hadoop/hello_world.py")
+      infoList.add(pmi)
+
+      val pmi1 = new PythonModuleInfoVO()
+      pmi1.setPath("viewfs:///apps-data/hadoop/redis2.zip")
+      infoList.add(pmi1)
+    }
+
+    // 替换Viewfs
+    if (IS_VIEW_FS_ENV.getValue) {
+      infoList.asScala.foreach { info =>
+        val path = info.getPath
+        info.setPath(path.replace("hdfs://", "viewfs://"))
+      }
+    }
 
     logger.info(s"${user} load python modules: ")
-    list.foreach(l => logger.info(s"module name:${l.getName}, path:${l.getPath}\n"))
+    infoList.asScala.foreach(l => logger.info(s"module name:${l.getName}, path:${l.getPath}\n"))
 
     // 创建加载code
     val codes: mutable.Buffer[String] = infoList.asScala

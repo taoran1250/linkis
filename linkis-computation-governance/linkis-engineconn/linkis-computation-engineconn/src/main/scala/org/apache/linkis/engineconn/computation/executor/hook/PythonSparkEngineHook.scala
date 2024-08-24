@@ -36,7 +36,10 @@ class PythonSparkEngineHook extends PythonModuleLoadEngineConnHook {
   override protected def constructCode(pythonModuleInfo: PythonModuleInfoVO): String = {
     // 使用pythonModuleInfo的path属性，构造SparkContext.addPyFile的命令字符串
     // 这个命令在PySpark环境中将模块文件添加到所有worker上，以便在代码中可以使用
-    s"sc.addPyFile(\"${pythonModuleInfo.getPath}\")"
+    val path: String = pythonModuleInfo.getPath
+    val loadCode = s"sc.addPyFile('${path}')"
+    logger.info(s"pythonLoadCode: ${loadCode}")
+    loadCode
   }
 
 }
