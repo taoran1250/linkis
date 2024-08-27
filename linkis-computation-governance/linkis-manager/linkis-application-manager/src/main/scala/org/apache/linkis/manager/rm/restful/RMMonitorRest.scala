@@ -39,6 +39,7 @@ import org.apache.linkis.manager.label.entity.cluster.ClusterLabel
 import org.apache.linkis.manager.label.entity.engine.{
   EngineInstanceLabel,
   EngineTypeLabel,
+  FixedEngineConnLabel,
   UserCreatorLabel
 }
 import org.apache.linkis.manager.label.service.NodeLabelService
@@ -334,12 +335,16 @@ class RMMonitorRest extends Logging {
         .find(_.isInstanceOf[EngineTypeLabel])
         .get
         .asInstanceOf[EngineTypeLabel]
+      val fixedEngineConnLabel =
+        node.getLabels.asScala.find(_.isInstanceOf[FixedEngineConnLabel]).getOrElse(null)
       val record = new mutable.HashMap[String, Any]
       if (node.getServiceInstance != null) {
         record.put("applicationName", node.getServiceInstance.getApplicationName)
         record.put("engineInstance", node.getServiceInstance.getInstance)
       }
-
+      if (null != fixedEngineConnLabel) {
+        record.put("fixedEngineConn", fixedEngineConnLabel.getStringValue)
+      }
       record.put("creator", userCreatorLabel.getCreator)
       record.put("engineType", engineTypeLabel.getEngineType)
       if (node.getNodeResource != null) {
