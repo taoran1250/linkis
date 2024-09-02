@@ -36,6 +36,7 @@ import org.apache.linkis.manager.label.entity.engine.ReuseExclusionLabel
 import org.apache.linkis.manager.label.entity.node.AliasServiceInstanceLabel
 import org.apache.linkis.manager.label.service.{NodeLabelService, UserLabelService}
 import org.apache.linkis.manager.label.utils.{LabelUtil, LabelUtils}
+import org.apache.linkis.manager.persistence.NodeManagerPersistence
 import org.apache.linkis.manager.service.common.label.LabelFilter
 import org.apache.linkis.rpc.Sender
 import org.apache.linkis.rpc.message.annotation.Receiver
@@ -75,6 +76,9 @@ class DefaultEngineReuseService extends AbstractEngineService with EngineReuseSe
 
   @Autowired
   private var labelFilter: LabelFilter = _
+
+  @Autowired
+  private var nodeManagerPersistence: NodeManagerPersistence = _
 
   /**
    *   1. Obtain the EC corresponding to all labels 2. Judging reuse exclusion tags and fixed engine
@@ -172,17 +176,33 @@ class DefaultEngineReuseService extends AbstractEngineService with EngineReuseSe
           labelFilter.choseEngineLabel(labels),
           AMConfiguration.ENGINE_START_MAX_TIME.getValue.toLong
         )
+        val pythonVersion: String = getPythonVersion(engineReuseRequest.getProperties)
 
         // 过滤掉资源不满足的引擎
         engineScoreList = engineScoreList
           .filter(engine => engine.getNodeStatus == NodeStatus.Unlock)
           .filter(engine => {
+            val params: String = engine.getParams
+            val paramsMap: util.Map[String, String] =
+              AMUtils.GSON.fromJson(params, classOf[util.Map[String, String]])
+            val enginePythonVersion: String = getPythonVersion(paramsMap)
+            var pythonVersionMatch: Boolean = true
+            if (
+                StringUtils.isNotBlank(pythonVersion) && StringUtils.isNotBlank(enginePythonVersion)
+            ) {
+              pythonVersionMatch = pythonVersion.equalsIgnoreCase(enginePythonVersion)
+            }
+            if (!pythonVersionMatch) {
+              logger.info(
+                s"will be not reuse ${engine.getServiceInstance}, cause engine python version: $enginePythonVersion , param python version $pythonVersion is not match"
+              )
+            }
             if (engine.getNodeResource.getUsedResource != null) {
               // 引擎资源只有满足需要的资源才复用
-              engine.getNodeResource.getUsedResource >= resource.getMaxResource
+              pythonVersionMatch && engine.getNodeResource.getUsedResource >= resource.getMaxResource
             } else {
               // 引擎正在启动中，比较锁住的资源，最终是否复用沿用之前复用逻辑
-              engine.getNodeResource.getLockedResource >= resource.getMaxResource
+              pythonVersionMatch && engine.getNodeResource.getLockedResource >= resource.getMaxResource
             }
           })
       }
@@ -265,6 +285,19 @@ class DefaultEngineReuseService extends AbstractEngineService with EngineReuseSe
       )
     }
     engine
+  }
+
+  private def getPythonVersion(prop: util.Map[String, String]): String = {
+    var pythonVersion: String = null
+    if (prop == null) {
+      return null
+    }
+    if (prop.containsKey("python.version")) {
+      pythonVersion = prop.get("python.version")
+    } else if (prop.containsKey("spark.python.version")) {
+      pythonVersion = prop.get("spark.python.version")
+    }
+    pythonVersion
   }
 
 }
