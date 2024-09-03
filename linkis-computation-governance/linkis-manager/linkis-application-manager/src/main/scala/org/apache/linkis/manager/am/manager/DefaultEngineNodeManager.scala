@@ -232,7 +232,9 @@ class DefaultEngineNodeManager extends EngineNodeManager with Logging {
       optionRMNode.foreach(rmNode => engineNode.setNodeResource(rmNode.getNodeResource))
 
       val maybeNode: Option[PersistenceNode] =
-        persistenceNodes.asScala.find(_.getInstance.equals(engineNode.getServiceInstance))
+        persistenceNodes.asScala.find(
+          _.getInstance.equals(engineNode.getServiceInstance.getInstance)
+        )
       val persistenceNode: PersistenceNode = maybeNode.get
       if (persistenceNode != null) {
         engineNode.setParams(persistenceNode.getParams)
