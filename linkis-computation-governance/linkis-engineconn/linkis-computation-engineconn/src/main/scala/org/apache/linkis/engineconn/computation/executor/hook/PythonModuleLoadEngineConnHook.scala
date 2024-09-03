@@ -35,16 +35,17 @@ import org.apache.linkis.manager.label.entity.Label
 import org.apache.linkis.manager.label.entity.engine.{CodeLanguageLabel, RunType}
 import org.apache.linkis.manager.label.entity.engine.RunType.RunType
 import org.apache.linkis.rpc.Sender
-import org.apache.linkis.storage.FSFactory
-import org.apache.linkis.storage.fs.FileSystem
 import org.apache.linkis.udf.UDFClientConfiguration
 import org.apache.linkis.udf.api.rpc.{RequestPythonModuleProtocol, ResponsePythonModuleProtocol}
 import org.apache.linkis.udf.entity.PythonModuleInfoVO
 
+import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringUtils
+import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 
 import java.io.{FileOutputStream, InputStream}
+import java.nio.file.Files
 import java.util
 
 import scala.collection.JavaConverters._
@@ -239,25 +240,19 @@ class PythonEngineHook extends PythonModuleLoadEngineConnHook {
     val engineCreationContext: EngineCreationContext =
       EngineConnManager.getEngineConnManager.getEngineConn.getEngineCreationContext
     val user: String = engineCreationContext.getUser
-    val fsPath = new FsPath(path)
-    // val config = HDFSUtils.getConfiguration(HadoopConf.HADOOP_ROOT_USER.getValue)
-    // config.setBoolean("fs.hdfs.impl.disable.cache", true)
-    var fileSystem: Fs = null
-    var outputStream: FileOutputStream = null
-    var destPath: String = null
+
     var loadCode: String = null
-    Utils.tryFinally({
-      fileSystem = FSFactory.getFsByProxyUser(fsPath, user)
-      val stream: InputStream = fileSystem.read(fsPath)
-      destPath = "/tmp/" + user + fsPath.toFile.getName
-      outputStream = new FileOutputStream(destPath)
-      val buffer = new Array[Byte](1024)
-      var bytesRead: Int = 0
-      while ((bytesRead = stream.read(buffer)) != -1) outputStream.write(buffer, 0, bytesRead)
-      outputStream.flush
-      loadCode = s"import sys \n sys.path.append('${destPath}')"
-      logger.info(s"load local python code: ${loadCode}")
-    })()
+    logger.info(s"gen code in constructCode")
+    Utils.tryAndWarn({
+      // 获取FileSystem实例// 获取FileSystem实例
+      val destDir: String = "/tmp/python-module/" + user + "/"
+      val destPath: String = destDir + new java.io.File(path).getName
+      val config: Configuration = HDFSUtils.getConfiguration(HadoopConf.HADOOP_ROOT_USER.getValue)
+      val fs: FileSystem = HDFSUtils.getHDFSUserFileSystem(user, config)
+      fs.copyToLocalFile(new Path(path), new Path("file://" + destPath))
+      loadCode = s"import sys; sys.path.append('${destDir}')"
+      logger.info(s"5 load local python code: ${loadCode}")
+    })
     loadCode
   }
 
