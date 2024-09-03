@@ -210,7 +210,7 @@ class DefaultEngineNodeManager extends EngineNodeManager with Logging {
       val engineNode = new AMEngineNode()
       engineNode.setScore(scoreServiceInstances.getScore)
       engineNode.setServiceInstance(scoreServiceInstances.getServiceInstance)
-      instances.add(scoreServiceInstances.getServiceInstance.toString)
+      instances.add(scoreServiceInstances.getServiceInstance.getInstance)
       engineNode
     }
     // 1. add nodeMetrics 2 add RM info 3 add params
