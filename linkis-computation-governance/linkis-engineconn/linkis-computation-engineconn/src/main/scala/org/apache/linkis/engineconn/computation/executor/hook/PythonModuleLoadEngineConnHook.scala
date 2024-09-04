@@ -20,6 +20,7 @@ package org.apache.linkis.engineconn.computation.executor.hook
 import org.apache.linkis.common.conf.Configuration.IS_VIEW_FS_ENV
 import org.apache.linkis.common.io.{Fs, FsPath}
 import org.apache.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.engineconn.common.conf.EngineConnConf
 import org.apache.linkis.engineconn.common.creation.EngineCreationContext
 import org.apache.linkis.engineconn.common.engineconn.EngineConn
 import org.apache.linkis.engineconn.common.hook.EngineConnHook
@@ -245,13 +246,17 @@ class PythonEngineHook extends PythonModuleLoadEngineConnHook {
     logger.info(s"gen code in constructCode")
     Utils.tryAndWarn({
       // 获取FileSystem实例// 获取FileSystem实例
-      val destDir: String = "/tmp/python-module/" + user + "/"
-      val destPath: String = destDir + new java.io.File(path).getName
+      // 获取引擎临时目录
+      var tmpDir: String = EngineConnConf.getEngineTmpDir
+      if (!tmpDir.endsWith("/")) {
+        tmpDir += "/"
+      }
+      val destPath: String = tmpDir + new java.io.File(path).getName
       val config: Configuration = HDFSUtils.getConfiguration(HadoopConf.HADOOP_ROOT_USER.getValue)
       val fs: FileSystem = HDFSUtils.getHDFSUserFileSystem(user, config)
       fs.copyToLocalFile(new Path(path), new Path("file://" + destPath))
-      loadCode = s"import sys; sys.path.append('${destDir}')"
-      logger.info(s"5 load local python code: ${loadCode}")
+      loadCode = s"import sys; sys.path.append('${tmpDir}')"
+      logger.info(s"5 load local python code: ${loadCode} in path: $destPath")
     })
     loadCode
   }
