@@ -40,13 +40,16 @@ import org.apache.linkis.manager.persistence.NodeManagerPersistence
 import org.apache.linkis.manager.service.common.label.LabelFilter
 import org.apache.linkis.rpc.Sender
 import org.apache.linkis.rpc.message.annotation.Receiver
+
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.exception.ExceptionUtils
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 import java.util
-import java.util.concurrent.{TimeUnit, TimeoutException}
+import java.util.concurrent.{TimeoutException, TimeUnit}
+
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
 
@@ -190,7 +193,8 @@ class DefaultEngineReuseService extends AbstractEngineService with EngineReuseSe
             val enginePythonVersion: String = getPythonVersion(paramsMap)
             var pythonVersionMatch: Boolean = true
             if (
-                StringUtils.isNotBlank(pythonVersion) && StringUtils.isNotBlank(enginePythonVersion) && pythonFlag
+                StringUtils.isNotBlank(pythonVersion) && StringUtils
+                  .isNotBlank(enginePythonVersion) && pythonFlag
             ) {
               pythonVersionMatch = pythonVersion.equalsIgnoreCase(enginePythonVersion)
             }
