@@ -18,7 +18,7 @@
 package org.apache.linkis.manager.am.service.engine
 
 import org.apache.linkis.common.exception.LinkisRetryException
-import org.apache.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.common.utils.{CodeAndRunTypeUtils, Logging, Utils}
 import org.apache.linkis.governance.common.conf.GovernanceCommonConf
 import org.apache.linkis.governance.common.utils.JobUtils
 import org.apache.linkis.manager.am.conf.AMConfiguration
@@ -40,16 +40,13 @@ import org.apache.linkis.manager.persistence.NodeManagerPersistence
 import org.apache.linkis.manager.service.common.label.LabelFilter
 import org.apache.linkis.rpc.Sender
 import org.apache.linkis.rpc.message.annotation.Receiver
-
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.exception.ExceptionUtils
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 import java.util
-import java.util.concurrent.{TimeoutException, TimeUnit}
-
+import java.util.concurrent.{TimeUnit, TimeoutException}
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
 
@@ -178,6 +175,11 @@ class DefaultEngineReuseService extends AbstractEngineService with EngineReuseSe
         )
         val pythonVersion: String = getPythonVersion(engineReuseRequest.getProperties)
 
+        // 只对python相关的引擎做python版本匹配
+        val codeType = LabelUtil.getCodeType(labels)
+        val languageType = CodeAndRunTypeUtils.getLanguageTypeByCodeType(codeType)
+        val pythonFlag: Boolean = languageType == CodeAndRunTypeUtils.LANGUAGE_TYPE_PYTHON
+
         // 过滤掉资源不满足的引擎
         engineScoreList = engineScoreList
           .filter(engine => engine.getNodeStatus == NodeStatus.Unlock)
@@ -188,7 +190,7 @@ class DefaultEngineReuseService extends AbstractEngineService with EngineReuseSe
             val enginePythonVersion: String = getPythonVersion(paramsMap)
             var pythonVersionMatch: Boolean = true
             if (
-                StringUtils.isNotBlank(pythonVersion) && StringUtils.isNotBlank(enginePythonVersion)
+                StringUtils.isNotBlank(pythonVersion) && StringUtils.isNotBlank(enginePythonVersion) && pythonFlag
             ) {
               pythonVersionMatch = pythonVersion.equalsIgnoreCase(enginePythonVersion)
             }
