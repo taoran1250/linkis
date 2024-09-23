@@ -117,8 +117,9 @@ public class LinkisErrorCodeHandler
 
     LOGGER.info("begin to handle logFilePath {}", logFilePath);
     // At the end of the file, write "error code information is being generated for you".
-    try {
-      writeToFile(logFilePath, ERROR_CODE_PRE);
+    try (BufferedWriter bufferedWriter =
+        new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFilePath, true)))) {
+      writeToFile(bufferedWriter, ERROR_CODE_PRE);
     } catch (Exception e) {
       // If there is a write exception, skip this question directly.
       LOGGER.error("Failed to append error code to log file {}", logFilePath, e);

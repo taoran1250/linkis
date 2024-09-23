@@ -846,7 +846,8 @@ public class UDFRestfulApi {
     PrintWriter writer = null;
     InputStream is = null;
     BufferedInputStream fis = null;
-    try (BufferedOutputStream outputStream = new BufferedOutputStream(response.getOutputStream())) {
+    BufferedOutputStream outputStream = null;
+    try {
 
       long udfId = json.get("udfId").longValue();
       String version = json.get("version").textValue();
@@ -867,6 +868,7 @@ public class UDFRestfulApi {
       // filename表示文件的默认名称，因为网络传输只支持URL编码的相关支付，因此需要将文件名URL编码后进行传输,前端收到后需要反编码才能获取到真正的名称
       response.addHeader("Content-Disposition", "attachment;filename=" + downloadVo.getFileName());
       //            response.addHeader("Content-Length", "" + file.length());
+      outputStream = new BufferedOutputStream(response.getOutputStream()); // NOSONAR
       response.setContentType("application/octet-stream");
       byte[] buffer = new byte[1024];
       int hasRead = 0;
