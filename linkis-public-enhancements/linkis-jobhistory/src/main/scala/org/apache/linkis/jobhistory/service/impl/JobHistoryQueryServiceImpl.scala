@@ -384,7 +384,13 @@ class JobHistoryQueryServiceImpl extends JobHistoryQueryService with Logging {
         cacheKey,
         new Callable[Integer] {
           override def call(): Integer = {
-            getCountUndoneTasks(username, creator, sDate, eDate, engineType, startJobId)
+            try {
+              getCountUndoneTasks(username, creator, sDate, eDate, engineType, startJobId)
+            } catch {
+              case e: Exception =>
+                logger.error("Failed to get count undone tasks", e)
+                0
+            }
           }
         }
       )
@@ -399,7 +405,7 @@ class JobHistoryQueryServiceImpl extends JobHistoryQueryService with Logging {
       engineType: String,
       startJobId: lang.Long
   ): Integer = {
-    logger.info("Get count undone Tasks {}, {}, {}", username, creator, engineType)
+    logger.info("Get count undone Tasks {}, {}, {}, {}", username, creator, engineType, startJobId)
     val statusList: util.List[String] = new util.ArrayList[String]()
     statusList.add(TaskStatus.Running.toString)
     statusList.add(TaskStatus.Inited.toString)
@@ -498,6 +504,46 @@ class JobHistoryQueryServiceImpl extends JobHistoryQueryService with Logging {
       username: String
   ): util.List[JobHistory] = {
     jobHistoryMapper.selectJobHistoryByTaskidList(taskidList, username)
+  }
+
+  override def taskDurationTopN(
+      sDate: Date,
+      eDate: Date,
+      username: String,
+      creator: String,
+      engineType: String
+  ): util.List[JobHistory] = {
+    val result = if (StringUtils.isBlank(creator)) {
+      jobHistoryMapper.taskDurationTopN(sDate, eDate, username, engineType)
+    } else if (StringUtils.isBlank(username)) {
+      val fakeLabel = new UserCreatorLabel
+      jobHistoryMapper.taskDurationTopNWithCreatorOnly(
+        username,
+        fakeLabel.getLabelKey,
+        creator,
+        sDate,
+        eDate,
+        engineType
+      )
+    } else {
+      val fakeLabel = new UserCreatorLabel
+      fakeLabel.setUser(username)
+      fakeLabel.setCreator(creator)
+      val userCreator = fakeLabel.getStringValue
+      Utils.tryCatch(fakeLabel.valueCheck(userCreator)) { t =>
+        logger.info("input user or creator is not correct", t)
+        throw t
+      }
+      jobHistoryMapper.taskDurationTopNWithUserCreator(
+        username,
+        fakeLabel.getLabelKey,
+        userCreator,
+        sDate,
+        eDate,
+        engineType
+      )
+    }
+    result
   }
 
 }
