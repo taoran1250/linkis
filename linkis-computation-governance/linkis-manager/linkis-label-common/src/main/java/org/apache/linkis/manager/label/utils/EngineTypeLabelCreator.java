@@ -51,16 +51,13 @@ public class EngineTypeLabelCreator {
       defaultVersion.put(
           EngineType.REPL().toString(), LabelCommonConfig.REPL_ENGINE_VERSION.getValue());
       defaultVersion.put(
-          EngineType.IO_ENGINE_FILE().toString(),
-          LabelCommonConfig.FILE_ENGINE_VERSION.getValue());
+          EngineType.IO_ENGINE_FILE().toString(), LabelCommonConfig.FILE_ENGINE_VERSION.getValue());
       defaultVersion.put(
-          EngineType.IO_ENGINE_HDFS().toString(),
-          LabelCommonConfig.HDFS_ENGINE_VERSION.getValue());
+          EngineType.IO_ENGINE_HDFS().toString(), LabelCommonConfig.HDFS_ENGINE_VERSION.getValue());
       defaultVersion.put(
           EngineType.JDBC().toString(), LabelCommonConfig.JDBC_ENGINE_VERSION.getValue());
       defaultVersion.put(
-          EngineType.PIPELINE().toString(),
-          LabelCommonConfig.PIPELINE_ENGINE_VERSION.getValue());
+          EngineType.PIPELINE().toString(), LabelCommonConfig.PIPELINE_ENGINE_VERSION.getValue());
       defaultVersion.put(
           EngineType.SHELL().toString(), LabelCommonConfig.SHELL_ENGINE_VERSION.getValue());
       defaultVersion.put(
@@ -84,8 +81,7 @@ public class EngineTypeLabelCreator {
           EngineType.OPENLOOKENG().toString(),
           LabelCommonConfig.OPENLOOKENG_ENGINE_VERSION.getValue());
       defaultVersion.put(
-          EngineType.TRINO().toString(),
-          LabelCommonConfig.TRINO_ENGINE_CONN_VERSION.getValue());
+          EngineType.TRINO().toString(), LabelCommonConfig.TRINO_ENGINE_CONN_VERSION.getValue());
       defaultVersion.put(
           EngineType.ELASTICSEARCH().toString(),
           LabelCommonConfig.ELASTICSEARCH_ENGINE_VERSION.getValue());

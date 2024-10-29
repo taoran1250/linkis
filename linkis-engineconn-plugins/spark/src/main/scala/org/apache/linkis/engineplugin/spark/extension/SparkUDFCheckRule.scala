@@ -15,12 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.linkis.monitor.request
+package org.apache.linkis.engineplugin.spark.extension
 
-trait UserAction extends org.apache.linkis.httpclient.request.UserAction {
-  private var user: String = _
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
+import org.apache.spark.sql.catalyst.rules.Rule
 
-  override def setUser(user: String): Unit = this.user = user
+case class SparkUDFCheckRule(sparkSession: SparkSession) extends Rule[LogicalPlan] {
 
-  override def getUser: String = user
+  override def apply(plan: LogicalPlan): LogicalPlan = {
+    plan
+  }
+
 }

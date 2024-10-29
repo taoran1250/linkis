@@ -44,6 +44,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 
 import java.util
+import java.util.{Collections, Comparator}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -67,6 +68,15 @@ abstract class PythonModuleLoad extends Logging {
       .ask(RequestPythonModuleProtocol(userName, engineType))
       .asInstanceOf[ResponsePythonModuleProtocol]
       .getModulesInfo()
+    // 使用Collections.sort()和Comparator进行排序// 使用Collections.sort()和Comparator进行排序
+
+    Collections.sort(
+      infoList,
+      new Comparator[PythonModuleInfoVO]() {
+        override def compare(o1: PythonModuleInfoVO, o2: PythonModuleInfoVO): Int =
+          Integer.compare(o1.getId.toInt, o1.getId.toInt)
+      }
+    )
     infoList
   }
 

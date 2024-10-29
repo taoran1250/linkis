@@ -15,17 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.linkis.manager.service.common.label
+package org.apache.linkis.monitor.response
 
-import org.apache.linkis.manager.label.entity.Label
+import org.apache.linkis.httpclient.dws.annotation.DWSHttpMessageResult
+import org.apache.linkis.httpclient.dws.response.DWSResult
 
 import java.util
 
-trait LabelChecker {
+import scala.beans.BeanProperty
 
-  def checkEngineLabel(labelList: util.List[Label[_]]): Boolean
+@DWSHttpMessageResult("/api/rest_j/v\\d+/configuration/keyvalue")
+class KeyvalueResult extends DWSResult {
 
-  def checkEMLabel(labelList: util.List[Label[_]]): Boolean
+  @BeanProperty
+  var configValues: util.ArrayList[util.Map[String, AnyRef]] = _
 
-  def checkCorrespondingLabel(labelList: util.List[Label[_]], clazz: Class[_]*): Boolean
+  @BeanProperty
+  var totalPage: Int = _
+
 }
