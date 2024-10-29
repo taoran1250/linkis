@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 public class HBaseShellSessionManager {
   private static final Logger LOG = LoggerFactory.getLogger(HBaseShellSessionManager.class);
   private final ConcurrentHashMap<String, HBaseShellSession> shellSessionMap;
-  private static HBaseShellSessionManager instance = null;
+  private static volatile HBaseShellSessionManager instance = null;
 
   private final ReentrantLock lock = new ReentrantLock();
 
@@ -37,9 +37,13 @@ public class HBaseShellSessionManager {
     shellSessionMap = new ConcurrentHashMap<>();
   }
 
-  public static synchronized HBaseShellSessionManager getInstance() {
-    if (instance == null) {
-      instance = new HBaseShellSessionManager();
+  public static HBaseShellSessionManager getInstance() {
+    if (instance == null) { // NOSONAR
+      synchronized (HBaseShellSessionManager.class) {
+        if (instance == null) {
+          instance = new HBaseShellSessionManager();
+        }
+      }
     }
     return instance;
   }

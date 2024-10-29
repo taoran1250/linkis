@@ -24,10 +24,14 @@ public class ContextClientListenerManager {
 
   private static ContextClientListenerBus<ContextClientListener, Event> contextClientListenerBus;
 
-  public static synchronized ContextClientListenerBus<ContextClientListener, Event>
-      getContextClientListenerBus() {
-    if (contextClientListenerBus == null) {
-      contextClientListenerBus = new ContextClientListenerBus<ContextClientListener, Event>();
+  public static ContextClientListenerBus<ContextClientListener, Event>
+  getContextClientListenerBus() {
+    if (contextClientListenerBus == null) { // NOSONAR
+      synchronized (ContextClientListenerManager.class) {
+        if (contextClientListenerBus == null) {
+          contextClientListenerBus = new ContextClientListenerBus<ContextClientListener, Event>();
+        }
+      }
     }
     return contextClientListenerBus;
   }

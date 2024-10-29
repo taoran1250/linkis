@@ -62,9 +62,13 @@ public class LinkisErrorCodeHandler
           threadFactory,
           new ThreadPoolExecutor.AbortPolicy());
 
-  public static synchronized LinkisErrorCodeHandler getInstance() {
-    if (null == linkisErrorCodeHandler) {
-      linkisErrorCodeHandler = new LinkisErrorCodeHandler();
+  public static LinkisErrorCodeHandler getInstance() {
+    if (null == linkisErrorCodeHandler) { // NOSONAR
+      synchronized (LinkisErrorCodeHandler.class) {
+        if (null == linkisErrorCodeHandler) {
+          linkisErrorCodeHandler = new LinkisErrorCodeHandler();
+        }
+      }
     }
     return linkisErrorCodeHandler;
   }

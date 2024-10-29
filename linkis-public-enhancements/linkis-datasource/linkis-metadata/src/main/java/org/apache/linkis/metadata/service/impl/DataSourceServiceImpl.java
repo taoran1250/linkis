@@ -307,10 +307,14 @@ public class DataSourceServiceImpl implements DataSourceService {
     }
   }
 
-  private synchronized FileSystem getRootHdfs() {
-    if (rootHdfs == null) {
-      rootHdfs = HDFSUtils.getHDFSRootUserFileSystem();
-      KerberosUtils.startKerberosRefreshThread();
+  private FileSystem getRootHdfs() {
+    if (rootHdfs == null) { // NOSONAR
+      synchronized (this) {
+        if (rootHdfs == null) {
+          rootHdfs = HDFSUtils.getHDFSRootUserFileSystem();
+          KerberosUtils.startKerberosRefreshThread();
+        }
+      }
     }
     return rootHdfs;
   }

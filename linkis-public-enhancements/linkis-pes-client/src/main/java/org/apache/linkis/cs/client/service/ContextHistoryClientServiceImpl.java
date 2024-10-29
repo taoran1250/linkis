@@ -43,9 +43,13 @@ public class ContextHistoryClientServiceImpl implements ContextHistoryClientServ
 
   private ContextHistoryClientServiceImpl() {}
 
-  public static synchronized ContextHistoryClientService getInstance() {
-    if (null == contextHistoryClientService) {
-      contextHistoryClientService = new ContextHistoryClientServiceImpl();
+  public static ContextHistoryClientService getInstance() {
+    if (null == contextHistoryClientService) { // NOSONAR
+      synchronized (ContextHistoryClientServiceImpl.class) {
+        if (null == contextHistoryClientService) {
+          contextHistoryClientService = new ContextHistoryClientServiceImpl();
+        }
+      }
     }
     return contextHistoryClientService;
   }

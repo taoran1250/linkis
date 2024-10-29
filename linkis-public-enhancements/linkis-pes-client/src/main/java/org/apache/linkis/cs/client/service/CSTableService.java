@@ -53,9 +53,13 @@ public class CSTableService implements TableService {
 
   private CSTableService() {}
 
-  public static synchronized CSTableService getInstance() {
-    if (null == csTableService) {
-      csTableService = new CSTableService();
+  public static CSTableService getInstance() {
+    if (null == csTableService) { // NOSONAR
+      synchronized (CSTableService.class) {
+        if (null == csTableService) {
+          csTableService = new CSTableService();
+        }
+      }
     }
     return csTableService;
   }

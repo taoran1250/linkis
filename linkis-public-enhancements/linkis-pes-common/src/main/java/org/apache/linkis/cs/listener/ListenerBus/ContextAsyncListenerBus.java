@@ -42,10 +42,14 @@ public class ContextAsyncListenerBus<L extends ContextAsyncEventListener, E exte
 
   private static ContextAsyncListenerBus contextAsyncListenerBus = null;
 
-  public static synchronized ContextAsyncListenerBus getInstance() {
-    if (contextAsyncListenerBus == null) {
-      contextAsyncListenerBus = new ContextAsyncListenerBus();
-      contextAsyncListenerBus.start();
+  public static ContextAsyncListenerBus getInstance() {
+    if (contextAsyncListenerBus == null) { // NOSONAR
+      synchronized (ContextAsyncListenerBus.class) {
+        if (contextAsyncListenerBus == null) {
+          contextAsyncListenerBus = new ContextAsyncListenerBus();
+          contextAsyncListenerBus.start();
+        }
+      }
     }
     return contextAsyncListenerBus;
   }

@@ -82,9 +82,13 @@ public class LinkisErrorCodeSynchronizer {
             TimeUnit.HOURS);
   }
 
-  public static synchronized LinkisErrorCodeSynchronizer getInstance() {
-    if (linkisErrorCodeSynchronizer == null) {
-      linkisErrorCodeSynchronizer = new LinkisErrorCodeSynchronizer();
+  public static LinkisErrorCodeSynchronizer getInstance() {
+    if (linkisErrorCodeSynchronizer == null) { // NOSONAR
+      synchronized (LinkisErrorCodeSynchronizer.class) {
+        if (linkisErrorCodeSynchronizer == null) {
+          linkisErrorCodeSynchronizer = new LinkisErrorCodeSynchronizer();
+        }
+      }
     }
     return linkisErrorCodeSynchronizer;
   }

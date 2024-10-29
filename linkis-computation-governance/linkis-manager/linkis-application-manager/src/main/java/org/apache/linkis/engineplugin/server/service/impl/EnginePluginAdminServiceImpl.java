@@ -126,7 +126,6 @@ public class EnginePluginAdminServiceImpl implements EnginePluginAdminService {
       while ((len = in.read(buffer)) != -1) {
         out.write(buffer, 0, len);
       }
-      out.close();
       in.close();
     } catch (Exception e) {
       log.info("file {} upload fail", mfile.getOriginalFilename());

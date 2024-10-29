@@ -41,21 +41,25 @@ public class LabelBuilderFactoryContext {
     LabelBuilderFactoryContext.clazz = clazz;
   }
 
-  public static synchronized LabelBuilderFactory getLabelBuilderFactory() {
+  public static LabelBuilderFactory getLabelBuilderFactory() {
     if (labelBuilderFactory == null) {
-      String className = LabelCommonConfig.LABEL_FACTORY_CLASS.acquireNew();
-      if (clazz == StdLabelBuilderFactory.class && StringUtils.isNotBlank(className)) {
-        try {
-          clazz = (Class<? extends LabelBuilderFactory>) ClassUtils.getClass(className);
-        } catch (ClassNotFoundException e) {
-          throw new RuntimeException("find class + " + className + " failed!", e);
+      synchronized (LabelBuilderFactoryContext.class) { // NOSONAR
+        if (labelBuilderFactory == null) {
+          String className = LabelCommonConfig.LABEL_FACTORY_CLASS.acquireNew();
+          if (clazz == StdLabelBuilderFactory.class && StringUtils.isNotBlank(className)) {
+            try {
+              clazz = (Class<? extends LabelBuilderFactory>) ClassUtils.getClass(className);
+            } catch (ClassNotFoundException e) {
+              throw new RuntimeException("find class + " + className + " failed!", e);
+            }
+          }
+          try {
+            labelBuilderFactory = clazz.newInstance();
+            labelBuilderInitRegister(labelBuilderFactory);
+          } catch (Throwable e) {
+            throw new RuntimeException("initial class + " + className + " failed!", e);
+          }
         }
-      }
-      try {
-        labelBuilderFactory = clazz.newInstance();
-        labelBuilderInitRegister(labelBuilderFactory);
-      } catch (Throwable e) {
-        throw new RuntimeException("initial class + " + className + " failed!", e);
       }
     }
     return labelBuilderFactory;

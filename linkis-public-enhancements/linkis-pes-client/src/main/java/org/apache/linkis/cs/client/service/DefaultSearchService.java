@@ -185,9 +185,13 @@ public class DefaultSearchService implements SearchService {
     return contextKeyValueList;
   }
 
-  public static synchronized SearchService getInstance() {
-    if (null == searchService) {
-      searchService = new DefaultSearchService();
+  public static SearchService getInstance() {
+    if (null == searchService) { // SONAR
+      synchronized (DefaultSearchService.class) {
+        if (null == searchService) {
+          searchService = new DefaultSearchService();
+        }
+      }
     }
     return searchService;
   }

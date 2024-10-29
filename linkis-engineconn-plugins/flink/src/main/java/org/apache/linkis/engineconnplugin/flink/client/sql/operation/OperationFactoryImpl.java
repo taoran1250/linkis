@@ -122,9 +122,14 @@ public class OperationFactoryImpl implements OperationFactory {
 
   private static OperationFactory operationFactory;
 
-  public static synchronized OperationFactory getInstance() {
-    if (operationFactory == null) {
-      operationFactory = ClassUtil.getInstance(OperationFactory.class, new OperationFactoryImpl());
+  public static OperationFactory getInstance() {
+    if (operationFactory == null) { // NOSONAR
+      synchronized (OperationFactory.class) {
+        if (operationFactory == null) {
+          operationFactory =
+                  ClassUtil.getInstance(OperationFactory.class, new OperationFactoryImpl());
+        }
+      }
     }
     return operationFactory;
   }
