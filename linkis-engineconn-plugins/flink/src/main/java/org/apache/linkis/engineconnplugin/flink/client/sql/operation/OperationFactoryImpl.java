@@ -127,7 +127,7 @@ public class OperationFactoryImpl implements OperationFactory {
       synchronized (OperationFactory.class) {
         if (operationFactory == null) {
           operationFactory =
-                  ClassUtil.getInstance(OperationFactory.class, new OperationFactoryImpl());
+              ClassUtil.getInstance(OperationFactory.class, new OperationFactoryImpl());
         }
       }
     }

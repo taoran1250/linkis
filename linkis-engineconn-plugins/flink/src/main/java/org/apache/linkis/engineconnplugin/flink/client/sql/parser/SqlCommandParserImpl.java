@@ -232,7 +232,7 @@ public class SqlCommandParserImpl implements SqlCommandParser {
       synchronized (OperationFactory.class) {
         if (sqlCommandParser == null) {
           sqlCommandParser =
-                  ClassUtil.getInstance(SqlCommandParser.class, new SqlCommandParserImpl());
+              ClassUtil.getInstance(SqlCommandParser.class, new SqlCommandParserImpl());
         }
       }
     }

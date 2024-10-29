@@ -45,7 +45,7 @@ public class HBaseShellCommands {
         if (commandsSet == null) {
           Set<String> sortedSet = new TreeSet<>();
           URL commandFilesUrl =
-                  HBaseShellCommands.class.getClassLoader().getResource(COMMANDS_PATH);
+              HBaseShellCommands.class.getClassLoader().getResource(COMMANDS_PATH);
           if (commandFilesUrl == null) {
             throw new IOException("The command files path is null!");
           }
@@ -54,9 +54,9 @@ public class HBaseShellCommands {
           if (!commandFile.exists()) {
             LOG.warn("The command files path is not exists, starting read file from jar.");
             String jarPath =
-                    commandFilesUrl
-                            .toString()
-                            .substring(0, commandFilesUrl.toString().indexOf("!/") + 2);
+                commandFilesUrl
+                    .toString()
+                    .substring(0, commandFilesUrl.toString().indexOf("!/") + 2);
             LOG.info("The path in jar is " + jarPath);
             URL jarUrl = new URL(jarPath);
             JarURLConnection jarCon = (JarURLConnection) jarUrl.openConnection();
@@ -67,7 +67,7 @@ public class HBaseShellCommands {
               String name = entry.getName();
               if (!entry.isDirectory() && name.startsWith(COMMANDS_PATH)) {
                 String commandName =
-                        name.substring(name.lastIndexOf(File.separator) + 1, name.lastIndexOf(".rb"));
+                    name.substring(name.lastIndexOf(File.separator) + 1, name.lastIndexOf(".rb"));
                 sortedSet.add(commandName);
               }
             }

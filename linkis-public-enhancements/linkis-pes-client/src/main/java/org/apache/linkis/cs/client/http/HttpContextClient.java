@@ -91,7 +91,7 @@ public class HttpContextClient extends AbstractContextClient {
   }
 
   public static HttpContextClient getInstance(ContextClientConfig contextClientConfig) {
-    if (httpContextClient == null) { //NOSONAR
+    if (httpContextClient == null) { // NOSONAR
       synchronized (HttpContextClient.class) {
         if (httpContextClient == null) {
           httpContextClient = new HttpContextClient(contextClientConfig);
